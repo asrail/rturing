@@ -11,7 +11,11 @@ end
 
 task :doc do
   require 'rdoc/rdoc'
-  RDoc::RDoc.new.document([])
+  RDoc::RDoc.new.document(
+    [ '--charset', 'utf-8' ] +
+    Dir.glob('**/README') +
+    Dir.glob('**/*.rb')
+  )
 end
 
 Rake::PackageTask.new(PACKAGE, VERSION) do |p|

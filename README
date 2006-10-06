@@ -1,0 +1,34 @@
+= rturing: a Turing machine simulator written in Ruby
+
+rturing simulates Turing machines designed to replace the dead and almost
+uncompilable gturing[http://freshmeat.net/projects/gturing/].
+
+_TODO_: _write_ _a_ _little_ _bit_ _about_ _Turing_ _machines_ _and_
+_gturing_.
+
+== Getting started
+
+_To_ _be_ _written_.
+
+== Copyright
+
+rturing - a Turing Machine simulator written in Ruby
+Copyright (C) 2006 Antonio S. de A. Terceiro <terceiro@dcc.ufba.br>
+
+gturing's input machines are Copyright &copy; Arturo Espinosa
+<arturo@ximian.com> and Germán Poo-Caamaño <gpoo@ubiobio.cl>. Please see 
+link:files/machines/README.html .
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.

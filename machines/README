@@ -1,0 +1,26 @@
+== Sample files
+
+rturing was develop to replace gturing, thus it was designed to read and write
+the same file format of gturing. This way, we distribute some gturing's ones
+together with new ones written by ourselves.
+
+The following files were taken from gturing:
+
+* <tt>3ones2zeroes.tur</tt>
+* <tt>addbin.tur</tt>
+* <tt>add.tur</tt>
+* <tt>bb2.tur</tt>
+* <tt>bb3.tur</tt>
+* <tt>bb5.tur</tt>
+* <tt>bin2dec_shift.tur</tt>
+* <tt>bin2dec.tur</tt>
+* <tt>dashnumbers.tur</tt>
+* <tt>dec2bin_shift.tur</tt>
+* <tt>dec2bin.tur</tt>
+* <tt>sort.tur</tt>
+* <tt>subst.tur</tt>
+
+gturing's input machines are Copyright &copy; Arturo Espinosa
+<arturo@ximian.com> and Germán Poo-Caamaño <gpoo@ubiobio.cl>.
+
+All other distributed input machines are copyrighted by the authors of rturing.
