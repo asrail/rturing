@@ -11,6 +11,5 @@ end
 
 machine = Turing::Machine.new(ARGV[0])
 machine.add_observer(Printer.new)
-puts machine
 machine.setup(ARGV[1])
 machine.process

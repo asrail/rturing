@@ -8,7 +8,39 @@ _gturing_.
 
 == Getting started
 
-_To_ _be_ _written_.
+This section explains how to use rturing. We assume we can use any plain text
+editor to write the Turing machines that will be simulated by rturing. Please
+see Turing::Machine for details in the input file format.
+
+=== Command-line interface
+
+You must invoke rturing passing to it two arguments:
+
+* first, the filename of a input Turing machine in the proper format.
+* the contents of the input tape that will be processed by the machine.
+
+rturing will read the machine's transition function from the informed file and
+will process your input tape. Each step of the evaluation process is shown in
+the terminal, by printing both the tape's state and the position of the
+machine's head.
+
+Example:
+
+ $ rturing machines/add.tur 01010
+ 01010
+ ^
+ 01010
+  ^
+ 01010
+   ^
+ 01110
+    ^
+ 01110
+     ^
+ 0111_
+    ^
+ 0110_
+     ^
 
 == Copyright
 

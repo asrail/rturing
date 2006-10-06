@@ -1,27 +1,27 @@
-# This file
-
+# == File input and output
+#
+# Turing::Machine provides two methods +read+ and +write+. Both take a
+# filename as parameter, and read (or write) the machine's states from (or
+# to) a file.
+#
+# Example:
+#
+#   machine = Machine.new
+#   machine.read('myfile.tur') # reads states from file +myfile.tur+
+#   machine.states.push(
+#     :current_state => 0,
+#     :read_symbol => '1',
+#     :written_symbol => '0',
+#     :direction => 'r',
+#     :new_state => 1,
+#     :comment => 'when in state 0 reading 1, write a 0, go right and change to state 1'
+#   )
+#   machine.write('mynewfile.tur')
+#
+# See Turing::Machine's <tt>read</tt> and <tt>write</tt> methods for details. 
 
 module Turing #:nodoc:
 
-  # == File input and output
-  #
-  # Turing::Machine provides two methods +read+ and +write+. Both take a
-  # filename as parameter, and read (or write) the machine's states from (or
-  # to) a file.
-  #
-  # Example:
-  #
-  #   machine = Machine.new
-  #   machine.read('myfile.tur') # reads states from file +myfile.tur+
-  #   machine.states.push(
-  #     :current_state => 0,
-  #     :read_symbol => '1',
-  #     :written_symbol => '0',
-  #     :direction => 'r',
-  #     :new_state => 1,
-  #     :comment => 'when in state 0 reading 1, write a 0, go right and change to state 1'
-  #   )
-  #   machine.write('mynewfile.tur')
   class Machine
 
     attr_accessor :states
@@ -54,8 +54,8 @@ module Turing #:nodoc:
       }
     end
 
-    # writes the states to file named by +filename+, in the format expected by
-    # #read.
+    # writes the states to a file named by +filename+, in the format expected
+    # by #read.
     def write(filename)
     end
 

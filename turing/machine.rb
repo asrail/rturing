@@ -1,12 +1,15 @@
 # This files implements the logic that drives the Turing machine into the
 # Turing::Machine class.
 
-
 require 'turing/io'
 require 'observer'
 
 module Turing #:nodoc:
 
+  # == Theory of operation
+  #
+  # _To_ _be_ _written_.
+  #
   class Machine
 
     include Observable
