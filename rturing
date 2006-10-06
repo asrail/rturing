@@ -1,0 +1,16 @@
+#!/usr/bin/ruby
+
+require 'turing/machine'
+
+class Printer
+  def update(machine)
+    puts machine.tape.join('')
+    puts ' ' * (machine.tape_position) + '^'
+  end
+end
+
+machine = Turing::Machine.new(ARGV[0])
+machine.add_observer(Printer.new)
+puts machine
+machine.setup(ARGV[1])
+machine.process

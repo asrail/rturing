@@ -1,0 +1,87 @@
+# Muhammad Sajid Vayalil Koroth <sajidvk@hotmail.com>
+#
+# dec2bin.tur: This program converts a dec number to binary
+#
+# Tape format
+#
+#           decimalnumber 
+#
+#	final
+#
+#	    binarynumber<blanks>
+#
+# 	what it does?
+#
+#           at each step moves to right, divides decimal number by 2
+#           remembers the reminder. if the decimal number is zero,
+#           wipes it out from tape and halts.
+#           after dividing by two, moves to the leftmost and prepends
+#           the reminder digit (0/1) to the binary number then moves
+#           to the right of the binary number and REPEAT!!!
+
+0 0 0 r 0 STATE 0 - check if result is zero divide first nonzero digit
+0 1 0 r 2
+0 3 1 r 2
+0 5 2 r 2
+0 7 3 r 2
+0 9 4 r 2
+0 2 1 r 3
+0 4 2 r 3
+0 6 3 r 3
+0 8 4 r 3
+0 _ _ l 1
+1 0 _ l 1 STATE 1 - decimal number is zero, wipe it out.
+1 _ _ l 9 STATE 9 - HALT
+2 0 5 r 3 STATE 2 - divide digit and add reminder from previous digit
+2 2 6 r 3
+2 4 7 r 3
+2 6 8 r 3
+2 8 9 r 3
+2 1 5 r 2
+2 3 6 r 2
+2 5 7 r 2
+2 7 8 r 2
+2 9 9 r 2
+2 _ _ l 4
+3 0 0 r 3 STATE 3 - divide digit (no reminder from previous digit)
+3 2 1 r 3
+3 4 2 r 3
+3 6 3 r 3
+3 8 4 r 3
+3 1 0 r 2
+3 3 1 r 2
+3 5 2 r 2
+3 7 3 r 2
+3 9 4 r 2
+3 _ _ l 5
+4 0 0 l 4 STATE 4 - move to the left of decimal number (there is a reminder)
+4 1 1 l 4
+4 2 2 l 4
+4 3 3 l 4
+4 4 4 l 4
+4 5 5 l 4
+4 6 6 l 4
+4 7 7 l 4
+4 8 8 l 4
+4 9 9 l 4
+4 _ _ l 6
+5 0 0 l 5 STATE 5 - move to the left of decimal number (there is no reminder)
+5 1 1 l 5
+5 2 2 l 5
+5 3 3 l 5
+5 4 4 l 5
+5 5 5 l 5
+5 6 6 l 5
+5 7 7 l 5
+5 8 8 l 5
+5 9 9 l 5
+5 _ _ l 7
+6 0 0 l 6 STATE 6 - move to the left of binary and prepend a 1
+6 1 1 l 6 
+6 _ 1 r 8
+7 0 0 l 7 STATE 7 - move to the left of binary and prepend a 0
+7 1 1 l 7
+7 _ 0 r 8
+8 0 0 r 8 STATE 8 - move to the right of binary and number and REPEAT
+8 1 1 r 8
+8 _ _ r 0

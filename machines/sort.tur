@@ -1,0 +1,19 @@
+# Mads Sejersen <Psyco@Mailme.dk>
+#
+# Sorts a sequence of 1's and 0's, with 1's on the right
+# Tape format: any sequence of 1's and 0's
+
+0 1 1 r 0  Go right until we find 0
+0 0 0 r 1  if we find 0 then goto 1 or else we quit 
+1 1 1 r 1  Do nothing until we reach the end
+1 0 0 r 1
+1 _ 1 l 2  Here is the end. Append 1 and goto 2
+2 1 1 l 2  Move left until we reach the start
+2 0 0 l 2 
+2 _ _ r 3  Here is the start
+3 0 _ r 4  Remove the first 0
+3 1 _ r 0  if the first one is 1 replace it with 0
+4 0 0 r 4  Go right until we find 1
+4 1 0 r 0  and replace it with 0
+
+I don't really know how, but it works
