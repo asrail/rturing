@@ -40,12 +40,25 @@ module Turing #:nodoc:
       tape[tape_position] = symbol
     end
 
+    def go_left
+      self.tape_position = self.tape_position - 1 unless (self.tape_position == 0)
+    end
+
+    def go_right
+      self.tape_position = self.tape_position + 1
+    end
+
     def step
       rule = self.find_rule(self.current_state, self.current_symbol)
       if rule
         self.current_state = rule[:new_state] 
         self.current_symbol = rule[:written_symbol]
-        self.tape_position = (rule[:direction] == 'l') ? (tape_position-1) : (tape_position+1)
+        case rule[:direction]
+          when 'l'
+            self.go_left
+          when 'r'
+            self.go_right
+        end
       end
     end
 
