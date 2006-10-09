@@ -47,7 +47,7 @@ Example:
 rturing - a Turing Machine simulator written in Ruby
 Copyright (C) 2006 Antonio S. de A. Terceiro <terceiro@dcc.ufba.br>
 
-gturing's input machines are Copyright &copy; Arturo Espinosa
+gturing's input machines are Copyright (C) Arturo Espinosa
 <arturo@ximian.com> and Germán Poo-Caamaño <gpoo@ubiobio.cl>. Please see 
 link:files/machines/README.html .
 
