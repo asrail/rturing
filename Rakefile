@@ -19,7 +19,7 @@ task :doc do
   )
 end
 
-Rake::PackageTask.new(PACKAGE, VERSION) do |p|
+Rake::PackageTask.new(PACKAGE, RTURING_VERSION) do |p|
   p.need_tar = true
   p.package_files.include('turing/*.rb')
   p.package_files.include('rturing')
@@ -29,4 +29,8 @@ end
 task :clean do
   Dir.rm_rf('doc')
   Dir.rm_rf('pkg')
+end
+
+task :tagrelease do
+  system("svn copy https://intranet.dcc.ufba.br/svn/rturing/trunk https://intranet.dcc.ufba.br/svn/rturing/tags/#{RTURING_VERSION}")
 end
