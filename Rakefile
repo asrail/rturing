@@ -20,15 +20,17 @@ task :doc do
 end
 
 Rake::PackageTask.new(PACKAGE, RTURING_VERSION) do |p|
-  p.need_tar = true
-  p.package_files.include('turing/*.rb')
+  p.need_tar_gz = true
+  p.package_files.include('turing/*')
   p.package_files.include('rturing')
   p.package_files.include('machines/*')
+  p.package_files.include('Rakefile')
+  p.package_files.include('README')
+  p.package_files.include('tests/*')
 end
 
-task :clean do
+task :clean => [ :clobber_package ] do
   Dir.rm_rf('doc')
-  Dir.rm_rf('pkg')
 end
 
 task :tagrelease do
