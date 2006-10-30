@@ -1,7 +1,7 @@
 require 'rake/packagetask'
 
 PACKAGE = 'rturing'
-RTURING_VERSION = '0.0.1'
+RTURING_VERSION = '0.0.2'
 
 task :default do
   Dir.glob('tests/*').each { |test|
