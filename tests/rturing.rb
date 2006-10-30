@@ -16,12 +16,13 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
     machine.setup('1110111')
     machine.process
     assert_equal(['0', '0', '0', '0', '0', '0', '0' ], machine.tape)
+    assert(machine.halted)
   end
 
   def test_empty
     machine = Turing::Machine.new("machines/empty.tur")
     machine.setup('0')
-    assert_equal([], machine.states)
+    assert_equal(1, machine.machines.size)
     assert(machine.halted)
   end
 
@@ -48,5 +49,4 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
     machine.step
     assert(!machine.halted)
   end
-
 end
