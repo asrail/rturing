@@ -1,7 +1,6 @@
 require 'rake/packagetask'
 
 PACKAGE = 'rturing'
-RTURING_VERSION = '0.0.2'
 
 task :default do
   Dir.glob('tests/*').each { |test|
@@ -33,6 +32,11 @@ task :clean => [ :clobber_package ] do
   Dir.rm_rf('doc')
 end
 
-task :tagrelease do
-  system("svn copy https://intranet.dcc.ufba.br/svn/rturing/trunk https://intranet.dcc.ufba.br/svn/rturing/tags/#{RTURING_VERSION}")
+
+task :tag do
+  begin
+    system("svn copy https://intranet.dcc.ufba.br/svn/rturing/trunk https://intranet.dcc.ufba.br/svn/rturing/tags/${version}")
+  rescue
+    puts "Favor especificar version=VERSAO_DESEJADA na linha de comando."
+  end
 end
