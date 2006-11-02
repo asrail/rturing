@@ -76,8 +76,8 @@ class JanelaPrincipal < Gtk::Window
       quit
     }
 
-    @border_width = 10
-    @window_position = POS_CENTER
+    self.border_width = 1
+    self.window_position = POS_CENTER
 
     @maquina = Turing::Machine.new
     @maquina.setup("Bem vindo ao rturing.")
