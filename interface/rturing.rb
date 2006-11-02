@@ -18,7 +18,7 @@ class Buttons < Gtk::HBox
 end
 
 class Menus < Gtk::MenuBar
-  attr_accessor :menus, :file, :help
+  attr_accessor :menus, :file, :help, :about
   def initialize(window)
     super()
     @window = window
@@ -26,8 +26,14 @@ class Menus < Gtk::MenuBar
       [:file, [:open, :quit]], 
       [:edit, [:tape]], 
       [:help, [:about]]]
+    mnemonics = {
+      :open => [Gdk::Keyval::GDK_O, Gdk::Window::CONTROL_MASK],
+      :tape  => [Gdk::Keyval::GDK_E, Gdk::Window::CONTROL_MASK],
+      :about => [Gdk::Keyval::GDK_F1, 0],
+      :quit => [Gdk::Keyval::GDK_Q,Gdk::Window::CONTROL_MASK]
+    }
     submenus.each {|item,submenu|
-     menuItem(item,submenu)
+      menuItem(item,mnemonics,submenu)
     }
   end
   
@@ -47,7 +53,7 @@ class Menus < Gtk::MenuBar
     @window.choose_tape
   end
 
-  def menuItem(nome,submenu=nil)
+  def menuItem(nome,mnemonics,submenu=nil)
     nome = Gtk::MenuItem.new("_" + nome.to_s.capitalize)
     if submenu
       menu = Gtk::Menu.new
@@ -56,6 +62,10 @@ class Menus < Gtk::MenuBar
         item.signal_connect("activate") {
           self.send(sub)
         }
+        if mnemonics.key?sub
+          item.add_accelerator("activate", @window.ag, mnemonics[sub][0], mnemonics[sub][1],
+                               Gtk::ACCEL_VISIBLE)
+        end
         menu.append(item)
       }
     end
@@ -66,6 +76,8 @@ class Menus < Gtk::MenuBar
 end
 
 class JanelaPrincipal < Gtk::Window
+  attr_accessor :ag
+
   def initialize
     super
     @title = "RTuring"
@@ -79,27 +91,8 @@ class JanelaPrincipal < Gtk::Window
     self.border_width = 1
     self.window_position = POS_CENTER
 
-    ag=Gtk::AccelGroup.new
-
-    ag = Gtk::AccelGroup.new
-    ag.connect(Gdk::Keyval::GDK_O, Gdk::Window::CONTROL_MASK,
-               Gtk::ACCEL_VISIBLE) {
-      open_file
-    }
-    ag.connect(Gdk::Keyval::GDK_E, Gdk::Window::CONTROL_MASK,
-               Gtk::ACCEL_VISIBLE) {
-      choose_tape
-    }
-    ag.connect(Gdk::Keyval::GDK_F1, nil,
-               Gtk::ACCEL_VISIBLE) {
-      about
-    }
-    ag.connect(Gdk::Keyval::GDK_Q, Gdk::Window::CONTROL_MASK,
-               Gtk::ACCEL_VISIBLE) {
-      quit
-    }
-
-    self.add_accel_group(ag)
+    @ag = Gtk::AccelGroup.new
+    self.add_accel_group(@ag)
 
     @maquina = Turing::Machine.new
     @maquina.setup("Bem vindo ao rturing.")
