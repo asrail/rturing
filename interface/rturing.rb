@@ -1,5 +1,6 @@
 require "gtk2"
 require "turing/machine"
+require "interface/factory"
 
 class Buttons < Gtk::HBox
   attr_accessor :botoes,:first,:prev,:stop,:play,:step,:last
@@ -144,6 +145,7 @@ class JanelaPrincipal < Gtk::Window
     }
     self.border_width = 1
     self.window_position = POS_CENTER
+    @factory = Factory.new
     @timeout = 100
     @ag = Gtk::AccelGroup.new
     self.add_accel_group(@ag)
@@ -285,31 +287,8 @@ class JanelaPrincipal < Gtk::Window
     return runned == Gtk::Dialog::RESPONSE_ACCEPT
   end
 
-  def choose_factory(title,input_text,text,&response)
-    linha = Gtk::HBox.new
-    label = Gtk::Label.new(text) # 0 parameter... la la la...
-    linha.pack_start(label)
-    input = Gtk::Entry.new
-    input.text = input_text #1 parameter
-    linha.pack_start(input)
-    dialog = Gtk::Dialog.new(title, #2 parameters
-                             self,
-                             Gtk::Dialog::MODAL,
-                             [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_NONE])
-    input.signal_connect("key_press_event") {|inp, ev|
-      if Gdk::Keyval.to_name(ev.keyval) == "Return"
-        dialog.signal_emit("response", 0)
-      end
-    }
-    dialog.signal_connect("response") {
-      response.call(input,dialog)
-    }
-    dialog.vbox.pack_start(linha)
-    dialog.show_all
-  end
-
   def choose_tape
-    choose_factory("Selecionar fita",@maquina.tape.to_s[1..-1],"Entre com a fita: #") {|input,dialog|
+    @factory.choose_factory("Selecionar fita",@maquina.tape.to_s[1..-1],"Entre com a fita: #") {|input,dialog|
       @maquina.setup(input.text)
       self.first # não faz sentido editar a fita sem ver o resultado
       self.update_labels
@@ -318,7 +297,7 @@ class JanelaPrincipal < Gtk::Window
   end
 
   def choose_timeout
-    choose_factory("Editar timeout",@timeout.to_s,"Entre com tempo desejado:") {|input,dialog|
+    @factory.choose_factory("Editar timeout",@timeout.to_s,"Entre com tempo desejado:") {|input,dialog|
       self.timeout = input.text.to_i
       dialog.destroy
     }
