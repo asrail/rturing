@@ -276,7 +276,7 @@ class JanelaPrincipal < Gtk::Window
     return runned == Gtk::Dialog::RESPONSE_ACCEPT
   end
 
-  def choose_factory(title,input_text,text,response)
+  def choose_factory(title,input_text,text,&response)
     linha = Gtk::HBox.new
     label = Gtk::Label.new(text) # 0 parameter... la la la...
     linha.pack_start(label)
@@ -300,40 +300,44 @@ class JanelaPrincipal < Gtk::Window
   end
 
   def choose_tape
-    proc = Proc.new {|input,dialog|
+    choose_factory("Selecionar fita",@maquina.tape.to_s[1..-1],"Entre com a fita: #") {|input,dialog|
       @maquina.setup(input.text)
       self.first # não faz sentido editar a fita sem ver o resultado
       self.update_labels
       dialog.destroy
     }
-    choose_factory("Selecionar fita",@maquina.tape.to_s[1..-1],"Entre com a fita: #",proc)
   end
 
-  def edit_machine
-    maquina_atual = Gtk::TextBuffer.new
-    maquina_atual.insert_interactive_at_cursor(@maquina.trans.to_s, true)
-    textentry = Gtk::TextView.new(maquina_atual)
-    dialog = Gtk::Dialog.new("Editar Máquina",
+  def choose_timeout
+    choose_factory("Editar timeout",@timeout.to_s,"Entre com tempo desejado:") {|input,dialog|
+      self.timeout = input.text.to_i
+      dialog.destroy
+    }
+  end
+
+  def edit_factory(title,input_text,text,&response) #text will be used soon
+    buffer = Gtk::TextBuffer.new
+    buffer.insert_interactive_at_cursor(input_text, true)
+    textentry = Gtk::TextView.new(buffer)
+    dialog = Gtk::Dialog.new(title,
                              self,
                              Gtk::Dialog::MODAL,       
                              [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_NONE])
     dialog.signal_connect("response") {
+      response.call(buffer,dialog)
+    }
+    dialog.vbox.pack_start(textentry)
+    dialog.show_all
+  end
+
+  def edit_machine
+    edit_factory("Editar Máquina",@maquina.trans.to_s,"") {|maquina_atual,dialog|
       @maquina.trans = Turing::TransFunction.new(maquina_atual.text)
       self.first # não faz sentido editar os estados no meio, ainda
       @saved = false
       self.update_labels
       dialog.destroy
     }
-    dialog.vbox.pack_start(textentry)
-    dialog.show_all
-  end
-
-  def choose_timeout
-    proc = Proc.new {|input,dialog|
-      self.timeout = input.text.to_i
-      dialog.destroy
-    }
-    choose_factory("Editar timeout",@timeout.to_s,"Entre com tempo desejado:",proc)
   end
 
   def about
