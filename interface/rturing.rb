@@ -2,23 +2,25 @@ require "gtk2"
 require "turing/machine"
 
 class Buttons < Gtk::HBox
-  attr_accessor :botoes,:first,:prev,:stop,:play,:step
+  attr_accessor :botoes,:first,:prev,:stop,:play,:step,:last
   def initialize(window)
     super()
-    [[Gtk::Stock::MEDIA_STOP, "_Reiniciar"],
-      [Gtk::Stock::MEDIA_PREVIOUS, "_Voltar"],
+    [[Gtk::Stock::MEDIA_PREVIOUS, "_Reiniciar"],
+      [Gtk::Stock::MEDIA_REWIND, "_Voltar"],
       [Gtk::Stock::MEDIA_PAUSE, "_Parar"],
       [Gtk::Stock::MEDIA_PLAY, "E_xecutar"],
-      [Gtk::Stock::MEDIA_NEXT, "Ava_nçar"]].each { |id, label|
+      [Gtk::Stock::MEDIA_FORWARD, "Ava_nçar"],
+      [Gtk::Stock::MEDIA_NEXT, "Últi_mo"]].each { |id, label|
       
       Gtk::Stock.add(id, label)
     }
     buttons = [
-      [:first, Gtk::Stock::MEDIA_STOP], 
-      [:prev, Gtk::Stock::MEDIA_PREVIOUS], 
+      [:first, Gtk::Stock::MEDIA_PREVIOUS], 
+      [:prev, Gtk::Stock::MEDIA_REWIND], 
       [:stop, Gtk::Stock::MEDIA_PAUSE], 
       [:play, Gtk::Stock::MEDIA_PLAY], 
-      [:step, Gtk::Stock::MEDIA_NEXT]]
+      [:step, Gtk::Stock::MEDIA_FORWARD],
+      [:last, Gtk::Stock::MEDIA_NEXT]]
     buttons.each {|but, icon|
       sbut = but.to_s
       if icon
@@ -191,6 +193,10 @@ class JanelaPrincipal < Gtk::Window
       stop if @maquina.halted
       step
     }
+  end
+
+  def last
+    play(0)
   end
 
   def prev
