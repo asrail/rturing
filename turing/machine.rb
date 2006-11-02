@@ -28,7 +28,7 @@ module Turing #:nodoc
   end
   
   class TransFunction
-    attr_reader :states
+    attr_reader :states, :original
 
     def get(state, symbol)
       return ((@states[state] and 
@@ -41,6 +41,7 @@ module Turing #:nodoc
 
     def initialize(aut)
       @states = {}
+      @original = aut
       aut.each_line do |line|
         next if line =~ /^\s*#/
         line =~ /^\s*(\d+)\s*(\S+)\s*(\S+)\s*(l|r)\s*(\d+)(\s*(.*))?$/
@@ -58,6 +59,7 @@ module Turing #:nodoc
     end
     
     def to_s
+=begin
       string = ""
       @states.each do |state|
         #string + "d(#{state[0].join(',')}) = #{state[1..3].join(',')}\n"
@@ -66,6 +68,8 @@ module Turing #:nodoc
         end
       end
       return string
+=end
+      @original
     end
   end
   
