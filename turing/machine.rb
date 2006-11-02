@@ -74,7 +74,7 @@ module Turing #:nodoc
       @tape = tape
       @state = state
       @pos = pos
-      @halted = false
+      self.halted = false
     end
     
     def next
@@ -137,7 +137,7 @@ module Turing #:nodoc
     
     def setup(tape)
       @machines = [MachineState.new(trans, Tape.new("#" + tape), 0, 1)]
-      @halted = @trans.states.empty?
+      self.halted = @trans.states.empty?
     end
 
     def tape
@@ -150,7 +150,7 @@ module Turing #:nodoc
         begin
           machines.push(machines[-1].next) 
         rescue ExecutionEnded
-          @halted = true
+          self.halted = true
           return
         end
       end
