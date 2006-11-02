@@ -37,15 +37,16 @@ class Buttons < Gtk::HBox
 end
 
 class Menus < Gtk::MenuBar
-  attr_accessor :menus, :arquivo, :ajuda, :about
+  attr_accessor :menus
   def initialize(window)
     super()
     @window = window
     Gtk::Stock.add(Gtk::Stock::EDIT, "_Fita")
     Gtk::Stock.add(Gtk::Stock::EXECUTE, "_Máquina")
+    Gtk::Stock.add(Gtk::Stock::CONVERT, "_Timeout")
     submenus = [
       [:arquivo, [:open, :save, :quit]], 
-      [:editar, [:tape, :machine]], 
+      [:editar, [:tape, :machine, :edit_timeout]], 
       [:ajuda, [:about], 2]]
     mnemonics = {
       :open => [Gdk::Keyval::GDK_O, 
@@ -54,7 +55,7 @@ class Menus < Gtk::MenuBar
       :save => [Gdk::Keyval::GDK_S, 
         Gdk::Window::CONTROL_MASK, 
         Gtk::Stock::SAVE],
-      :tape  => [Gdk::Keyval::GDK_T, 
+      :tape  => [Gdk::Keyval::GDK_F, 
         Gdk::Window::CONTROL_MASK, 
         Gtk::Stock::EDIT],
       :machine  => [Gdk::Keyval::GDK_M, 
@@ -65,7 +66,11 @@ class Menus < Gtk::MenuBar
         Gtk::Stock::ABOUT],
       :quit => [Gdk::Keyval::GDK_Q,
         Gdk::Window::CONTROL_MASK,
-        Gtk::Stock::QUIT]
+        Gtk::Stock::QUIT],
+      :edit_timeout => [Gdk::Keyval::GDK_T,
+        Gdk::Window::CONTROL_MASK,
+        Gtk::Stock::CONVERT]
+
     }
     submenus.each {|item,submenu, accel|
       menuItem(item,mnemonics,submenu,accel)
@@ -122,10 +127,15 @@ class Menus < Gtk::MenuBar
     @window.save_machine
   end
 
+  def edit_timeout #these methods are going to raise up
+    @window.edit_timeout
+  end
+
 end
 
 class JanelaPrincipal < Gtk::Window
   attr_accessor :ag
+  attr_reader :timeout
 
   def initialize
     super
@@ -161,6 +171,10 @@ class JanelaPrincipal < Gtk::Window
     @linhas.pack_start(@status)
     add(@linhas)
     show_all
+  end
+
+  def timeout=(timeout)
+    self.timeout = timeout unless timeout == 0 #to create a dialog informing it
   end
 
   def quit
@@ -308,8 +322,28 @@ class JanelaPrincipal < Gtk::Window
     dialog.show_all
   end
 
-  def edit_play_time
-
+  def edit_timeout
+    linha = Gtk::HBox.new
+    label = Gtk::Label.new "Enter the tape: #"
+    linha.pack_start(label)
+    input = Gtk::Entry.new
+    input.text = @timeout.to_s #1 parameter
+    linha.pack_start(input)
+    dialog = Gtk::Dialog.new("Editar timeout", #2 parameters
+                             self,
+                             Gtk::Dialog::MODAL,
+                             [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_NONE])
+    input.signal_connect("key_press_event") {|inp, ev|
+      if Gdk::Keyval.to_name(ev.keyval) == "Return"
+        dialog.signal_emit("response", 0)
+      end
+    }
+    dialog.signal_connect("response") { #one closure
+      @timeout = input.text.to_i
+      dialog.destroy
+    }
+    dialog.vbox.pack_start(linha)
+    dialog.show_all
   end
 
   def about
