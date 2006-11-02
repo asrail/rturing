@@ -79,6 +79,28 @@ class JanelaPrincipal < Gtk::Window
     self.border_width = 1
     self.window_position = POS_CENTER
 
+    ag=Gtk::AccelGroup.new
+
+    ag = Gtk::AccelGroup.new
+    ag.connect(Gdk::Keyval::GDK_O, Gdk::Window::CONTROL_MASK,
+               Gtk::ACCEL_VISIBLE) {
+      open_file
+    }
+    ag.connect(Gdk::Keyval::GDK_E, Gdk::Window::CONTROL_MASK,
+               Gtk::ACCEL_VISIBLE) {
+      choose_tape
+    }
+    ag.connect(Gdk::Keyval::GDK_F1, nil,
+               Gtk::ACCEL_VISIBLE) {
+      about
+    }
+    ag.connect(Gdk::Keyval::GDK_Q, Gdk::Window::CONTROL_MASK,
+               Gtk::ACCEL_VISIBLE) {
+      quit
+    }
+
+    self.add_accel_group(ag)
+
     @maquina = Turing::Machine.new
     @maquina.setup("Bem vindo ao rturing.")
     
@@ -142,10 +164,12 @@ class JanelaPrincipal < Gtk::Window
                                         [Gtk::Stock::CANCEL, Gtk::Dialog::RESPONSE_CANCEL],
                                         [Gtk::Stock::OPEN, Gtk::Dialog::RESPONSE_ACCEPT])
     
-
-    if dialog.run == Gtk::Dialog::RESPONSE_ACCEPT
+    runned = dialog.run
+    if runned == Gtk::Dialog::RESPONSE_ACCEPT
       @maquina = Turing::Machine.new(dialog.filename)
-      dialog.destroy
+    end
+    dialog.destroy
+    if runned == Gtk::Dialog::RESPONSE_ACCEPT
       self.choose_tape
     end
   end
