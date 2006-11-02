@@ -110,12 +110,12 @@ class SalvaAntes < Gtk::Dialog
     super("Deseja #{operacao} sem salvar?",
           window, 
           Gtk::Dialog::MODAL, 
-          [Gtk::Stock::YES, 
-            Gtk::Dialog::RESPONSE_YES],
+          [Gtk::Stock::CANCEL, 
+            Gtk::Dialog::RESPONSE_CANCEL],
           [Gtk::Stock::NO, 
             Gtk::Dialog::RESPONSE_NO],
-          [Gtk::Stock::CANCEL, 
-            Gtk::Dialog::RESPONSE_CANCEL])
+          [Gtk::Stock::YES, 
+            Gtk::Dialog::RESPONSE_YES])
     message = "Existem alterações não gravadas na máquina.\n" +
       "Deseja salvar antes de #{operacao}?"
     hbox = Gtk::HBox.new
