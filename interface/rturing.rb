@@ -45,20 +45,20 @@ class Menus < Gtk::MenuBar
     Gtk::Stock.add(Gtk::Stock::EXECUTE, "_Máquina")
     Gtk::Stock.add(Gtk::Stock::CONVERT, "_Timeout")
     submenus = [
-      [:arquivo, [:open, :save, :quit]], 
-      [:editar, [:tape, :machine, :choose_timeout]], 
+      [:arquivo, [:open_file, :save_machine, :quit]], 
+      [:editar, [:choose_tape, :edit_machine, :choose_timeout]], 
       [:ajuda, [:about], 2]]
     mnemonics = {
-      :open => [Gdk::Keyval::GDK_O, 
+      :open_file => [Gdk::Keyval::GDK_O, 
         Gdk::Window::CONTROL_MASK, 
         Gtk::Stock::OPEN],
-      :save => [Gdk::Keyval::GDK_S, 
+      :save_machine => [Gdk::Keyval::GDK_S, 
         Gdk::Window::CONTROL_MASK, 
         Gtk::Stock::SAVE],
-      :tape  => [Gdk::Keyval::GDK_F, 
+      :choose_tape  => [Gdk::Keyval::GDK_F, 
         Gdk::Window::CONTROL_MASK, 
         Gtk::Stock::EDIT],
-      :machine  => [Gdk::Keyval::GDK_M, 
+      :edit_machine  => [Gdk::Keyval::GDK_M, 
         Gdk::Window::CONTROL_MASK, 
         Gtk::Stock::EXECUTE],
       :about => [Gdk::Keyval::GDK_F1, 
@@ -77,7 +77,6 @@ class Menus < Gtk::MenuBar
     }
   end
   
-
   def menuItem(nome,mnemonics,submenu=nil,accel=nil)
     nome = Gtk::MenuItem.new(nome.to_s.capitalize.insert(accel.to_i,'_'))
     if submenu
@@ -89,7 +88,7 @@ class Menus < Gtk::MenuBar
           item = Gtk::MenuItem.new("_" + sub.to_s.capitalize)
         end
         item.signal_connect("activate") {
-          self.send(sub)
+          @window.send(sub)
         }
         if mnemonics.key?sub
           item.add_accelerator("activate", @window.ag, mnemonics[sub][0], mnemonics[sub][1],
@@ -102,35 +101,6 @@ class Menus < Gtk::MenuBar
     append(nome)
     nome.show
   end
-
-  def open
-    @window.open_file
-  end
-
-  def quit
-    @window.quit
-  end
-  
-  def about
-    @window.about
-  end
-  
-  def tape
-    @window.choose_tape
-  end
-
-  def machine
-    @window.edit_machine
-  end
-  
-  def save
-    @window.save_machine
-  end
-
-  def choose_timeout #these methods are going to raise up
-    @window.choose_timeout
-  end
-
 end
 
 class JanelaPrincipal < Gtk::Window
