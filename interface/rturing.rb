@@ -145,9 +145,9 @@ class JanelaPrincipal < Gtk::Window
 
     if dialog.run == Gtk::Dialog::RESPONSE_ACCEPT
       @maquina = Turing::Machine.new(dialog.filename)
+      dialog.destroy
+      self.choose_tape
     end
-    dialog.destroy
-    self.choose_tape
   end
   
   def choose_tape
