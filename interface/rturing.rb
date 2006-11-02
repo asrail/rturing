@@ -28,7 +28,7 @@ class Menus < Gtk::MenuBar
   def initialize(window)
     super()
     @window = window
-    submenus = {:file => [:open, :quit], :edit => [:tape], :help => [:about]}
+    submenus = {:help => [:about], :file => [:open, :quit], :edit => [:tape]}
     submenus.each {|item,submenu|
      menuItem(item,submenu)
     }
@@ -105,8 +105,8 @@ class JanelaPrincipal < Gtk::Window
     Gtk.main_quit
   end
 
-  def play
-    @tid = Gtk::timeout_add(1000) {
+  def play(timeout=500)
+    @tid = Gtk::timeout_add(timeout) {
       stop if @maquina.halted
       step
       update_labels
