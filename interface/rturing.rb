@@ -103,6 +103,31 @@ class Menus < Gtk::MenuBar
   end
 end
 
+
+class SalvaAntes < Gtk::Dialog
+  def initialize(operacao, window)
+    super("Deseja #{operacao} sem salvar?",
+          window, 
+          Gtk::Dialog::MODAL, 
+          [Gtk::Stock::YES, 
+            Gtk::Dialog::RESPONSE_YES],
+          [Gtk::Stock::NO, 
+            Gtk::Dialog::RESPONSE_NO],
+          [Gtk::Stock::CANCEL, 
+            Gtk::Dialog::RESPONSE_CANCEL])
+    message = "Existem alterações não gravadas na máquina.\n" +
+      "Deseja salvar antes de #{operacao}?"
+    hbox = Gtk::HBox.new
+    hbox.add(Gtk::Image.new(Gtk::Stock::DIALOG_QUESTION, 
+                              Gtk::IconSize::DIALOG))
+    hbox.add(Gtk::Label.new(message))
+    hbox.show_all
+    self.vbox.add(hbox)
+    self.show_all
+  end
+end
+
+
 class JanelaPrincipal < Gtk::Window
   attr_accessor :ag
   attr_reader :timeout
@@ -151,23 +176,7 @@ class JanelaPrincipal < Gtk::Window
     if @saved
       Gtk.main_quit
     else
-      message = "Existem alterações não gravadas na máquina.\n" +
-        "Deseja salvar antes de sair?"
-      deseja_salvar = Gtk::Dialog.new("Deseja sair sem salvar?",
-                                      @window, 
-                                      Gtk::Dialog::MODAL, 
-                                      [Gtk::Stock::YES, 
-                                        Gtk::Dialog::RESPONSE_YES],
-                                      [Gtk::Stock::NO, 
-                                        Gtk::Dialog::RESPONSE_NO],
-                                      [Gtk::Stock::CANCEL, 
-                                        Gtk::Dialog::RESPONSE_CANCEL])
-      hbox = Gtk::HBox.new
-      hbox.add(Gtk::Image.new(Gtk::Stock::DIALOG_WARNING, Gtk::IconSize::DIALOG))
-      hbox.add(Gtk::Label.new(message))
-      hbox.show_all
-      deseja_salvar.vbox.add(hbox)
-      deseja_salvar.show_all
+      deseja_salvar = SalvaAntes.new("sair", self)
       deseja_salvar.run { |response|
         if response == Gtk::Dialog::RESPONSE_YES
           if save_machine
@@ -178,7 +187,6 @@ class JanelaPrincipal < Gtk::Window
         end
         deseja_salvar.destroy
         show_all
-
       }
     end
   end
@@ -223,21 +231,38 @@ class JanelaPrincipal < Gtk::Window
   end
 
   def open_file
-    dialog = Gtk::FileChooserDialog.new("Open File",
-                                        self,
-                                        Gtk::FileChooser::ACTION_OPEN,
-                                        nil,
-                                        [Gtk::Stock::CANCEL, Gtk::Dialog::RESPONSE_CANCEL],
-                                        [Gtk::Stock::OPEN, Gtk::Dialog::RESPONSE_ACCEPT])
-    
-    runned = dialog.run
-    if runned == Gtk::Dialog::RESPONSE_ACCEPT
-      @maquina = Turing::Machine.new(dialog.filename)
-      @maquina.setup ""
-    end
-    dialog.destroy
-    if runned == Gtk::Dialog::RESPONSE_ACCEPT
-      self.choose_tape
+    if not @saved
+      deseja_salvar = SalvaAntes.new("abrir outra máquina", self)
+      deseja_salvar.run { |response|
+        if response == Gtk::Dialog::RESPONSE_YES
+          if save_machine
+            open_file
+          end
+        elsif response == Gtk::Dialog::RESPONSE_NO
+          @saved = true
+          open_file
+        end
+        deseja_salvar.destroy
+      }
+    else
+      dialog = Gtk::FileChooserDialog.new("Open File",
+                                          self,
+                                          Gtk::FileChooser::ACTION_OPEN,
+                                          nil,
+                                          [Gtk::Stock::CANCEL, 
+                                            Gtk::Dialog::RESPONSE_CANCEL],
+                                          [Gtk::Stock::OPEN, 
+                                            Gtk::Dialog::RESPONSE_ACCEPT])
+      
+      runned = dialog.run
+      if runned == Gtk::Dialog::RESPONSE_ACCEPT
+        @maquina = Turing::Machine.new(dialog.filename)
+        @maquina.setup ""
+      end
+      dialog.destroy
+      if runned == Gtk::Dialog::RESPONSE_ACCEPT
+        self.choose_tape
+      end
     end
   end
 
