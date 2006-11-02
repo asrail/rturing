@@ -28,7 +28,7 @@ class Menus < Gtk::MenuBar
   def initialize(window)
     super()
     @window = window
-    submenus = {:file => [:open, :quit], :help => [:about]}
+    submenus = {:file => [:open, :quit], :edit => [:tape], :help => [:about]}
     submenus.each {|item,submenu|
      menuItem(item,submenu)
     }
@@ -45,13 +45,17 @@ class Menus < Gtk::MenuBar
   def about
     @window.about
   end
+  
+  def tape
+    @window.choose_tape
+  end
 
   def menuItem(nome,submenu=nil)
-    nome = Gtk::MenuItem.new(nome.to_s.capitalize)
+    nome = Gtk::MenuItem.new("_" + nome.to_s.capitalize)
     if submenu
       menu = Gtk::Menu.new
       submenu.each {|sub|
-        item = Gtk::MenuItem.new(sub.to_s.capitalize)
+        item = Gtk::MenuItem.new("_" + sub.to_s.capitalize)
         item.signal_connect("activate") {
           self.send(sub)
         }
@@ -84,13 +88,11 @@ class JanelaPrincipal < Gtk::Window
     @menu = Menus.new(self)
     @linhas.pack_start(@menu,false,false,0)
     @fita = Gtk::Label.new
-    @fita.set_markup("<span face=\"Courier\">#{@maquina.tape.to_s}</span>")
-    puts @fita.attributes
     @fita.set_alignment(0,0)
-    @linhas.pack_start(@fita)
     @cabecote = Gtk::Label.new
-    @cabecote.set_markup("<span face=\"Courier\">_^</span>")
     @cabecote.set_alignment(0,0)
+    self.update_labels
+    @linhas.pack_start(@fita)
     @linhas.pack_start(@cabecote)
     @botoes = Buttons.new
     @linhas.pack_start(@botoes)
@@ -101,8 +103,46 @@ class JanelaPrincipal < Gtk::Window
   def quit
     Gtk.main_quit
   end
+
+  def update_labels
+    @fita.set_markup("<span face=\"Courier\">#{@maquina.tape.to_s}</span>")
+    @cabecote.set_markup("<span face=\"Courier\">_^</span>") # FIXME
+  end
+
   def open_file
-    puts "open_file"
+    dialog = Gtk::FileChooserDialog.new("Open File",
+                                        self,
+                                        Gtk::FileChooser::ACTION_OPEN,
+                                        nil,
+                                        [Gtk::Stock::CANCEL, Gtk::Dialog::RESPONSE_CANCEL],
+                                        [Gtk::Stock::OPEN, Gtk::Dialog::RESPONSE_ACCEPT])
+    
+
+    if dialog.run == Gtk::Dialog::RESPONSE_ACCEPT
+      @maquina = Turing::Machine.new(dialog.filename)
+    end
+    dialog.destroy
+    self.choose_tape
+  end
+  
+  def choose_tape
+    linha = Gtk::HBox.new
+    label = Gtk::Label.new "Enter the tape: #"
+    linha.pack_start(label)
+    input = Gtk::Entry.new
+    linha.pack_start(input)
+    dialog = Gtk::Dialog.new("Tape Selector",
+                             self,
+                             Gtk::Dialog::MODAL,
+                         
+                             [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_NONE])
+    dialog.signal_connect("response") {
+      @maquina.setup("#" + input.text)
+      self.update_labels
+      dialog.destroy
+    }
+    dialog.vbox.pack_start(linha)
+    dialog.show_all
   end
 
   def about
