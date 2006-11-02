@@ -2,24 +2,18 @@ require "gtk2"
 require "turing/machine"
 
 class Buttons < Gtk::HBox
-  attr_accessor :botoes
+  attr_accessor :botoes,:prev,:stop,:play,:step
   def initialize(window)
     super()
-    @prev = Gtk::Button.new "Prev"
-    @prev.signal_connect("clicked") {
-      window.prev
+    buttons = [:prev,:stop,:play,:step]
+    buttons.each {|but|
+      sbut = but.to_s
+      send(sbut+"=", Gtk::Button.new(sbut.capitalize))
+      send(sbut).signal_connect("clicked") {
+        window.send(sbut)
+      }
+      pack_start(send(sbut))
     }
-    pack_start(@prev)
-    @stop = Gtk::Button.new "stop"
-    @stop.signal_connect("clicked") {
-      window.stop
-    }
-    pack_start(@stop)
-    @play = Gtk::Button.new "Play"
-    @play.signal_connect("clicked") { |coisas|
-      window.play
-    }
-    pack_start(@play)
   end
 end
 
@@ -109,7 +103,6 @@ class JanelaPrincipal < Gtk::Window
     @tid = Gtk::timeout_add(timeout) {
       stop if @maquina.halted
       step
-      update_labels
     }
   end
 
@@ -120,6 +113,7 @@ class JanelaPrincipal < Gtk::Window
 
   def step
     @maquina.step
+    update_labels
   end
 
   def update_labels
