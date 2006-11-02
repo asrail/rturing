@@ -144,7 +144,7 @@ class JanelaPrincipal < Gtk::Window
     signal_connect("delete_event") {
       false
     }
-    signal_connect("destroy") {
+    signal_connect("delete-event") {
       quit
     }
     self.border_width = 1
@@ -182,20 +182,34 @@ class JanelaPrincipal < Gtk::Window
       Gtk.main_quit
     else
       message = "Existem alterações não gravadas na máquina.\n" +
-        "Deseja mesmo sair?"
-      deseja_salvar = Gtk::MessageDialog.new(@window, 
-                                             Gtk::MessageDialog::MODAL, 
-                                             Gtk::MessageDialog::QUESTION,
-                                             Gtk::MessageDialog::BUTTONS_YES_NO,
-                                             message)
+        "Deseja salvar antes de sair?"
+      deseja_salvar = Gtk::Dialog.new("Deseja sair sem salvar?",
+                                      @window, 
+                                      Gtk::Dialog::MODAL, 
+                                      [Gtk::Stock::YES, 
+                                        Gtk::Dialog::RESPONSE_YES],
+                                      [Gtk::Stock::NO, 
+                                        Gtk::Dialog::RESPONSE_NO],
+                                      [Gtk::Stock::CANCEL, 
+                                        Gtk::Dialog::RESPONSE_CANCEL])
+      hbox = Gtk::HBox.new
+      hbox.add(Gtk::Image.new(Gtk::Stock::DIALOG_WARNING, Gtk::IconSize::DIALOG))
+      hbox.add(Gtk::Label.new(message))
+      hbox.show_all
+      deseja_salvar.vbox.add(hbox)
+      deseja_salvar.show_all
       deseja_salvar.run { |response|
         if response == Gtk::Dialog::RESPONSE_YES
+          if save_machine
             Gtk.main_quit
-        else
-          save_machine
+          end
+        elsif response == Gtk::Dialog::RESPONSE_NO
+          Gtk.main_quit
         end
+        deseja_salvar.destroy
+        show_all
+
       }
-      deseja_salvar.destroy
     end
   end
 
