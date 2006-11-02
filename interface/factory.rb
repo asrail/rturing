@@ -6,6 +6,7 @@ class Factory < Gtk::Window
   end
 
   def edit_factory(title,input_text,text,&response) #text will be used soon
+    @control = false
     buffer = Gtk::TextBuffer.new
     buffer.insert_interactive_at_cursor(input_text, true)
     textentry = Gtk::TextView.new(buffer)
@@ -15,6 +16,21 @@ class Factory < Gtk::Window
                              [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_NONE])
     dialog.signal_connect("response") {
       response.call(buffer,dialog)
+    }
+    dialog.signal_connect("key-press-event") { |inp, ev|
+      if Gdk::Keyval.to_name(ev.keyval) =~ /^Control/
+        @control = true
+      elsif Gdk::Keyval.to_name(ev.keyval) == "Return"
+        if @control
+          dialog.signal_emit("response", Gtk::Dialog::RESPONSE_NONE)
+          @control = false
+        end
+      end
+    }
+    dialog.signal_connect("key-release-event") { |inp, ev|
+      if Gdk::Keyval.to_name(ev.keyval) =~ /^Control/
+        @control = false
+      end
     }
     dialog.vbox.pack_start(textentry)
     dialog.show_all
