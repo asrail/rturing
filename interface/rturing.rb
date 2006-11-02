@@ -104,11 +104,14 @@ class JanelaPrincipal < Gtk::Window
     @fita.set_alignment(0,0)
     @cabecote = Gtk::Label.new
     @cabecote.set_alignment(0,0)
+    @status = Gtk::Statusbar.new
+    @status.push(@status.get_context_id("estado"), "nunca aparece")
     self.update_labels
     @linhas.pack_start(@fita)
     @linhas.pack_start(@cabecote)
     @botoes = Buttons.new(self)
     @linhas.pack_start(@botoes)
+    @linhas.pack_start(@status)
     add(@linhas)
     show_all
   end
@@ -147,6 +150,8 @@ class JanelaPrincipal < Gtk::Window
   def update_labels
     @fita.set_markup("<span face=\"Courier\">#{@maquina.tape.to_s}</span>")
     @cabecote.set_markup("<span face=\"Courier\">#{"_"*@maquina.machines[-1].pos}^</span>") # FIXME
+    @status.pop(@status.get_context_id("estado"))
+    @status.push(@status.get_context_id("estado"), "Estado atual: #{@maquina.state}")
   end
 
   def open_file
@@ -160,6 +165,7 @@ class JanelaPrincipal < Gtk::Window
     runned = dialog.run
     if runned == Gtk::Dialog::RESPONSE_ACCEPT
       @maquina = Turing::Machine.new(dialog.filename)
+      @maquina.setup ""
     end
     dialog.destroy
     if runned == Gtk::Dialog::RESPONSE_ACCEPT
@@ -172,14 +178,21 @@ class JanelaPrincipal < Gtk::Window
     label = Gtk::Label.new "Enter the tape: #"
     linha.pack_start(label)
     input = Gtk::Entry.new
+    input.text = @maquina.tape.to_s[1..-1]
     linha.pack_start(input)
     dialog = Gtk::Dialog.new("Tape Selector",
                              self,
                              Gtk::Dialog::MODAL,
                          
                              [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_NONE])
+    input.signal_connect("key_press_event") {|inp, ev|
+      if Gdk::Keyval.to_name(ev.keyval) == "Return"
+        dialog.signal_emit("response", 0)
+      end
+    }
     dialog.signal_connect("response") {
       @maquina.setup(input.text)
+      self.first # não faz sentido editar a fita sem ver o resultado
       self.update_labels
       dialog.destroy
     }

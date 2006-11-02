@@ -128,6 +128,10 @@ module Turing #:nodoc
     def halted=(value)
       @machines[-1].halted = value
     end
+    
+    def state
+      @machines[-1].state
+    end
 
     def initialize(filename = nil)
       if filename
