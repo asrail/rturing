@@ -222,7 +222,7 @@ class JanelaPrincipal < Gtk::Window
 
   def update_labels
     @fita.set_markup("<span face=\"Courier\">#{@maquina.tape.to_s}</span>")
-    @cabecote.set_markup("<span face=\"Courier\">#{"_"*@maquina.machines[-1].pos}^</span>") # FIXME
+    @cabecote.set_markup("<span face=\"Courier\">#{"_"*@maquina.machines[-1].pos}^</span>")
     @status.pop(@status.get_context_id("estado"))
     @status.push(@status.get_context_id("estado"), "Estado atual: #{@maquina.state}")
   end
@@ -252,7 +252,7 @@ class JanelaPrincipal < Gtk::Window
                                         Gtk::FileChooser::ACTION_SAVE,
                                         nil,
                                         [Gtk::Stock::CANCEL, Gtk::Dialog::RESPONSE_CANCEL],
-                                        [Gtk::Stock::OPEN, Gtk::Dialog::RESPONSE_ACCEPT])
+                                        [Gtk::Stock::SAVE, Gtk::Dialog::RESPONSE_ACCEPT])
     
     runned = dialog.run
     if runned == Gtk::Dialog::RESPONSE_ACCEPT
