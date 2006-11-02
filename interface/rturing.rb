@@ -2,10 +2,10 @@ require "gtk2"
 require "turing/machine"
 
 class Buttons < Gtk::HBox
-  attr_accessor :botoes,:prev,:stop,:play,:step
+  attr_accessor :botoes,:first,:prev,:stop,:play,:step
   def initialize(window)
     super()
-    buttons = [:prev,:stop,:play,:step]
+    buttons = [:first, :prev,:stop,:play,:step]
     buttons.each {|but|
       sbut = but.to_s
       send(sbut+"=", Gtk::Button.new(sbut.capitalize))
@@ -22,7 +22,10 @@ class Menus < Gtk::MenuBar
   def initialize(window)
     super()
     @window = window
-    submenus = [[:file, [:open, :quit]], [:edit, [:tape]], [:help, [:about]]]
+    submenus = [
+      [:file, [:open, :quit]], 
+      [:edit, [:tape]], 
+      [:help, [:about]]]
     submenus.each {|item,submenu|
      menuItem(item,submenu)
     }
@@ -99,11 +102,21 @@ class JanelaPrincipal < Gtk::Window
     Gtk.main_quit
   end
 
-  def play(timeout=500)
+  def play(timeout=50)
     @tid = Gtk::timeout_add(timeout) {
       stop if @maquina.halted
       step
     }
+  end
+
+  def prev
+    @maquina.unstep
+    update_labels
+  end
+
+  def first
+    @maquina.machines = [@maquina.machines[0]]
+    update_labels
   end
 
   def stop

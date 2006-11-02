@@ -67,13 +67,14 @@ module Turing #:nodoc
   end
   
   class MachineState
-    attr_accessor :tape, :state, :pos, :trans
+    attr_accessor :tape, :state, :pos, :trans, :halted
 
     def initialize(trans, tape, state, pos)
       @trans = trans
       @tape = tape
       @state = state
       @pos = pos
+      @halted = false
     end
     
     def next
@@ -94,6 +95,7 @@ module Turing #:nodoc
     end
     
     def get(pos)
+
       return (pos >= tape.size)? "_" : tape[pos]
     end
 
@@ -112,8 +114,17 @@ module Turing #:nodoc
   end
   
   class Machine
-    attr_accessor :trans, :machines, :halted
+    attr_accessor :trans, :machines
     
+
+    def halted
+      @machines[-1].halted
+    end
+    
+    def halted=(value)
+      @machines[-1].halted = value
+    end
+
     def initialize(filename = nil)
       if filename
         File.open(filename) do |file| 
@@ -146,7 +157,11 @@ module Turing #:nodoc
     end
     
     def unstep(i = 1)
-      i.times do machines.pop end
+      i.times do 
+        if machines[1]
+          machines.pop 
+        end
+      end
     end
     
     def tape
