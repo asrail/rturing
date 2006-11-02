@@ -31,7 +31,8 @@ module Turing #:nodoc
     attr_reader :states
 
     def get(state, symbol)
-      return (@states[state][symbol] or raise ExecutionEnded)
+      return ((@states[state] and 
+               @states[state][symbol]) or raise ExecutionEnded)
     end
     
     def set(state, symbol, rule)
