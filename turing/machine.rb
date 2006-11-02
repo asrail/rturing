@@ -114,15 +114,23 @@ module Turing #:nodoc
   class Machine
     attr_accessor :trans, :machines, :halted
     
-    def initialize(filename)
-      File.open(filename) do |file| 
-        @trans = TransFunction.new(file.read)
+    def initialize(filename = nil)
+      if filename
+        File.open(filename) do |file| 
+          @trans = TransFunction.new(file.read)
+        end
+      else
+        @trans = TransFunction.new("")
       end
     end
     
     def setup(tape)
       @machines = [MachineState.new(trans, Tape.new(tape), 0, 0)]
       @halted = @trans.states.empty?
+    end
+
+    def tape
+      @machines[0].tape
     end
 
     def step(i = 1)
