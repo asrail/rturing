@@ -1,30 +1,30 @@
-= rturing: a Turing machine simulator written in Ruby
+= rturing: um simulador de Maquinas de Turing escrito em Ruby
 
-rturing simulates Turing machines designed to replace the dead and almost
-uncompilable gturing[http://freshmeat.net/projects/gturing/].
-
-_TODO_: _write_ _a_ _little_ _bit_ _about_ _Turing_ _machines_ _and_
-_gturing_.
+rturing é um simulador de Máquinas de Turing, feito originalmente com o
+intuito de substituir o morto e quase incompativel
+gturing[http://freshmeat.net/projects/gturing/].
 
 == Getting started
 
-This section explains how to use rturing. We assume we can use any plain text
-editor to write the Turing machines that will be simulated by rturing. Please
-see Turing::Machine for details in the input file format.
+Esta seção informa como usar o rturing.
 
-=== Command-line interface
+=== Formato básico
+As máquinas são arquivos de texto, no qual linhas começando com um '#'
+são comentários.
+Cada linha deve conter o estado atual, o símbolo lido, o símbolo escrito,
+informar se ele irá para a esquerda ou direita e o estado seguinte.
+São aceitos 'r' ou 'd' para direita e 'l' ou 'e' para esquerda.
 
-You must invoke rturing passing to it two arguments:
+=== Interface de linha de comando
 
-* first, the filename of a input Turing machine in the proper format.
-* the contents of the input tape that will be processed by the machine.
+Execute rturing passando dois argumentos:
 
-rturing will read the machine's transition function from the informed file and
-will process your input tape. Each step of the evaluation process is shown in
-the terminal, by printing both the tape's state and the position of the
-machine's head.
+* o nome (com caminho relativo ou completo) do arquivo contendo a MT;
+* o conteúdo da fita.
 
-Example:
+Cada passo será exibido na tela
+
+Exemplo:
 
  $ rturing machines/add.tur 01010
  01010
@@ -41,11 +41,16 @@ Example:
     ^
  0110_
      ^
+=== Interface gráfica
+Execute grturing, abra a MT e edite a fita.
+Escolha um tempo de intervalo para cada passo que seja conveniente.
 
 == Copyright
 
 rturing - a Turing Machine simulator written in Ruby
-Copyright (C) 2006 Antonio S. de A. Terceiro <terceiro@dcc.ufba.br>
+Copyright (C) 2006 Antonio S. de A. Terceiro <terceiro@dcc.ufba.br>,
+Alexandre Passos <alexandre.tp@gmail.com> e Caio Tiago Oliveira
+<caiotiago@gmail.com>.
 
 gturing's input machines are Copyright (C) Arturo Espinosa
 <arturo@ximian.com> and Germán Poo-Caamaño <gpoo@ubiobio.cl>. Please see 
