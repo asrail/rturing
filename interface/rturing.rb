@@ -3,21 +3,21 @@ require "turing/machine"
 
 class Buttons < Gtk::HBox
   attr_accessor :botoes
-  def initialize
-    super
+  def initialize(window)
+    super()
     @prev = Gtk::Button.new "Prev"
     @prev.signal_connect("clicked") {
-      puts "prev"
+      window.prev
     }
     pack_start(@prev)
     @stop = Gtk::Button.new "stop"
     @stop.signal_connect("clicked") {
-      puts "stop"
+      window.stop
     }
     pack_start(@stop)
     @play = Gtk::Button.new "Play"
-    @play.signal_connect("clicked") {
-      puts "play"
+    @play.signal_connect("clicked") { |coisas|
+      window.play
     }
     pack_start(@play)
   end
@@ -78,6 +78,7 @@ class JanelaPrincipal < Gtk::Window
     signal_connect("destroy") {
       quit
     }
+
     @border_width = 10
     @window_position = POS_CENTER
 
@@ -94,19 +95,36 @@ class JanelaPrincipal < Gtk::Window
     self.update_labels
     @linhas.pack_start(@fita)
     @linhas.pack_start(@cabecote)
-    @botoes = Buttons.new
+    @botoes = Buttons.new(self)
     @linhas.pack_start(@botoes)
     add(@linhas)
     show_all
-    
   end
+
   def quit
     Gtk.main_quit
   end
 
+  def play
+    @tid = Gtk::timeout_add(1000) {
+      stop if @maquina.halted
+      step
+      update_labels
+    }
+  end
+
+  def stop
+    Gtk::timeout_remove(@tid) if @tid
+    @tid = nil
+  end
+
+  def step
+    @maquina.step
+  end
+
   def update_labels
     @fita.set_markup("<span face=\"Courier\">#{@maquina.tape.to_s}</span>")
-    @cabecote.set_markup("<span face=\"Courier\">_^</span>") # FIXME
+    @cabecote.set_markup("<span face=\"Courier\">#{"_"*@maquina.machines[-1].pos}^</span>") # FIXME
   end
 
   def open_file
@@ -137,7 +155,7 @@ class JanelaPrincipal < Gtk::Window
                          
                              [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_NONE])
     dialog.signal_connect("response") {
-      @maquina.setup("#" + input.text)
+      @maquina.setup(input.text)
       self.update_labels
       dialog.destroy
     }
@@ -148,7 +166,7 @@ class JanelaPrincipal < Gtk::Window
   def about
     message = "RTuring\nUm interpretador de máquinas de turing " +
       "feito por Alexandre Passos, Antonio Terceiro e " +
-      "Caio Tiago Oliveira de Souza."
+      "Caio Tiago Oliveira."
     about = Gtk::MessageDialog.new(@window, 
                                    Gtk::MessageDialog::MODAL, 
                                    Gtk::MessageDialog::INFO, 
@@ -158,9 +176,6 @@ class JanelaPrincipal < Gtk::Window
     about.destroy
   end
 end
-
-
-
 
 def main
   w = JanelaPrincipal.new
