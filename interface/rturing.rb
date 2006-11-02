@@ -46,7 +46,7 @@ class Menus < Gtk::MenuBar
     Gtk::Stock.add(Gtk::Stock::CONVERT, "_Timeout")
     submenus = [
       [:arquivo, [:open, :save, :quit]], 
-      [:editar, [:tape, :machine, :edit_timeout]], 
+      [:editar, [:tape, :machine, :choose_timeout]], 
       [:ajuda, [:about], 2]]
     mnemonics = {
       :open => [Gdk::Keyval::GDK_O, 
@@ -67,7 +67,7 @@ class Menus < Gtk::MenuBar
       :quit => [Gdk::Keyval::GDK_Q,
         Gdk::Window::CONTROL_MASK,
         Gtk::Stock::QUIT],
-      :edit_timeout => [Gdk::Keyval::GDK_T,
+      :choose_timeout => [Gdk::Keyval::GDK_T,
         Gdk::Window::CONTROL_MASK,
         Gtk::Stock::CONVERT]
 
@@ -127,8 +127,8 @@ class Menus < Gtk::MenuBar
     @window.save_machine
   end
 
-  def edit_timeout #these methods are going to raise up
-    @window.edit_timeout
+  def choose_timeout #these methods are going to raise up
+    @window.choose_timeout
   end
 
 end
@@ -276,7 +276,7 @@ class JanelaPrincipal < Gtk::Window
     return runned == Gtk::Dialog::RESPONSE_ACCEPT
   end
 
-  def edit_factory(title,input_text,text,response)
+  def choose_factory(title,input_text,text,response)
     linha = Gtk::HBox.new
     label = Gtk::Label.new(text) # 0 parameter... la la la...
     linha.pack_start(label)
@@ -306,7 +306,7 @@ class JanelaPrincipal < Gtk::Window
       self.update_labels
       dialog.destroy
     }
-    edit_factory("Selecionar fita",@maquina.tape.to_s[1..-1],"Entre com a fita: #",proc)
+    choose_factory("Selecionar fita",@maquina.tape.to_s[1..-1],"Entre com a fita: #",proc)
   end
 
   def edit_machine
@@ -328,12 +328,12 @@ class JanelaPrincipal < Gtk::Window
     dialog.show_all
   end
 
-  def edit_timeout
+  def choose_timeout
     proc = Proc.new {|input,dialog|
       self.timeout = input.text.to_i
       dialog.destroy
     }
-    edit_factory("Editar timeout",@timeout.to_s,"Entre com tempo desejado:",proc)
+    choose_factory("Editar timeout",@timeout.to_s,"Entre com tempo desejado:",proc)
   end
 
   def about
