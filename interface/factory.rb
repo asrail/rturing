@@ -10,6 +10,7 @@ class Factory < Gtk::Window
     buffer = Gtk::TextBuffer.new
     buffer.insert_interactive_at_cursor(input_text, true)
     textentry = Gtk::TextView.new(buffer)
+    textentry.accepts_tab = false
     dialog = Gtk::Dialog.new(title,
                              self,
                              Gtk::Dialog::MODAL,       
