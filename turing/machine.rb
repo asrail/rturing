@@ -3,7 +3,7 @@ module Turing #:nodoc
   def self.dir_to_amount(dir)
     if ['r','d'].include?dir then
       1
-    elsif ['l','d'].include?dir then
+    elsif ['l','e'].include?dir then
       -1
     else
       0
