@@ -174,7 +174,7 @@ class JanelaPrincipal < Gtk::Window
   end
 
   def timeout=(timeout)
-    self.timeout = timeout unless timeout == 0 #to create a dialog informing it
+    @timeout = timeout unless timeout == 0 #to create a dialog informing it
   end
 
   def quit
@@ -276,17 +276,16 @@ class JanelaPrincipal < Gtk::Window
     return runned == Gtk::Dialog::RESPONSE_ACCEPT
   end
 
-  def choose_tape
+  def edit_factory(title,input_text,text,response)
     linha = Gtk::HBox.new
-    label = Gtk::Label.new "Enter the tape: #"
+    label = Gtk::Label.new(text) # 0 parameter... la la la...
     linha.pack_start(label)
     input = Gtk::Entry.new
-    input.text = @maquina.tape.to_s[1..-1]
+    input.text = input_text #1 parameter
     linha.pack_start(input)
-    dialog = Gtk::Dialog.new("Tape Selector",
+    dialog = Gtk::Dialog.new(title, #2 parameters
                              self,
                              Gtk::Dialog::MODAL,
-                         
                              [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_NONE])
     input.signal_connect("key_press_event") {|inp, ev|
       if Gdk::Keyval.to_name(ev.keyval) == "Return"
@@ -294,13 +293,20 @@ class JanelaPrincipal < Gtk::Window
       end
     }
     dialog.signal_connect("response") {
+      response.call(input,dialog)
+    }
+    dialog.vbox.pack_start(linha)
+    dialog.show_all
+  end
+
+  def choose_tape
+    proc = Proc.new {|input,dialog|
       @maquina.setup(input.text)
       self.first # não faz sentido editar a fita sem ver o resultado
       self.update_labels
       dialog.destroy
     }
-    dialog.vbox.pack_start(linha)
-    dialog.show_all
+    edit_factory("Selecionar fita",@maquina.tape.to_s[1..-1],"Entre com a fita: #",proc)
   end
 
   def edit_machine
@@ -323,27 +329,11 @@ class JanelaPrincipal < Gtk::Window
   end
 
   def edit_timeout
-    linha = Gtk::HBox.new
-    label = Gtk::Label.new "Entre com tempo desejado:" # 0 parameter... la la la...
-    linha.pack_start(label)
-    input = Gtk::Entry.new
-    input.text = @timeout.to_s #1 parameter
-    linha.pack_start(input)
-    dialog = Gtk::Dialog.new("Editar timeout", #2 parameters
-                             self,
-                             Gtk::Dialog::MODAL,
-                             [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_NONE])
-    input.signal_connect("key_press_event") {|inp, ev|
-      if Gdk::Keyval.to_name(ev.keyval) == "Return"
-        dialog.signal_emit("response", 0)
-      end
-    }
-    dialog.signal_connect("response") { #one closure
-      @timeout = input.text.to_i
+    proc = Proc.new {|input,dialog|
+      self.timeout = input.text.to_i
       dialog.destroy
     }
-    dialog.vbox.pack_start(linha)
-    dialog.show_all
+    edit_factory("Editar timeout",@timeout.to_s,"Entre com tempo desejado:",proc)
   end
 
   def about
