@@ -5,10 +5,10 @@ class Buttons < Gtk::HBox
   attr_accessor :botoes,:first,:prev,:stop,:play,:step
   def initialize(window)
     super()
-    buttons = [:first, :prev,:stop,:play,:step]
-    buttons.each {|but|
+    buttons = [[:first,1], [:prev,3], [:stop,0], [:play,0], [:step,1]]
+    buttons.each {|but,accel|
       sbut = but.to_s
-      send(sbut+"=", Gtk::Button.new(sbut.capitalize))
+      send(sbut+"=", Gtk::Button.new(sbut.capitalize.insert(accel,'_'),true))
       send(sbut).signal_connect("clicked") {
         window.send(sbut)
       }
