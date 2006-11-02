@@ -35,25 +35,67 @@ class Buttons < Gtk::HBox
 end
 
 class Menus < Gtk::MenuBar
-  attr_accessor :menus, :file, :help, :about
+  attr_accessor :menus, :arquivo, :ajuda, :about
   def initialize(window)
     super()
     @window = window
+    Gtk::Stock.add(Gtk::Stock::EDIT, "Fita")
+    Gtk::Stock.add(Gtk::Stock::EXECUTE, "Máquina")
     submenus = [
-      [:file, [:open, :quit]], 
-      [:edit, [:tape]], 
-      [:help, [:about]]]
+      [:arquivo, [:open, :save, :quit]], 
+      [:editar, [:tape, :machine]], 
+      [:ajuda, [:about]]]
     mnemonics = {
-      :open => [Gdk::Keyval::GDK_O, Gdk::Window::CONTROL_MASK],
-      :tape  => [Gdk::Keyval::GDK_E, Gdk::Window::CONTROL_MASK],
-      :about => [Gdk::Keyval::GDK_F1, 0],
-      :quit => [Gdk::Keyval::GDK_Q,Gdk::Window::CONTROL_MASK]
+      :open => [Gdk::Keyval::GDK_O, 
+        Gdk::Window::CONTROL_MASK, 
+        Gtk::Stock::OPEN],
+      :save => [Gdk::Keyval::GDK_O, 
+        Gdk::Window::CONTROL_MASK, 
+        Gtk::Stock::SAVE],
+      :tape  => [Gdk::Keyval::GDK_E, 
+        Gdk::Window::CONTROL_MASK, 
+        Gtk::Stock::EDIT],
+      :machine  => [Gdk::Keyval::GDK_E, 
+        Gdk::Window::CONTROL_MASK, 
+        Gtk::Stock::EXECUTE],
+      :about => [Gdk::Keyval::GDK_F1, 
+        0,
+        Gtk::Stock::ABOUT],
+      :quit => [Gdk::Keyval::GDK_Q,
+        Gdk::Window::CONTROL_MASK,
+        Gtk::Stock::QUIT]
     }
     submenus.each {|item,submenu|
       menuItem(item,mnemonics,submenu)
     }
   end
   
+
+  def menuItem(nome,mnemonics,submenu=nil)
+    nome = Gtk::MenuItem.new("_" + nome.to_s.capitalize)
+    if submenu
+      menu = Gtk::Menu.new
+      submenu.each {|sub|
+        if mnemonics[sub][2]
+          item = Gtk::ImageMenuItem.new(mnemonics[sub][2])
+        else
+          item = Gtk::MenuItem.new("_" + sub.to_s.capitalize)
+        end
+        item.signal_connect("activate") {
+          self.send(sub)
+        }
+        if mnemonics.key?sub
+          item.add_accelerator("activate", @window.ag, mnemonics[sub][0], mnemonics[sub][1],
+                               Gtk::ACCEL_VISIBLE)
+        end
+        menu.append(item)
+      }
+    end
+    nome.set_submenu(menu)
+    append(nome)
+    nome.show
+  end
+
   def open
     @window.open_file
   end
@@ -70,26 +112,14 @@ class Menus < Gtk::MenuBar
     @window.choose_tape
   end
 
-  def menuItem(nome,mnemonics,submenu=nil)
-    nome = Gtk::MenuItem.new("_" + nome.to_s.capitalize)
-    if submenu
-      menu = Gtk::Menu.new
-      submenu.each {|sub|
-        item = Gtk::MenuItem.new("_" + sub.to_s.capitalize)
-        item.signal_connect("activate") {
-          self.send(sub)
-        }
-        if mnemonics.key?sub
-          item.add_accelerator("activate", @window.ag, mnemonics[sub][0], mnemonics[sub][1],
-                               Gtk::ACCEL_VISIBLE)
-        end
-        menu.append(item)
-      }
-    end
-    nome.set_submenu(menu)
-    append(nome)
-    nome.show
+  def machine
+    @window.edit_machine
   end
+  
+  def save
+    @window.save_machine
+  end
+
 end
 
 class JanelaPrincipal < Gtk::Window
@@ -97,7 +127,8 @@ class JanelaPrincipal < Gtk::Window
 
   def initialize
     super
-    @title = "RTuring"
+    self.title = "RTuring"
+    @saved = true
     signal_connect("delete_event") {
       false
     }
@@ -134,7 +165,25 @@ class JanelaPrincipal < Gtk::Window
   end
 
   def quit
-    Gtk.main_quit
+    if @saved
+      Gtk.main_quit
+    else
+      message = "Existem alterações não gravadas na máquina.\n" +
+        "Deseja mesmo sair?"
+      deseja_salvar = Gtk::MessageDialog.new(@window, 
+                                             Gtk::MessageDialog::MODAL, 
+                                             Gtk::MessageDialog::QUESTION,
+                                             Gtk::MessageDialog::BUTTONS_YES_NO,
+                                             message)
+      deseja_salvar.run { |response|
+        if response == Gtk::Dialog::RESPONSE_YES
+            Gtk.main_quit
+        else
+          save_machine
+        end
+      }
+      deseja_salvar.destroy
+    end
   end
 
   def play(timeout=50)
@@ -151,6 +200,7 @@ class JanelaPrincipal < Gtk::Window
 
   def first
     @maquina.machines = [@maquina.machines[0]]
+    @maquina.machines[0].trans = @maquina.trans
     update_labels
   end
 
@@ -189,6 +239,26 @@ class JanelaPrincipal < Gtk::Window
       self.choose_tape
     end
   end
+
+  def save_machine
+    dialog = Gtk::FileChooserDialog.new("Salvar Máquina",
+                                        self,
+                                        Gtk::FileChooser::ACTION_SAVE,
+                                        nil,
+                                        [Gtk::Stock::CANCEL, Gtk::Dialog::RESPONSE_CANCEL],
+                                        [Gtk::Stock::OPEN, Gtk::Dialog::RESPONSE_ACCEPT])
+    
+    runned = dialog.run
+    if runned == Gtk::Dialog::RESPONSE_ACCEPT
+      File.open(dialog.filename, "w") { |file|
+        file.write(@maquina.trans.to_s)
+      }
+      @saved = true
+    end
+    dialog.destroy
+    return runned == Gtk::Dialog::RESPONSE_ACCEPT
+  end
+
   
   def choose_tape
     linha = Gtk::HBox.new
@@ -216,6 +286,27 @@ class JanelaPrincipal < Gtk::Window
     dialog.vbox.pack_start(linha)
     dialog.show_all
   end
+
+  def edit_machine
+    maquina_atual = Gtk::TextBuffer.new
+    maquina_atual.insert_interactive_at_cursor(@maquina.trans.to_s, true)
+    textentry = Gtk::TextView.new(maquina_atual)
+    dialog = Gtk::Dialog.new("Editar Máquina",
+                             self,
+                             Gtk::Dialog::MODAL,       
+                             [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_NONE])
+    dialog.signal_connect("response") {
+      @maquina.trans = Turing::TransFunction.new(maquina_atual.text)
+      self.first # não faz sentido editar os estados no meio, ainda
+      @saved = false
+      self.update_labels
+      dialog.destroy
+    }
+    dialog.vbox.pack_start(textentry)
+    dialog.show_all
+  end
+
+
 
   def about
     message = "RTuring\nUm interpretador de máquinas de turing " +

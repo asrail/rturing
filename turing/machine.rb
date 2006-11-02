@@ -57,12 +57,14 @@ module Turing #:nodoc
     end
     
     def to_s
-      @states.inject("") do |string,state|
+      string = ""
+      @states.each do |state|
         #string + "d(#{state[0].join(',')}) = #{state[1..3].join(',')}\n"
         state[1].each do |elem, rule|
-          string += "${state[0]} ${elem} ${rule.to_s}\n"
+          string += "#{state[0]} #{elem} #{rule.to_s}\n"
         end
       end
+      return string
     end
   end
   
