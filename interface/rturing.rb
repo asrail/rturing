@@ -137,16 +137,13 @@ class JanelaPrincipal < Gtk::Window
     signal_connect("destroy") {
       quit
     }
-
     self.border_width = 1
     self.window_position = POS_CENTER
-
+    @timeout = 100
     @ag = Gtk::AccelGroup.new
     self.add_accel_group(@ag)
-
     @maquina = Turing::Machine.new
     @maquina.setup("Bem vindo ao rturing.")
-    
     @linhas = Gtk::VBox.new
     @menu = Menus.new(self)
     @linhas.pack_start(@menu,false,false,0)
@@ -188,7 +185,7 @@ class JanelaPrincipal < Gtk::Window
     end
   end
 
-  def play(timeout=50)
+  def play(timeout=@timeout)
     @tid = Gtk::timeout_add(timeout) {
       stop if @maquina.halted
       step
@@ -265,7 +262,6 @@ class JanelaPrincipal < Gtk::Window
     return runned == Gtk::Dialog::RESPONSE_ACCEPT
   end
 
-  
   def choose_tape
     linha = Gtk::HBox.new
     label = Gtk::Label.new "Enter the tape: #"
@@ -312,7 +308,9 @@ class JanelaPrincipal < Gtk::Window
     dialog.show_all
   end
 
+  def edit_play_time
 
+  end
 
   def about
     message = "RTuring\nUm interpretador de máquinas de turing " +
@@ -332,7 +330,6 @@ def main
   w = JanelaPrincipal.new
   Gtk.main
 end
-
 
 if __FILE__ == $0
   main()
