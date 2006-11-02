@@ -5,26 +5,26 @@ class Buttons < Gtk::HBox
   attr_accessor :botoes,:first,:prev,:stop,:play,:step
   def initialize(window)
     super()
-    [[Gtk::Stock::MEDIA_STOP, "Reiniciar"],
-      [Gtk::Stock::MEDIA_PREVIOUS, "Voltar"],
-      [Gtk::Stock::MEDIA_PAUSE, "Parar"],
-      [Gtk::Stock::MEDIA_PLAY, "Executar"],
-      [Gtk::Stock::MEDIA_NEXT, "Avançar"]].each { |id, label|
+    [[Gtk::Stock::MEDIA_STOP, "_Reiniciar"],
+      [Gtk::Stock::MEDIA_PREVIOUS, "_Voltar"],
+      [Gtk::Stock::MEDIA_PAUSE, "_Parar"],
+      [Gtk::Stock::MEDIA_PLAY, "E_xecutar"],
+      [Gtk::Stock::MEDIA_NEXT, "Ava_nçar"]].each { |id, label|
       
       Gtk::Stock.add(id, label)
     }
     buttons = [
-      [:first,1, Gtk::Stock::MEDIA_STOP], 
-      [:prev, 3, Gtk::Stock::MEDIA_PREVIOUS], 
-      [:stop, 0, Gtk::Stock::MEDIA_PAUSE], 
-      [:play, 0, Gtk::Stock::MEDIA_PLAY], 
-      [:step, 1, Gtk::Stock::MEDIA_NEXT]]
-    buttons.each {|but,accel, icon|
+      [:first, Gtk::Stock::MEDIA_STOP], 
+      [:prev, Gtk::Stock::MEDIA_PREVIOUS], 
+      [:stop, Gtk::Stock::MEDIA_PAUSE], 
+      [:play, Gtk::Stock::MEDIA_PLAY], 
+      [:step, Gtk::Stock::MEDIA_NEXT]]
+    buttons.each {|but, icon|
       sbut = but.to_s
       if icon
         send(sbut+"=", Gtk::Button.new(icon,true))
       else
-        send(sbut+"=", Gtk::Button.new(sbut.capitalize.insert(accel,'_'),true))
+        send(sbut+"=", Gtk::Button.new(sbut.capitalize,true))
       end
       send(sbut).signal_connect("clicked") {
         window.send(sbut)
