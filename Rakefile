@@ -1,6 +1,9 @@
 require 'rake/packagetask'
+require 'rake/loaders/makefile'
+
 
 PACKAGE = 'rturing'
+RTURING_VERSION="0.0.2"
 
 task :default do
   Dir.glob('tests/*').each { |test|
@@ -40,3 +43,4 @@ task :tag do
     puts "Favor especificar version=VERSAO_DESEJADA na linha de comando."
   end
 end
+
