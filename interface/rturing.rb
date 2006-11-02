@@ -303,23 +303,8 @@ class JanelaPrincipal < Gtk::Window
     }
   end
 
-  def edit_factory(title,input_text,text,&response) #text will be used soon
-    buffer = Gtk::TextBuffer.new
-    buffer.insert_interactive_at_cursor(input_text, true)
-    textentry = Gtk::TextView.new(buffer)
-    dialog = Gtk::Dialog.new(title,
-                             self,
-                             Gtk::Dialog::MODAL,       
-                             [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_NONE])
-    dialog.signal_connect("response") {
-      response.call(buffer,dialog)
-    }
-    dialog.vbox.pack_start(textentry)
-    dialog.show_all
-  end
-
   def edit_machine
-    edit_factory("Editar Máquina",@maquina.trans.to_s,"") {|maquina_atual,dialog|
+    @factory.edit_factory("Editar Máquina",@maquina.trans.to_s,"") {|maquina_atual,dialog|
       @maquina.trans = Turing::TransFunction.new(maquina_atual.text)
       self.first # não faz sentido editar os estados no meio, ainda
       @saved = false
