@@ -125,7 +125,7 @@ module Turing #:nodoc
     end
     
     def setup(tape)
-      @machines = [MachineState.new(trans, Tape.new(tape), 0, 0)]
+      @machines = [MachineState.new(trans, Tape.new("#" + tape), 0, 1)]
       @halted = @trans.states.empty?
     end
 
