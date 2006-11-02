@@ -1,7 +1,6 @@
 require 'rake/packagetask'
 require 'rake/loaders/makefile'
 
-
 PACKAGE = 'rturing'
 RTURING_VERSION="0.1"
 
@@ -40,7 +39,7 @@ task :tag do
   begin
     system("svn copy https://intranet.dcc.ufba.br/svn/rturing/trunk https://intranet.dcc.ufba.br/svn/rturing/tags/${version}")
   rescue
-    puts "Favor especificar version=VERSAO_DESEJADA na linha de comando."
+    system("svn copy https://intranet.dcc.ufba.br/svn/rturing/trunk https://intranet.dcc.ufba.br/svn/rturing/tags/#{RTURING_VERSION}")
   end
 end
 
