@@ -21,7 +21,7 @@ class Factory < Gtk::Window
     dialog.signal_connect("key-press-event") { |inp, ev|
       if Gdk::Keyval.to_name(ev.keyval) =~ /^Control/
         @control = true
-      elsif Gdk::Keyval.to_name(ev.keyval) == "Return"
+      elsif ev.keyval == Gdk::Keyval::GDK_Return or ev.keyval == Gdk::Keyval::GDK_KP_Enter
         if @control
           dialog.signal_emit("response", Gtk::Dialog::RESPONSE_NONE)
           @control = false
@@ -34,6 +34,7 @@ class Factory < Gtk::Window
       end
     }
     dialog.vbox.pack_start(textentry)
+    dialog.set_default_size(200,100)
     dialog.show_all
   end
 
@@ -49,7 +50,7 @@ class Factory < Gtk::Window
                              Gtk::Dialog::MODAL,
                              [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_NONE])
     input.signal_connect("key_press_event") {|inp, ev|
-      if Gdk::Keyval.to_name(ev.keyval) == "Return"
+      if ev.keyval == Gdk::Keyval::GDK_Return or ev.keyval == Gdk::Keyval::GDK_KP_Enter
         dialog.signal_emit("response", 0)
       end
     }
@@ -57,6 +58,7 @@ class Factory < Gtk::Window
       response.call(input,dialog)
     }
     dialog.vbox.pack_start(linha)
+    dialog.set_default_size(200,-1)
     dialog.show_all
   end
 end
