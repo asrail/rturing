@@ -324,7 +324,7 @@ class JanelaPrincipal < Gtk::Window
 
   def edit_timeout
     linha = Gtk::HBox.new
-    label = Gtk::Label.new "Enter the tape: #"
+    label = Gtk::Label.new "Entre com tempo desejado:" # 0 parameter... la la la...
     linha.pack_start(label)
     input = Gtk::Entry.new
     input.text = @timeout.to_s #1 parameter
