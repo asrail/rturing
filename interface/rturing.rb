@@ -29,8 +29,8 @@ class Menus < Gtk::MenuBar
     super()
     @window = window
     submenus = {:file => [:open, :quit], :help => [:about]}
-    [:file,:help].each {|item|
-     menuItem(item,submenus[item])
+    submenus.each {|item,submenu|
+     menuItem(item,submenu)
     }
   end
   
