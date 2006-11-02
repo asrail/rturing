@@ -69,21 +69,25 @@ module Turing #:nodoc
   class MachineState
     attr_accessor :tape, :state, :pos, :trans, :halted
 
-    def initialize(trans, tape, state, pos)
+    def initialize(trans, tape, state, pos, halt=false)
       @trans = trans
       @tape = tape
       @state = state
       @pos = pos
-      self.halted = false
+      self.halted = halt
     end
     
     def next
-      rule = @trans.get(state, @tape.get(pos))
-      new_state = rule.new_state
-      new_symbol =  rule.written_symbol
-      newpos = Turing::dir_to_amount(rule.direction) + pos
-      newtape = tape.set_at(pos, new_symbol)
-      return MachineState.new(trans, newtape, new_state, newpos)
+      begin
+        rule = @trans.get(state, @tape.get(pos))
+        new_state = rule.new_state
+        new_symbol =  rule.written_symbol
+        newpos = Turing::dir_to_amount(rule.direction) + pos
+        newtape = tape.set_at(pos, new_symbol)
+        return MachineState.new(trans, newtape, new_state, newpos)
+      rescue ExecutionEnded
+        return MachineState.new(trans, tape, state, pos, true)
+      end
     end
   end
   
@@ -145,14 +149,9 @@ module Turing #:nodoc
     end
 
     def step(i = 1)
-      return if halted
       i.times do
-        begin
-          machines.push(machines[-1].next) 
-        rescue ExecutionEnded
-          self.halted = true
-          return
-        end
+        return if halted
+        machines.push(machines[-1].next) 
       end
     end
     
