@@ -39,23 +39,23 @@ class Menus < Gtk::MenuBar
   def initialize(window)
     super()
     @window = window
-    Gtk::Stock.add(Gtk::Stock::EDIT, "Fita")
-    Gtk::Stock.add(Gtk::Stock::EXECUTE, "Máquina")
+    Gtk::Stock.add(Gtk::Stock::EDIT, "_Fita")
+    Gtk::Stock.add(Gtk::Stock::EXECUTE, "_Máquina")
     submenus = [
       [:arquivo, [:open, :save, :quit]], 
       [:editar, [:tape, :machine]], 
-      [:ajuda, [:about]]]
+      [:ajuda, [:about], 2]]
     mnemonics = {
       :open => [Gdk::Keyval::GDK_O, 
         Gdk::Window::CONTROL_MASK, 
         Gtk::Stock::OPEN],
-      :save => [Gdk::Keyval::GDK_O, 
+      :save => [Gdk::Keyval::GDK_S, 
         Gdk::Window::CONTROL_MASK, 
         Gtk::Stock::SAVE],
-      :tape  => [Gdk::Keyval::GDK_E, 
+      :tape  => [Gdk::Keyval::GDK_T, 
         Gdk::Window::CONTROL_MASK, 
         Gtk::Stock::EDIT],
-      :machine  => [Gdk::Keyval::GDK_E, 
+      :machine  => [Gdk::Keyval::GDK_M, 
         Gdk::Window::CONTROL_MASK, 
         Gtk::Stock::EXECUTE],
       :about => [Gdk::Keyval::GDK_F1, 
@@ -65,14 +65,14 @@ class Menus < Gtk::MenuBar
         Gdk::Window::CONTROL_MASK,
         Gtk::Stock::QUIT]
     }
-    submenus.each {|item,submenu|
-      menuItem(item,mnemonics,submenu)
+    submenus.each {|item,submenu, accel|
+      menuItem(item,mnemonics,submenu,accel)
     }
   end
   
 
-  def menuItem(nome,mnemonics,submenu=nil)
-    nome = Gtk::MenuItem.new("_" + nome.to_s.capitalize)
+  def menuItem(nome,mnemonics,submenu=nil,accel=nil)
+    nome = Gtk::MenuItem.new(nome.to_s.capitalize.insert(accel.to_i,'_'))
     if submenu
       menu = Gtk::Menu.new
       submenu.each {|sub|
