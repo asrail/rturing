@@ -83,7 +83,7 @@ class JanelaPrincipal < Gtk::Window
     @window_position = POS_CENTER
 
     @maquina = Turing::Machine.new
-    @maquina.setup("#Bem vindo ao rturing.")
+    @maquina.setup("Bem vindo ao rturing.")
     
     @linhas = Gtk::VBox.new
     @menu = Menus.new(self)
