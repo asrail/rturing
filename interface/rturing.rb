@@ -28,7 +28,7 @@ class Menus < Gtk::MenuBar
   def initialize(window)
     super()
     @window = window
-    submenus = {:help => [:about], :file => [:open, :quit], :edit => [:tape]}
+    submenus = [[:file, [:open, :quit]], [:edit, [:tape]], [:help, [:about]]]
     submenus.each {|item,submenu|
      menuItem(item,submenu)
     }
