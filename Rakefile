@@ -24,10 +24,12 @@ Rake::PackageTask.new(PACKAGE, RTURING_VERSION) do |p|
   p.need_tar_bz2 = true
   p.package_files.include('turing/*')
   p.package_files.include('rturing')
+  p.package_files.include('grturing')
   p.package_files.include('machines/*')
   p.package_files.include('Rakefile')
   p.package_files.include('README')
   p.package_files.include('tests/*')
+  p.package_files.include('interface/*')
 end
 
 task :clean => [ :clobber_package ] do
