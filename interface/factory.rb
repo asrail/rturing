@@ -1,11 +1,34 @@
 require 'gtk2'
+require 'turing/machine'
+
+
 
 class Factory < Gtk::Window
   def initialize
     super
   end
 
+  def validate(machine, dialog)
+    begin
+      t = Turing::TransFunction.new(machine)
+      return true
+    rescue Turing::InvalidMachine
+      value = false
+      message = "A máquina de turing digitada não é válida."
+      d2 = Gtk::MessageDialog.new(dialog,
+                                  Gtk::MessageDialog::MODAL,
+                                  Gtk::MessageDialog::INFO,
+                                  Gtk::MessageDialog::BUTTONS_CLOSE,
+                                  message)
+      d2.run {}
+      d2.destroy
+      return false
+    end
+  end
+
   def edit_factory(title,input_text,text,&response) #text will be used soon
+    Gtk::Stock.add(Gtk::Stock::APPLY, "Validar")
+    
     @control = false
     buffer = Gtk::TextBuffer.new
     buffer.insert_interactive_at_cursor(input_text, true)
@@ -13,10 +36,20 @@ class Factory < Gtk::Window
     textentry.accepts_tab = false
     dialog = Gtk::Dialog.new(title,
                              self,
-                             Gtk::Dialog::MODAL,       
-                             [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_NONE])
-    dialog.signal_connect("response") {
-      response.call(buffer,dialog)
+                             Gtk::Dialog::MODAL,
+                             [Gtk::Stock::APPLY, Gtk::Dialog::RESPONSE_APPLY],
+                             [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_OK],
+                             [Gtk::Stock::CANCEL, Gtk::Dialog::RESPONSE_CANCEL])
+    dialog.signal_connect("response") {|dia, action|
+      if action == Gtk::Dialog::RESPONSE_OK
+        if validate(buffer.text, dialog)
+          response.call(buffer,dialog, response)
+        end
+      elsif action == Gtk::Dialog::RESPONSE_APPLY
+        validate(buffer.text, dialog)
+      else
+        dialog.destroy
+      end
     }
     dialog.signal_connect("key-press-event") { |inp, ev|
       if Gdk::Keyval.to_name(ev.keyval) =~ /^Control/

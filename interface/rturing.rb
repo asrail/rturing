@@ -251,7 +251,7 @@ class JanelaPrincipal < Gtk::Window
 
   def set_trans(trans, window, saved=false)
     begin
-      tape = @maquina.tape.to_s
+      tape = @maquina.tape.to_s[1..-1]
       maquina = Turing::Machine.new(trans)
       maquina.setup(tape)
       @maquina = maquina
@@ -340,7 +340,7 @@ class JanelaPrincipal < Gtk::Window
   end
 
   def edit_machine
-    @factory.edit_factory("Editar Máquina",@maquina.trans.to_s,"") {|maquina_atual,dialog|
+    @factory.edit_factory("Editar Máquina",@maquina.trans.to_s,"") { |maquina_atual,dialog|
       set_trans(maquina_atual.text, dialog)
       self.first # não faz sentido editar os estados no meio, ainda
       self.update_labels
