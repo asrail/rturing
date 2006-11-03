@@ -66,7 +66,9 @@ module Turing #:nodoc
     end
 
     def match(str)
-      MTMatcher.new(super(str),@order)
+      md = super(str)
+      return nil unless md
+      MTMatcher.new(md,@order)
     end
   end
 
