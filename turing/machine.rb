@@ -193,12 +193,11 @@ module Turing #:nodoc
 
     @@wiesbaden = MTKind.new(:wiesbaden,
 %r((?x)
-  ^\s*(\S+)
-   \s*(\S+)
-   \s*(\S+)
-   \s*(\S+)
-   \s*(<|>)
-   (\s*(.*))?$
+  ^\s*,?\s*((?:\w|\d)+)
+   \s*,?\s*((?:\w|\d)+)
+   \s*,?\s*((?:\w|\d)+)
+   \s*,?\s*((?:\w|\d)+)
+   \s*,?\s*(<|>)$
 ), [1,2,5,4,3], {:l => ['<'], :r => ['>']})
 
     @@kind = @@gturing
