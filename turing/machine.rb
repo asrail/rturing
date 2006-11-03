@@ -34,7 +34,11 @@ module Turing #:nodoc
     }
 
     def initialize(format)
-      super(@@kinds[format])
+      if format.kind_of?Symbol
+        super(@@kinds[format])
+      else
+        super(format)
+      end
     end
   end
 
