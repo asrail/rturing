@@ -27,6 +27,17 @@ module Turing #:nodoc
   class ExecutionEnded < RuntimeError
   end
   
+  class MTRegex < Regexp
+    @@kinds={
+      :gturing => %r(^\s*(\d+)\s*(\S+)\s*(\S+)\s*(l|r)\s*(\d+)(\s*(.*))?$),
+      :fuckingsite => %r()
+    }
+
+    def initialize(format)
+      super(@@kinds[format])
+    end
+  end
+
   class TransFunction
     attr_reader :states, :original
 
@@ -39,13 +50,13 @@ module Turing #:nodoc
       @states[state][symbol] = rule
     end
 
-    def initialize(aut)
+    def initialize(aut,regex)
       @states = {}
       @original = aut
       aut.each_line do |line|
         next if line =~ /^\s*#/
-        md = /^\s*(\d+)\s*(\S+)\s*(\S+)\s*(l|r)\s*(\d+)(\s*(.*))?$/.match(line)
-        next unless $~
+        md = regex.match(line)
+        next unless md
         state = md[1].to_i
         symb_r = md[2]
         symb_w = md[3]
@@ -120,8 +131,18 @@ module Turing #:nodoc
   end
   
   class Machine
-    attr_accessor :trans, :machines
-    
+    attr_accessor :trans, :machines, :regex
+
+    def initialize(filename = nil, format=:gturing)
+      @regex = MTRegex.new(format)
+      if filename
+        File.open(filename) do |file| 
+          @trans = TransFunction.new(file.read,self.regex)
+        end
+      else
+        @trans = TransFunction.new("",self.regex)
+      end
+    end
 
     def halted
       @machines[-1].halted
@@ -133,16 +154,6 @@ module Turing #:nodoc
     
     def state
       @machines[-1].state
-    end
-
-    def initialize(filename = nil)
-      if filename
-        File.open(filename) do |file| 
-          @trans = TransFunction.new(file.read)
-        end
-      else
-        @trans = TransFunction.new("")
-      end
     end
     
     def setup(tape)
