@@ -44,13 +44,13 @@ module Turing #:nodoc
       @original = aut
       aut.each_line do |line|
         next if line =~ /^\s*#/
-        line =~ /^\s*(\d+)\s*(\S+)\s*(\S+)\s*(l|r)\s*(\d+)(\s*(.*))?$/
+        md = /^\s*(\d+)\s*(\S+)\s*(\S+)\s*(l|r)\s*(\d+)(\s*(.*))?$/.match(line)
         next unless $~
-        state = $~[1].to_i
-        symb_r = $~[2]
-        symb_w = $~[3]
-        dir = $~[4]
-        new_state = $~[5].to_i
+        state = md[1].to_i
+        symb_r = md[2]
+        symb_w = md[3]
+        dir = md[4]
+        new_state = md[5].to_i
         if !@states[state] then
           @states[state] = Hash.new
         end
