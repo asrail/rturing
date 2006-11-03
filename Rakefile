@@ -2,7 +2,7 @@ require 'rake/packagetask'
 require 'rake/loaders/makefile'
 
 PACKAGE = 'rturing'
-RTURING_VERSION="0.1.1"
+RTURING_VERSION="0.1.2"
 
 task :default do
   Dir.glob('tests/*').each { |test|
@@ -34,6 +34,7 @@ end
 
 task :clean => [ :clobber_package ] do
   Dir.rm_rf('doc')
+  Dir.rm_rf('pkg')
 end
 
 
