@@ -221,6 +221,9 @@ module Turing #:nodoc
       elsif /wiesbaden/ =~ kind
         @@kind = @@wiesbaden
       end
+      ObjectSpace.each_object(Machine) { |m|
+        m.kindified_initialize(kind)
+      }
     end
 
     def halted
@@ -246,11 +249,15 @@ module Turing #:nodoc
     end
     
     def initialize(transf="", kind=@@kind)
-      @kind = kind
-      self.regex = MTRegex.new(kind.exp,kind.order)
+      kindified_initialize(kind)
       @trans = TransFunction.new(transf, self.regex)
     end
     
+    def kindified_initialize(kind)
+      @kind = kind
+      self.regex = MTRegex.new(kind.exp,kind.order)
+    end
+
     def setup(tape)
       @machines = [MachineState.new(trans, Tape.new("#" + tape), 0, 1, kind)]
       self.halted = @trans.states.empty?
