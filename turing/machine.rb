@@ -26,6 +26,14 @@ module Turing #:nodoc
   
   class ExecutionEnded < RuntimeError
   end
+
+  class InvalidMachine < StandardError
+    attr_accessor :erros
+    def initialize(erros)
+      super()
+      self.erros = erros
+    end
+  end
   
   class MTMatcher
     @@order = {
@@ -36,9 +44,6 @@ module Turing #:nodoc
 
     def initialize(md,order)
       self.state,self.symb_r,self.symb_w,self.dir,self.new_state = @@order[order].map { |x|
-        md[x]
-      }
-      pp @@order[order].map { |x|
         md[x]
       }
     end
@@ -78,23 +83,30 @@ module Turing #:nodoc
     end
 
     def initialize(aut,regex=MTRegex.new(:gturing))
+      linhas_erradas = []
+      n_linha = 0
       @states = {}
       @original = aut
       aut.each_line do |line|
+        n_linha += 1
         next if line =~ /^\s*#/
         md = regex.match(line)
-        next unless md
+        if not md
+          linhas_erradas.push([n_linha, line])
+          next
+        end
         state = md.state.to_i
         symb_r = md.symb_r
         symb_w = md.symb_w
         dir = md.dir
         new_state = md.new_state.to_i
-        pp [state,symb_r,symb_w,dir,new_state]
         if !@states[state] then
           @states[state] = Hash.new
         end
         @states[state][symb_r] = Rule.new(symb_w, dir, new_state)
-        pp @states
+      end
+      if linhas_erradas != []
+        raise InvalidMachine.new(linhas_erradas)
       end
     end
     
@@ -162,16 +174,6 @@ module Turing #:nodoc
   class Machine
     attr_accessor :trans, :machines, :regex
 
-    def initialize(filename = nil, format=:gturing)
-      @regex = MTRegex.new(format)
-      if filename
-        File.open(filename) do |file| 
-          @trans = TransFunction.new(file.read,self.regex)
-        end
-      else
-        @trans = TransFunction.new("",self.regex)
-      end
-    end
 
     def halted
       @machines[-1].halted
@@ -183,6 +185,21 @@ module Turing #:nodoc
     
     def state
       @machines[-1].state
+    end
+
+    def self.from_file(filename = nil)
+      if filename
+        File.open(filename) do |file| 
+          Machine.new(file.read)
+        end
+      else
+        Machine.new("")
+      end
+    end
+    
+    def initialize(transf="", format=:gturing)
+      self.regex = MTRegex.new(format)
+      @trans = TransFunction.new(transf, self.regex)
     end
     
     def setup(tape)
