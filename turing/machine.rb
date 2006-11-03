@@ -278,7 +278,7 @@ end
 
 def main
   if ARGV.size == 2
-    machine = Turing::Machine.new(ARGV[0])
+    machine = Turing::Machine.from_file(ARGV[0])
     machine.setup(ARGV[1])
     machine.process(:print)
   end
