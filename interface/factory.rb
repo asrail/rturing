@@ -27,7 +27,7 @@ class Factory < Gtk::Window
   end
 
   def edit_factory(title,input_text,text,&response) #text will be used soon
-    Gtk::Stock.add(Gtk::Stock::APPLY, "Validar")
+    Gtk::Stock.add(Gtk::Stock::APPLY, "_Validar")
     
     @control = false
     buffer = Gtk::TextBuffer.new
