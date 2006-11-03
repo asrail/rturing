@@ -57,16 +57,19 @@ module Turing #:nodoc
   end
 
   class MTRegex < Regexp
-    def initialize(format,order)
-      if format.kind_of?Symbol
-        @order = order
-        super(format)
-      else
-        @order = [1,2,3,4,5]
-        super(format)
+    def initialize(exp,order=nil)
+      if not order.nil?
+        if exp.kind_of?Symbol
+          @order = order
+        else
+          @order = [1,2,3,4,5]
+        end
+      elsif exp.kind_of?MTKind
+        @order = exp.order
+        exp = exp.exp
       end
+      super(exp)
     end
-
     def match(str)
       md = super(str)
       return nil unless md
