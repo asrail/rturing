@@ -1,22 +1,5 @@
 require 'pp'
 module Turing #:nodoc
-  def self.kind
-   MTKind.new(:gturing,
-%r((?x)
-  ^\s*(\d+)
-   \s*(\S+)
-   \s*(\S+)
-   \s*(l|r)
-   \s*(\d+)
-   (\s*(.*))?$),
-       [1,2,3,4,5],
-              {:l => 'e',:r => 'd'})
-  end
-
-  def self.setup(kind)
-    @@kind = kind
-  end
-
   class MTKind
     attr_accessor :name,:exp,:order,:move
 
@@ -103,7 +86,7 @@ module Turing #:nodoc
       @states[state][symbol] = rule
     end
 
-    def initialize(aut,regex=Turing::kind.exp)
+    def initialize(aut,regex)
       linhas_erradas = []
       n_linha = 0
       @states = {}
@@ -194,6 +177,17 @@ module Turing #:nodoc
   class Machine
     attr_accessor :trans, :machines, :regex, :kind
 
+    @@gturing = MTKind.new(:gturing,
+%r((?x)
+  ^\s*(\d+)
+   \s*(\S+)
+   \s*(\S+)
+   \s*(l|r)
+   \s*(\d+)
+   (\s*(.*))?$),
+       [1,2,3,4,5],
+              {:l => 'e',:r => 'd'})
+
     def halted
       @machines[-1].halted
     end
@@ -216,7 +210,7 @@ module Turing #:nodoc
       end
     end
     
-    def initialize(transf="", kind=Turing.kind)
+    def initialize(transf="", kind=@@gturing)
       @kind = kind
       self.regex = MTRegex.new(kind.exp,kind.order)
       @trans = TransFunction.new(transf, self.regex)
