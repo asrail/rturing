@@ -105,6 +105,23 @@ class Menus < Gtk::MenuBar
 end
 
 
+class ExistemErros < Gtk::MessageDialog
+  def initialize(window, erros)
+    super(window,
+          Gtk::MessageDialog::MODAL,
+          Gtk::MessageDialog::ERROR,
+          Gtk::MessageDialog::BUTTONS_CLOSE,
+          "Existem erros na máquina a ser carregada. " +
+          "O primeiro fica na linha #{erros[0][0]}, que é " +
+          "\"#{erros[0][1]}\". Provavelmente, isso é por um " +
+          "desrespeito ao formato, que é:\n" +
+          "<estado_atual> <simbolo_lido> <simbolo_escrito> " +
+          "<direcao> <novo_estado>\n" +
+          "Onde direção é d, e, l, ou r.")
+    
+  end
+end
+
 class SalvaAntes < Gtk::Dialog
   def initialize(operacao, window)
     super("Deseja #{operacao} sem salvar?",
@@ -232,6 +249,22 @@ class JanelaPrincipal < Gtk::Window
     @status.push(@status.get_context_id("estado"), "Estado atual: #{@maquina.state}")
   end
 
+  def set_trans(trans, window)
+    begin
+      tape = @maquina.tape.to_s
+      maquina = Turing::Machine.new(trans)
+      maquina.setup(tape)
+      @maquina = maquina
+      @saved = false
+      return true
+    rescue Turing::InvalidMachine => m
+      dialog = ExistemErros.new(window, m.erros)
+      dialog.run {}
+      dialog.destroy
+      return false
+    end
+  end
+
   def open_file
     if not @saved
       deseja_salvar = SalvaAntes.new("abrir outra máquina", self)
@@ -257,12 +290,15 @@ class JanelaPrincipal < Gtk::Window
                                             Gtk::Dialog::RESPONSE_ACCEPT])
       
       runned = dialog.run
+      success = false
       if runned == Gtk::Dialog::RESPONSE_ACCEPT
-        @maquina = Turing::Machine.new(dialog.filename)
+        File.open(dialog.filename) { |file|
+          success = set_trans(file.read, dialog)
+        }
         @maquina.setup ""
       end
       dialog.destroy
-      if runned == Gtk::Dialog::RESPONSE_ACCEPT
+      if runned == Gtk::Dialog::RESPONSE_ACCEPT and success
         self.choose_tape
       end
     end
@@ -305,9 +341,8 @@ class JanelaPrincipal < Gtk::Window
 
   def edit_machine
     @factory.edit_factory("Editar Máquina",@maquina.trans.to_s,"") {|maquina_atual,dialog|
-      @maquina.trans = Turing::TransFunction.new(maquina_atual.text)
+      set_trans(maquina_atual.text, dialog)
       self.first # não faz sentido editar os estados no meio, ainda
-      @saved = false
       self.update_labels
       dialog.destroy
     }
