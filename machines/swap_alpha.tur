@@ -1,0 +1,3 @@
+# swap_alpha.tur: change a's for b's and b's for a's
+a a b r a
+a b a r a

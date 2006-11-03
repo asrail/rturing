@@ -38,10 +38,6 @@ end
 
 
 task :tag do
-  begin
-    system("svn copy https://intranet.dcc.ufba.br/svn/rturing/trunk https://intranet.dcc.ufba.br/svn/rturing/tags/${version}")
-  rescue
     system("svn copy https://intranet.dcc.ufba.br/svn/rturing/trunk https://intranet.dcc.ufba.br/svn/rturing/tags/#{RTURING_VERSION}")
-  end
 end
 
