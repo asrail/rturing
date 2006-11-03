@@ -113,6 +113,7 @@ module Turing #:nodoc
         @states[state][symb_r] = Rule.new(symb_w, dir, new_state)
       end
       if linhas_erradas != []
+        pp linhas_erradas
         raise InvalidMachine.new(linhas_erradas)
       end
     end
@@ -187,16 +188,39 @@ module Turing #:nodoc
    \s*(\S+)
    \s*(l|r|e|d)
    \s*(\S+)
-   (\s*(.*))?$),
-       [1,2,3,4,5],
-              {:l => 'e',:r => 'd'})
+   (\s*(.*))?$
+), [1,2,3,4,5], {:l => 'e',:r => 'd'})
+
+    @@wiesbaden = MTKind.new(:wiesbaden,
+%r((?x)
+  ^\s*(\S+)
+   \s*(\S+)
+   \s*(\S+)
+   \s*(\S+)
+   \s*(<|>)
+   (\s*(.*))?$
+), [1,2,5,4,3], {:l => ['<'], :r => ['>']})
+
+    @@kind = @@gturing
 
     def self.default_kind
-      @@gturing
+      @@kind
     end
 
     def default_kind
       self.default_kind
+    end
+
+    def default_kind=(kind)
+      self.default_kind=(kind)
+    end
+
+    def self.default_kind=(kind)
+      if /gturing/ =~ kind
+        @@kind = @@gturing
+      elsif /wiesbaden/ =~ kind
+        @@kind = @@wiesbaden
+      end
     end
 
     def halted
@@ -221,7 +245,7 @@ module Turing #:nodoc
       end
     end
     
-    def initialize(transf="", kind=@@gturing)
+    def initialize(transf="", kind=@@kind)
       @kind = kind
       self.regex = MTRegex.new(kind.exp,kind.order)
       @trans = TransFunction.new(transf, self.regex)

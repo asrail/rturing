@@ -364,6 +364,7 @@ end
 
 def main
   Gtk::init
+#  Turing::Machine.default_kind = "wiesbaden"
   w = JanelaPrincipal.new
   Gtk.main
 end

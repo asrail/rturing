@@ -37,9 +37,7 @@ end
 
 task :clean => [ :clobber_package ] do
   Dir.rm_rf('doc')
-  Dir.rm_rf('pkg')
 end
-
 
 task :tag do
     system("svn copy https://intranet.dcc.ufba.br/svn/rturing/trunk https://intranet.dcc.ufba.br/svn/rturing/tags/#{RTURING_VERSION}")
