@@ -56,7 +56,7 @@ class Factory < Gtk::Window
         @control = true
       elsif ev.keyval == Gdk::Keyval::GDK_Return or ev.keyval == Gdk::Keyval::GDK_KP_Enter
         if @control
-          dialog.signal_emit("response", Gtk::Dialog::RESPONSE_NONE)
+          dialog.signal_emit("response", Gtk::Dialog::RESPONSE_OK)
           @control = false
         end
       end
