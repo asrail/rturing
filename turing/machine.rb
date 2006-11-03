@@ -11,9 +11,9 @@ module Turing #:nodoc
     end
 
     def dir_to_amount(dir)
-      if ['r',move[:r]].include?dir then
+      if move[:r].include?dir then
         1
-      elsif ['l',move[:l]].include?dir then
+      elsif move[:l].include?dir then
         -1
       else
         0
@@ -189,7 +189,7 @@ module Turing #:nodoc
    \s*(l|r|e|d)
    \s*(\S+)
    (\s*(.*))?$
-), [1,2,3,4,5], {:l => 'e',:r => 'd'})
+), [1,2,3,4,5], {:l => ['e','l'],:r => ['d','r']})
 
     @@wiesbaden = MTKind.new(:wiesbaden,
 %r((?x)
