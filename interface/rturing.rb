@@ -328,6 +328,7 @@ class JanelaPrincipal < Gtk::Window
 end
 
 def main
+  Gtk::init
   w = JanelaPrincipal.new
   Gtk.main
 end
