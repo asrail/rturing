@@ -59,16 +59,6 @@ module Turing #:nodoc
     end
     
     def to_s
-=begin
-      string = ""
-      @states.each do |state|
-        #string + "d(#{state[0].join(',')}) = #{state[1..3].join(',')}\n"
-        state[1].each do |elem, rule|
-          string += "#{state[0]} #{elem} #{rule.to_s}\n"
-        end
-      end
-      return string
-=end
       @original
     end
   end
@@ -91,6 +81,10 @@ module Turing #:nodoc
         new_symbol =  rule.written_symbol
         newpos = Turing::dir_to_amount(rule.direction) + pos
         newtape = tape.set_at(pos, new_symbol)
+        if newpos < 0
+          newpos = 0
+          newtape.tape = ["_"] + newtape.tape
+        end
         return MachineState.new(trans, newtape, new_state, newpos)
       rescue ExecutionEnded
         return MachineState.new(trans, tape, state, pos, true)
@@ -107,8 +101,9 @@ module Turing #:nodoc
     
     def get(pos)
 
-      return (pos >= tape.size)? "_" : tape[pos]
+      return ((pos >= tape.size) or (pos < 0))? "_" : tape[pos]
     end
+    
 
     def set_at(pos, val)
       while pos >= tape.size do
