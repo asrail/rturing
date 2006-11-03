@@ -249,13 +249,13 @@ class JanelaPrincipal < Gtk::Window
     @status.push(@status.get_context_id("estado"), "Estado atual: #{@maquina.state}")
   end
 
-  def set_trans(trans, window)
+  def set_trans(trans, window, saved=false)
     begin
       tape = @maquina.tape.to_s
       maquina = Turing::Machine.new(trans)
       maquina.setup(tape)
       @maquina = maquina
-      @saved = false
+      @saved = saved
       return true
     rescue Turing::InvalidMachine => m
       dialog = ExistemErros.new(window, m.erros)
@@ -293,7 +293,7 @@ class JanelaPrincipal < Gtk::Window
       success = false
       if runned == Gtk::Dialog::RESPONSE_ACCEPT
         File.open(dialog.filename) { |file|
-          success = set_trans(file.read, dialog)
+          success = set_trans(file.read, dialog, true)
         }
         @maquina.setup ""
       end
