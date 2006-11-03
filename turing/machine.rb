@@ -1,4 +1,4 @@
-
+require 'pp'
 module Turing #:nodoc
   def self.dir_to_amount(dir)
     if ['r','d'].include?dir then
@@ -27,18 +27,41 @@ module Turing #:nodoc
   class ExecutionEnded < RuntimeError
   end
   
+  class MTMatcher
+    @@order = {
+      :gturing => [1,2,3,4,5],
+      :fuckingsite => []
+    }
+    attr_accessor :state,:symb_r,:symb_w,:dir,:new_state
+
+    def initialize(md,order)
+      self.state,self.symb_r,self.symb_w,self.dir,self.new_state = @@order[order].map { |x|
+        md[x]
+      }
+      pp @@order[order].map { |x|
+        md[x]
+      }
+    end
+  end
+
   class MTRegex < Regexp
     @@kinds={
       :gturing => %r(^\s*(\d+)\s*(\S+)\s*(\S+)\s*(l|r)\s*(\d+)(\s*(.*))?$),
       :fuckingsite => %r()
     }
 
-    def initialize(format)
+    def initialize(format,order=format)
       if format.kind_of?Symbol
+        @order = order
         super(@@kinds[format])
       else
+        @order = :gturing
         super(format)
       end
+    end
+
+    def match(str)
+      MTMatcher.new(super(str),@order)
     end
   end
 
@@ -54,22 +77,24 @@ module Turing #:nodoc
       @states[state][symbol] = rule
     end
 
-    def initialize(aut,regex)
+    def initialize(aut,regex=MTRegex.new(:gturing))
       @states = {}
       @original = aut
       aut.each_line do |line|
         next if line =~ /^\s*#/
         md = regex.match(line)
         next unless md
-        state = md[1].to_i
-        symb_r = md[2]
-        symb_w = md[3]
-        dir = md[4]
-        new_state = md[5].to_i
+        state = md.state.to_i
+        symb_r = md.symb_r
+        symb_w = md.symb_w
+        dir = md.dir
+        new_state = md.new_state.to_i
+        pp [state,symb_r,symb_w,dir,new_state]
         if !@states[state] then
           @states[state] = Hash.new
         end
         @states[state][symb_r] = Rule.new(symb_w, dir, new_state)
+        pp @states
       end
     end
     
