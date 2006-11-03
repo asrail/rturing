@@ -2,7 +2,7 @@ require 'rake/packagetask'
 require 'rake/loaders/makefile'
 
 PACKAGE = 'rturing'
-RTURING_VERSION="0.1"
+RTURING_VERSION="0.1.1"
 
 task :default do
   Dir.glob('tests/*').each { |test|
