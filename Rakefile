@@ -21,7 +21,7 @@ task :doc do
 end
 
 Rake::PackageTask.new(PACKAGE, RTURING_VERSION) do |p|
-  p.need_tar_bz2 = true
+  p.need_tar_gz = true
   p.package_files.include('turing/*')
   p.package_files.include('rturing')
   p.package_files.include('grturing')
