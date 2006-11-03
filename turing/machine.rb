@@ -1,12 +1,40 @@
 require 'pp'
 module Turing #:nodoc
-  def self.dir_to_amount(dir)
-    if ['r','d'].include?dir then
-      1
-    elsif ['l','e'].include?dir then
-      -1
-    else
-      0
+  def self.kind
+   MTKind.new(:gturing,
+%r((?x)
+  ^\s*(\d+)
+   \s*(\S+)
+   \s*(\S+)
+   \s*(l|r)
+   \s*(\d+)
+   (\s*(.*))?$),
+       [1,2,3,4,5],
+              {:l => 'e',:r => 'd'})
+  end
+
+  def self.setup(kind)
+    @@kind = kind
+  end
+
+  class MTKind
+    attr_accessor :name,:exp,:order,:move
+
+    def initialize(name,exp,order,move)
+      @name = name
+      @exp = exp
+      @order = order
+      @move = move
+    end
+
+    def dir_to_amount(dir)
+      if ['r',move[:r]].include?dir then
+        1
+      elsif ['l',move[:l]].include?dir then
+        -1
+      else
+        0
+      end
     end
   end
 
@@ -36,31 +64,22 @@ module Turing #:nodoc
   end
   
   class MTMatcher
-    @@order = {
-      :gturing => [1,2,3,4,5],
-      :fuckingsite => []
-    }
     attr_accessor :state,:symb_r,:symb_w,:dir,:new_state
 
     def initialize(md,order)
-      self.state,self.symb_r,self.symb_w,self.dir,self.new_state = @@order[order].map { |x|
+      self.state,self.symb_r,self.symb_w,self.dir,self.new_state = order.map { |x|
         md[x]
       }
     end
   end
 
   class MTRegex < Regexp
-    @@kinds={
-      :gturing => %r(^\s*(\d+)\s*(\S+)\s*(\S+)\s*(l|r)\s*(\d+)(\s*(.*))?$),
-      :fuckingsite => %r()
-    }
-
-    def initialize(format,order=format)
+    def initialize(format,order)
       if format.kind_of?Symbol
         @order = order
-        super(@@kinds[format])
+        super(format)
       else
-        @order = :gturing
+        @order = [1,2,3,4,5]
         super(format)
       end
     end
@@ -84,7 +103,7 @@ module Turing #:nodoc
       @states[state][symbol] = rule
     end
 
-    def initialize(aut,regex=MTRegex.new(:gturing))
+    def initialize(aut,regex=Turing::kind.exp)
       linhas_erradas = []
       n_linha = 0
       @states = {}
@@ -118,13 +137,14 @@ module Turing #:nodoc
   end
   
   class MachineState
-    attr_accessor :tape, :state, :pos, :trans, :halted
+    attr_accessor :tape, :state, :pos, :trans, :halted, :kind
 
-    def initialize(trans, tape, state, pos, halt=false)
+    def initialize(trans, tape, state, pos, kind, halt=false)
       @trans = trans
       @tape = tape
       @state = state
       @pos = pos
+      @kind = kind
       self.halted = halt
     end
     
@@ -133,15 +153,15 @@ module Turing #:nodoc
         rule = @trans.get(state, @tape.get(pos))
         new_state = rule.new_state
         new_symbol =  rule.written_symbol
-        newpos = Turing::dir_to_amount(rule.direction) + pos
+        newpos = kind.dir_to_amount(rule.direction) + pos
         newtape = tape.set_at(pos, new_symbol)
         if newpos < 0
           newpos = 0
           newtape.tape = ["_"] + newtape.tape
         end
-        return MachineState.new(trans, newtape, new_state, newpos)
+        return MachineState.new(trans, newtape, new_state, newpos, kind)
       rescue ExecutionEnded
-        return MachineState.new(trans, tape, state, pos, true)
+        return MachineState.new(trans, tape, state, pos, kind, true)
       end
     end
   end
@@ -154,10 +174,8 @@ module Turing #:nodoc
     end
     
     def get(pos)
-
       return ((pos >= tape.size) or (pos < 0))? "_" : tape[pos]
     end
-    
 
     def set_at(pos, val)
       while pos >= tape.size do
@@ -174,8 +192,7 @@ module Turing #:nodoc
   end
   
   class Machine
-    attr_accessor :trans, :machines, :regex
-
+    attr_accessor :trans, :machines, :regex, :kind
 
     def halted
       @machines[-1].halted
@@ -199,13 +216,14 @@ module Turing #:nodoc
       end
     end
     
-    def initialize(transf="", format=:gturing)
-      self.regex = MTRegex.new(format)
+    def initialize(transf="", kind=Turing.kind)
+      @kind = kind
+      self.regex = MTRegex.new(kind.exp,kind.order)
       @trans = TransFunction.new(transf, self.regex)
     end
     
     def setup(tape)
-      @machines = [MachineState.new(trans, Tape.new("#" + tape), 0, 1)]
+      @machines = [MachineState.new(trans, Tape.new("#" + tape), 0, 1, kind)]
       self.halted = @trans.states.empty?
     end
 
