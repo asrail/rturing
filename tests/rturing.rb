@@ -56,4 +56,11 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
     machine.step(5)
     assert_equal(['_', '0', '0', '0', '0', '0'], machine.tape)
   end
+
+  def test_alpha
+    machine = Turing::Machine.from_file('machines/swap_alpha.tur')
+    machine.setup('abab')
+    machine.process
+    assert_equal(['#', 'b','a','b','a'], machine.tape)
+  end
 end

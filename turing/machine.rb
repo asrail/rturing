@@ -182,11 +182,11 @@ module Turing #:nodoc
 
     @@gturing = MTKind.new(:gturing,
 %r((?x)
-  ^\s*(\d+)
+  ^\s*(\S+)
    \s*(\S+)
    \s*(\S+)
-   \s*(l|r)
-   \s*(\d+)
+   \s*(l|r|e|d)
+   \s*(\S+)
    (\s*(.*))?$),
        [1,2,3,4,5],
               {:l => 'e',:r => 'd'})
