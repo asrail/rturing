@@ -188,6 +188,14 @@ module Turing #:nodoc
        [1,2,3,4,5],
               {:l => 'e',:r => 'd'})
 
+    def self.default_kind
+      @@gturing
+    end
+
+    def default_kind
+      self.default_kind
+    end
+
     def halted
       @machines[-1].halted
     end
