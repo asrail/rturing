@@ -31,7 +31,6 @@ class ConfigRadioList < Gtk::MenuItem
   end
 
   def append(item,symb)
-    
     if @radio.nil?
       @radio = ConfigRadioMenuItem.new(@key,symb,item)
       radio = @radio

@@ -21,9 +21,11 @@ class Menus < Gtk::MenuBar
 #        window.edit_machine # forcing the user to validate it
       end
     }
+    mboth = ConfigCheckMenuItem.new(:mboth,"Infinita para os dois lados")
+    mconfigs = Gtk::MenuItem.new("Tipo").set_submenu(Gtk::Menu.new.append(mboth).append(kind))
     submenus = [
       [:arquivo, [:open_file, :save_machine, :quit]], 
-      [:editar, [kind, :choose_tape, :edit_machine, :choose_timeout]], 
+      [:editar, [mconfigs, :choose_tape, :edit_machine, :choose_timeout]], 
       [:ajuda, [:about], 2]] #os nomes estao hardcodeados ainda
     mnemonics = {
       :open_file => [Gdk::Keyval::GDK_O, 
