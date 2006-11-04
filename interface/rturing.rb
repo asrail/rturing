@@ -180,10 +180,10 @@ class JanelaPrincipal < Gtk::Window
     exec_field.pack_start(@fita,false,false,0)
     exec_field.pack_start(@cabecote,false,false,0)
     linhas.pack_start(exec_field,false,false,2)
-    linhas.pack_start(Gtk::HSeparator.new,false,false,2)
+    linhas.pack_start(Gtk::HSeparator.new.set_size_request(400, 2),false,false,2)
     button_line = hcenter(Buttons.new(self))
     linhas.pack_start(button_line,false,true)
-    linhas.pack_start(Gtk::VBox.new(false,0).pack_start(@status),false,false)
+    linhas.pack_end(Gtk::VBox.new(false,0).pack_start(@status),false,false)
     add(linhas)
     show_all
   end
