@@ -42,12 +42,18 @@ end
 class RadioList < Gtk::MenuItem
   def initialize(name)
     @menu = Gtk::Menu.new
+    @radio = nil
     super(name)
     set_submenu(@menu)
   end
 
-  def append(item)
-    @menu.append(Gtk::RadioMenuItem.new(item))
+  def append(item,active=true)
+    if @radio.nil?
+      @radio = Gtk::RadioMenuItem.new(item)
+      @menu.append(@radio)
+    else
+      @menu.append(Gtk::RadioMenuItem.new(@radio,item))
+    end
   end
 end
 
@@ -59,7 +65,7 @@ class Menus < Gtk::MenuBar
     Gtk::Stock.add(Gtk::Stock::EDIT, "_Fita")
     Gtk::Stock.add(Gtk::Stock::EXECUTE, "_Máquina")
     Gtk::Stock.add(Gtk::Stock::CONVERT, "_Timeout")
-    kind = RadioList.new("K")
+    kind = RadioList.new("Tipo de máquina")
     kind.append("Gturing")
     kind.append("Wiesbaden")
     submenus = [
