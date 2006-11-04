@@ -14,9 +14,9 @@ class Menus < Gtk::MenuBar
     kind.add_signal("toggled") {|item,kind,window|
       if item.active?
         Turing::Machine.default_kind = kind
-#        set_trans(@maquina.trans.to_s, dialog)
         window.first
         window.update_labels
+        window.edit_machine # forcing the user to validate it
       end
     }
     submenus = [
