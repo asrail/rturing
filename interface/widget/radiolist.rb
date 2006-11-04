@@ -2,10 +2,11 @@ require "gtk2"
 
 class RadioList < Gtk::MenuItem
   attr_accessor :kind
-  def initialize(name)
+  def initialize(name,window)
     @menu = Gtk::Menu.new
     @radio = nil
     @kind = {}
+    @window = window
     super(name)
     set_submenu(@menu)
   end
@@ -23,8 +24,8 @@ class RadioList < Gtk::MenuItem
 
   def add_signal(signal,&response)
     self.submenu.children.each {|rb|
-      rb.signal_connect(signal) { |window,event|
-        response.call(rb,kind[rb].to_s)
+      rb.signal_connect(signal) {
+        response.call(rb,kind[rb].to_s,@window)
       }
     }
   end

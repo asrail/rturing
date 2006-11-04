@@ -8,15 +8,15 @@ class Menus < Gtk::MenuBar
     Gtk::Stock.add(Gtk::Stock::EDIT, "_Fita")
     Gtk::Stock.add(Gtk::Stock::EXECUTE, "_Máquina")
     Gtk::Stock.add(Gtk::Stock::CONVERT, "_Timeout")
-    kind = RadioList.new("Tipo _de máquina")
+    kind = RadioList.new("Tipo _de máquina",window)
     kind.append("_Gturing",:gturing)
     kind.append("_Wiesbaden",:wiesbaden)
-    kind.add_signal("toggled") {|item,kind.machine|
+    kind.add_signal("toggled") {|item,kind,window|
       if item.active?
         Turing::Machine.default_kind = kind
 #        set_trans(@maquina.trans.to_s, dialog)
-        machine.first
-        machine.update_labels
+        window.first
+        window.update_labels
       end
     }
     submenus = [

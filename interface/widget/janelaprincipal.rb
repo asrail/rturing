@@ -1,5 +1,6 @@
 require "gtk2"
 require "turing/machine"
+require "interface/factory"
 require "mathn"
 
 class JanelaPrincipal < Gtk::Window
