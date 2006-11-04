@@ -174,7 +174,7 @@ module Turing #:nodoc
   end
   
   class Machine
-    attr_accessor :trans, :machines, :regex, :kind, :both_sides
+    attr_accessor :trans, :machines, :regex, :kind, :both
 
     @@both_sides = true
     @@gturing = MTKind.new(:gturing,
@@ -199,7 +199,7 @@ module Turing #:nodoc
     
     def initialize(transf="", both_sides=@@both_sides, kind=@@kind)
       @kind = kind
-      @both_sides = both_sides
+      @both = both_sides
       self.regex = MTRegex.new(kind)
       @trans = TransFunction.new(transf, self.regex)
     end
@@ -271,7 +271,7 @@ module Turing #:nodoc
     end
 
     def setup(tape)
-      @machines = [MachineState.new(trans, Tape.new("#" + tape), 
+      @machines = [MachineState.new(trans, Tape.new("#{'#' unless both}#{tape}"), 
                                     trans.inicial, 1, kind)]
       self.halted = @trans.states.empty?
     end
