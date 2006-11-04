@@ -1,4 +1,6 @@
 require "gtk2"
+require "interface/widget/radiolist"
+require "interface/widget/cmi"
 
 class Menus < Gtk::MenuBar
   attr_accessor :menus
