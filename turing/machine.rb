@@ -57,19 +57,12 @@ module Turing #:nodoc
   end
 
   class MTRegex < Regexp
-    def initialize(exp,order=nil)
-      if not order.nil?
-        if exp.kind_of?Symbol
-          @order = order
-        else
-          @order = [1,2,3,4,5]
-        end
-      elsif exp.kind_of?MTKind
-        @order = exp.order
-        exp = exp.exp
-      end
+    def initialize(exp)
+      @order = exp.order
+      exp = exp.exp
       super(exp)
     end
+
     def match(str)
       md = super(str)
       return nil unless md
@@ -202,7 +195,7 @@ module Turing #:nodoc
    ,?\s*((?:\w|\d)+)
    ,?\s*((?:\w|\d|[-+\/!@%^&=,.()$#*_])+)
    ,?\s*(<|>)$
-), [1,2,5,4,3], {:l => ['<'], :r => ['>']})
+), [1,2,4,5,3], {:l => ['<'], :r => ['>']})
 
     @@kind = @@gturing
 
@@ -250,7 +243,7 @@ module Turing #:nodoc
     
     def initialize(transf="", kind=@@kind)
       @kind = kind
-      self.regex = MTRegex.new(kind.exp,kind.order)
+      self.regex = MTRegex.new(kind)
       @trans = TransFunction.new(transf, self.regex)
     end
 
