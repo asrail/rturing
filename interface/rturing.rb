@@ -11,9 +11,9 @@ class Buttons < Gtk::HBox
        [Gtk::Stock::STOP, "_Parar"],
        [Gtk::Stock::YES, "E_xecutar"],
        [Gtk::Stock::GO_FORWARD, "Ava_nçar"],
-       [Gtk::Stock::GOTO_LAST, "Últi_mo"]].each { |id, label|
-      
-       Gtk::Stock.add(id, label)
+       [Gtk::Stock::GOTO_LAST, "Últi_mo"]
+     ].each { |id, label|
+      Gtk::Stock.add(id, label)
      }
      buttons = [
        [:first, Gtk::Stock::GOTO_FIRST], 
@@ -33,7 +33,7 @@ class Buttons < Gtk::HBox
       send(sbut).signal_connect("clicked") {
         window.send(sbut)
       }
-      pack_start(send(sbut))
+      pack_start(send(sbut),true,true,1)
     }
   end
 end
@@ -72,7 +72,6 @@ class Menus < Gtk::MenuBar
       :choose_timeout => [Gdk::Keyval::GDK_T,
         Gdk::Window::CONTROL_MASK,
         Gtk::Stock::CONVERT]
-
     }
     submenus.each {|item,submenu, accel|
       menuItem(item,mnemonics,submenu,accel)
@@ -168,9 +167,9 @@ class JanelaPrincipal < Gtk::Window
     self.add_accel_group(@ag)
     @maquina = Turing::Machine.new
     @maquina.setup("Bem vindo ao rturing.")
-    @linhas = Gtk::VBox.new
+    linhas = Gtk::VBox.new(false,0)
     @menu = Menus.new(self)
-    @linhas.pack_start(@menu,false,false,0)
+    linhas.pack_start(@menu,false,false,0)
     @fita = Gtk::Label.new
     @fita.set_alignment(0,0)
     @cabecote = Gtk::Label.new
@@ -178,12 +177,15 @@ class JanelaPrincipal < Gtk::Window
     @status = Gtk::Statusbar.new
     @status.push(@status.get_context_id("estado"), "nunca aparece")
     self.update_labels
-    @linhas.pack_start(@fita)
-    @linhas.pack_start(@cabecote)
+    campo_execucao = Gtk::VBox.new(false,0)
+    campo_execucao.pack_start(@fita,false,false,0)
+    campo_execucao.pack_start(@cabecote,false,false,0)
+    linhas.pack_start(campo_execucao,true,true,2)
+    linhas.pack_start(Gtk::HSeparator.new,false,false,2)
     @botoes = Buttons.new(self)
-    @linhas.pack_start(@botoes)
-    @linhas.pack_start(@status)
-    add(@linhas)
+    linhas.pack_start(@botoes)
+    linhas.pack_start(@status)
+    add(linhas)
     show_all
   end
 
