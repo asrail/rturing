@@ -10,13 +10,9 @@ class Menus < Gtk::MenuBar
     Gtk::Stock.add(Gtk::Stock::EDIT, "_Fita")
     Gtk::Stock.add(Gtk::Stock::EXECUTE, "_Máquina")
     Gtk::Stock.add(Gtk::Stock::CONVERT, "_Timeout")
-#    p Config::client["/apps/rturing/tipo"]
     kind = ConfigRadioList.new("Tipo _de máquina",window, "tipo")
-#    p Config::client["/apps/rturing/tipo"]
     kind.append("_Gturing",:gturing)
-#    p Config::client["/apps/rturing/tipo"]
     kind.append("_Wiesbaden",:wiesbaden)
-#    p Config::client["/apps/rturing/tipo"]
     kind.add_signal("toggled") {|item,kind,window|
       if item.active?
         Turing::Machine.default_kind = kind
