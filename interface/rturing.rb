@@ -33,7 +33,7 @@ class Buttons < Gtk::HBox
       send(sbut).signal_connect("clicked") {
         window.send(sbut)
       }
-      pack_start(send(sbut),true,true,1)
+      pack_start(send(sbut),true,false,1)
     }
   end
 end
@@ -182,9 +182,8 @@ class JanelaPrincipal < Gtk::Window
     campo_execucao.pack_start(@cabecote,false,false,0)
     linhas.pack_start(campo_execucao,true,true,2)
     linhas.pack_start(Gtk::HSeparator.new,false,false,2)
-    @botoes = Buttons.new(self)
-    linhas.pack_start(@botoes)
-    linhas.pack_start(@status)
+    linhas.pack_start(Gtk::VBox.new(false,0).pack_start(Buttons.new(self)),false,false)
+    linhas.pack_start(Gtk::VBox.new(false,0).pack_start(@status),false,false)
     add(linhas)
     show_all
   end
