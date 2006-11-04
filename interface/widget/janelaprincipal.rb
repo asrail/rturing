@@ -23,7 +23,7 @@ class JanelaPrincipal < Gtk::Window
     @ag = Gtk::AccelGroup.new
     self.add_accel_group(@ag)
     @maquina = Turing::Machine.new
-    @maquina.setup("Bem vindo ao rturing.")
+    @maquina.setup("")
     linhas = Gtk::VBox.new(false,0)
     @menu = Menus.new(self)
     linhas.pack_start(@menu,false,false,0)
