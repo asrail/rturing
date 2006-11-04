@@ -174,8 +174,9 @@ module Turing #:nodoc
   end
   
   class Machine
-    attr_accessor :trans, :machines, :regex, :kind
+    attr_accessor :trans, :machines, :regex, :kind, :both_sides
 
+    @@both_sides = true
     @@gturing = MTKind.new(:gturing,
 %r((?x)
   ^\s*(\S+)
@@ -185,7 +186,6 @@ module Turing #:nodoc
    \s*(\S+)
    (\s*(.*))?$
 ), [1,2,3,4,5], {:l => ['e','l'],:r => ['d','r']})
-
     @@wiesbaden = MTKind.new(:wiesbaden,
 %r((?x)
   ^\s*((?:\w|\d)+)
@@ -194,8 +194,15 @@ module Turing #:nodoc
    ,?\s*((?:\w|\d|[-+\/!@%^&=.()$#*_])+)
    ,?\s*(<|>)$
 ), [1,2,4,5,3], {:l => ['<'], :r => ['>']})
-
     @@kind = @@gturing
+
+    
+    def initialize(transf="", both_sides=@@both_sides, kind=@@kind)
+      @kind = kind
+      @both_sides = both_sides
+      self.regex = MTRegex.new(kind)
+      @trans = TransFunction.new(transf, self.regex)
+    end
 
     def self.default_kind
       @@kind
@@ -215,6 +222,30 @@ module Turing #:nodoc
       elsif /(?i)wiesbaden/ =~ kind
         @@kind = @@wiesbaden
       end
+    end
+
+    def self.both_sides
+      @@both_sides
+    end
+
+    def both_sides
+      self.both_sides
+    end
+
+    def toggle_both_sides
+      self.toggle_both_sides
+    end
+
+    def self.toggle_both_sides
+      self.both_sides = !self.both_sides
+    end
+
+    def both_sides=(both_sides)
+      self.both_sides = both_sides
+    end
+
+    def self.both_sides=(both_sides)
+        @@both_sides = both_sides
     end
 
     def halted
@@ -237,12 +268,6 @@ module Turing #:nodoc
       else
         Machine.new("")
       end
-    end
-    
-    def initialize(transf="", kind=@@kind)
-      @kind = kind
-      self.regex = MTRegex.new(kind)
-      @trans = TransFunction.new(transf, self.regex)
     end
 
     def setup(tape)
