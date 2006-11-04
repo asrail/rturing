@@ -39,6 +39,18 @@ class Buttons < Gtk::HBox
   end
 end
 
+class RadioList < Gtk::MenuItem
+  def initialize(name)
+    @menu = Gtk::Menu.new
+    super(name)
+    set_submenu(@menu)
+  end
+
+  def append(item)
+    @menu.append(Gtk::RadioMenuItem.new(item))
+  end
+end
+
 class Menus < Gtk::MenuBar
   attr_accessor :menus
   def initialize(window)
@@ -47,10 +59,13 @@ class Menus < Gtk::MenuBar
     Gtk::Stock.add(Gtk::Stock::EDIT, "_Fita")
     Gtk::Stock.add(Gtk::Stock::EXECUTE, "_Máquina")
     Gtk::Stock.add(Gtk::Stock::CONVERT, "_Timeout")
+    kind = RadioList.new("K")
+    kind.append("Gturing")
+    kind.append("Wiesbaden")
     submenus = [
-      [:arquivo, [:open_file, :save_machine, :quit]], 
-      [:editar, [:choose_tape, :edit_machine, :choose_timeout]], 
-      [:ajuda, [:about], 2]]
+      [:file, [:open_file, :save_machine, :quit]], 
+      [:edit, [kind, :choose_tape, :edit_machine, :choose_timeout]], 
+      [:help, [:about], 2]]
     mnemonics = {
       :open_file => [Gdk::Keyval::GDK_O, 
         Gdk::Window::CONTROL_MASK, 
@@ -72,36 +87,39 @@ class Menus < Gtk::MenuBar
         Gtk::Stock::QUIT],
       :choose_timeout => [Gdk::Keyval::GDK_T,
         Gdk::Window::CONTROL_MASK,
-        Gtk::Stock::CONVERT]
+        Gtk::Stock::CONVERT],
     }
     submenus.each {|item,submenu, accel|
       menuItem(item,mnemonics,submenu,accel)
     }
   end
-  
-  def menuItem(nome,mnemonics,submenu=nil,accel=nil)
-    nome = Gtk::MenuItem.new(nome.to_s.capitalize.insert(accel.to_i,'_'))
+
+  def menuItem(name,mnemonics,submenu=nil,accel=nil)
+    sup_menu = Gtk::MenuItem.new(name.to_s.capitalize.insert(accel.to_i,'_'))
     if submenu
       menu = Gtk::Menu.new
       submenu.each {|sub|
-        if mnemonics[sub][2]
-          item = Gtk::ImageMenuItem.new(mnemonics[sub][2])
-        else
-          item = Gtk::MenuItem.new("_" + sub.to_s.capitalize)
-        end
-        item.signal_connect("activate") {
-          @window.send(sub)
-        }
-        if mnemonics.key?sub
-          item.add_accelerator("activate", @window.ag, mnemonics[sub][0], mnemonics[sub][1],
-                               Gtk::ACCEL_VISIBLE)
+        item = sub if !sub.kind_of?Symbol
+        if sub.kind_of?Symbol
+          if mnemonics.key?sub and mnemonics[sub][2]
+            item = Gtk::ImageMenuItem.new(mnemonics[sub][2])
+          else
+            item = Gtk::MenuItem.new("_" + sub.to_s.capitalize)
+          end
+          item.signal_connect("activate") {
+            @window.send(sub)
+          }
+          if mnemonics.key?sub
+            item.add_accelerator("activate", @window.ag, mnemonics[sub][0], mnemonics[sub][1],
+                                 Gtk::ACCEL_VISIBLE)
+          end
         end
         menu.append(item)
       }
     end
-    nome.set_submenu(menu)
-    append(nome)
-    nome.show
+    sup_menu.set_submenu(menu)
+    append(sup_menu)
+    sup_menu.show
   end
 end
 
