@@ -10,6 +10,7 @@ class JanelaPrincipal < Gtk::Window
   def initialize
     super
     self.title = "RTuring"
+    Turing::Machine.default_kind = Config::client["/apps/rturing/tipo"]
     @saved = true
     signal_connect("delete_event") {
       false
