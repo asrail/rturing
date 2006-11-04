@@ -33,7 +33,7 @@ class Buttons < Gtk::HBox
       send(sbut).signal_connect("clicked") {
         window.send(sbut)
       }
-      pack_start(send(sbut),true,false,1)
+      pack_start(send(sbut),false,false,1)
     }
   end
 end
@@ -118,7 +118,6 @@ class ExistemErros < Gtk::MessageDialog
           "<estado_atual> <simbolo_lido> <simbolo_escrito> " +
           "<direcao> <novo_estado>\n" +
           "Onde direção é d, e, l, ou r.")
-    
   end
 end
 
@@ -177,12 +176,16 @@ class JanelaPrincipal < Gtk::Window
     @status = Gtk::Statusbar.new
     @status.push(@status.get_context_id("estado"), "nunca aparece")
     self.update_labels
-    campo_execucao = Gtk::VBox.new(false,0)
-    campo_execucao.pack_start(@fita,false,false,0)
-    campo_execucao.pack_start(@cabecote,false,false,0)
-    linhas.pack_start(campo_execucao,true,true,2)
+    exec_field = Gtk::VBox.new(false,0)
+    exec_field.pack_start(@fita,false,false,0)
+    exec_field.pack_start(@cabecote,false,false,0)
+    linhas.pack_start(exec_field,false,false,2)
     linhas.pack_start(Gtk::HSeparator.new,false,false,2)
-    linhas.pack_start(Gtk::VBox.new(false,0).pack_start(Buttons.new(self)),false,false)
+    button_line = Gtk::HBox.new(false,0)
+    button_line.pack_start(Gtk::HBox.new)
+    button_line.pack_start(Buttons.new(self),false,false)
+    button_line.pack_start(Gtk::HBox.new)
+    linhas.pack_start(button_line,false,true)
     linhas.pack_start(Gtk::VBox.new(false,0).pack_start(@status),false,false)
     add(linhas)
     show_all
