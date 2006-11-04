@@ -192,7 +192,7 @@ class JanelaPrincipal < Gtk::Window
   end
 
   def choose_tape
-    ChooseDialog.new("Selecionar fita",@maquina.tape.to_s[1..-1],"Entre com a fita: #") {|input,dialog|
+    ChooseDialog.new("Selecionar fita",@maquina.tape.to_s[1..-1],"Entre com a fita: #", nil) {|input,dialog|
       @maquina.setup(input.text)
       self.first # não faz sentido editar a fita sem ver o resultado
       self.update_labels
@@ -201,7 +201,7 @@ class JanelaPrincipal < Gtk::Window
   end
 
   def choose_timeout
-    ChooseDialog.new("Editar timeout",@timeout.to_s,"Entre com tempo desejado:") {|input,dialog|
+    ChooseDialog.new("Editar timeout",@timeout.to_s,"Entre com tempo desejado:","timeout") {|input,dialog|
       self.timeout = input.text.to_i
       dialog.destroy
     }

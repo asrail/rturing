@@ -1,5 +1,6 @@
 require 'gtk2'
 require 'turing/machine'
+require "interface/widget/configentry"
 
 
 
@@ -75,12 +76,16 @@ class EditDialog < Factory
 end
 
 class ChooseDialog < Factory
-  def initialize(title,input_text,text,&response)
+  def initialize(title,input_text,text,config,&response)
     linha = Gtk::HBox.new
     label = Gtk::Label.new(text)
     linha.pack_start(label)
-    input = Gtk::Entry.new
-    input.text = input_text
+    if config
+      input = ConfigEntry.new(config)
+    else
+      input = Gtk::Entry.new
+      input.text = input_text
+    end
     linha.pack_start(input)
     super(title,
           nil,
