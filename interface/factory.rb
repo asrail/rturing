@@ -34,7 +34,7 @@ class EditDialog < Factory
     
     @control = false
     buffer = Gtk::TextBuffer.new
-    buffer.insert_interactive_at_cursor(input_text, true)
+    buffer.insert_interactive_at_cursor(input_text.to_s, true)
     textentry = Gtk::TextView.new(buffer)
     textentry.accepts_tab = false
     super(title,
@@ -84,7 +84,7 @@ class ChooseDialog < Factory
       input = ConfigEntry.new(config)
     else
       input = Gtk::Entry.new
-      input.text = input_text
+      input.text = input_text.to_s
     end
     linha.pack_start(input)
     super(title,
