@@ -22,10 +22,11 @@ class Menus < Gtk::MenuBar
       end
     }
     mboth = ConfigCheckMenuItem.new(:mboth,"Infinita para os dois lados")
-    mconfigs = Gtk::MenuItem.new("Tipo").set_submenu(Gtk::Menu.new.append(mboth).append(kind))
+    mconfigs = Gtk::MenuItem.new("Configurar").set_submenu(Gtk::Menu.new.append(kind).append(mboth))
     submenus = [
-      [:arquivo, [:open_file, :save_machine, :quit]], 
-      [:editar, [mconfigs, :choose_tape, :edit_machine, :choose_timeout]], 
+      [:arquivo, [:open_file, :save_machine, :quit]],
+      [mconfigs],
+      [:editar, [:choose_tape, :edit_machine, :choose_timeout]], 
       [:ajuda, [:about], 2]] #os nomes estao hardcodeados ainda
     mnemonics = {
       :open_file => [Gdk::Keyval::GDK_O, 
@@ -50,13 +51,18 @@ class Menus < Gtk::MenuBar
         Gdk::Window::CONTROL_MASK,
         Gtk::Stock::CONVERT],
     }
-    submenus.each {|item,submenu, accel|
+    submenus.each {|item, submenu, accel|
       menuItem(item,mnemonics,submenu,accel)
     }
   end
 
   def menuItem(name,mnemonics,submenu=nil,accel=nil)
-    sup_menu = Gtk::MenuItem.new(name.to_s.capitalize.insert(accel.to_i,'_'))
+    if (name.kind_of?Symbol) || (name.kind_of?String)
+      sup_menu = Gtk::MenuItem.new(name.to_s.capitalize.insert(accel.to_i,'_'))
+    else
+      sup_menu = name
+      menu = name.submenu
+    end
     if submenu
       menu = Gtk::Menu.new
       submenu.each {|sub|
