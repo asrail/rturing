@@ -78,7 +78,7 @@ module Turing #:nodoc
   end
 
   class TransFunction
-    attr_reader :states, :original
+    attr_reader :states, :original, :inicial
 
     def get(state, symbol)
       return ((@states[state] and 
@@ -90,6 +90,7 @@ module Turing #:nodoc
     end
 
     def initialize(aut,regex)
+      @inicial = nil
       linhas_erradas = []
       n_linha = 0
       @states = {}
@@ -102,11 +103,14 @@ module Turing #:nodoc
           linhas_erradas.push([n_linha, line])
           next
         end
-        state = md.state.to_i
+        state = md.state
+        if !@inicial
+          @inicial = state
+        end
         symb_r = md.symb_r
         symb_w = md.symb_w
         dir = md.dir
-        new_state = md.new_state.to_i
+        new_state = md.new_state
         if !@states[state] then
           @states[state] = Hash.new
         end
@@ -251,7 +255,8 @@ module Turing #:nodoc
     end
 
     def setup(tape)
-      @machines = [MachineState.new(trans, Tape.new("#" + tape), 0, 1, kind)]
+      @machines = [MachineState.new(trans, Tape.new("#" + tape), 
+                                    trans.inicial, 1, kind)]
       self.halted = @trans.states.empty?
     end
 
