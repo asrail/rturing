@@ -210,9 +210,9 @@ module Turing #:nodoc
     end
 
     def self.default_kind=(kind)
-      if /gturing/ =~ kind
+      if /(?i)gturing/ =~ kind
         @@kind = @@gturing
-      elsif /wiesbaden/ =~ kind
+      elsif /(?i)wiesbaden/ =~ kind
         @@kind = @@wiesbaden
       end
     end
