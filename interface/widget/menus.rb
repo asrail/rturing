@@ -22,6 +22,12 @@ class Menus < Gtk::MenuBar
       end
     }
     mboth = ConfigCheckMenuItem.new(:mboth,"Infinita para os dois lados")
+    mboth.signal_connect("toggled") {|item,kind|
+      Turing::Machine.toggle_both_sides
+      window.first
+      window.tape_both_sides(item.active?)
+      window.update_labels
+    }
     mconfigs = Gtk::MenuItem.new("Configurar").set_submenu(Gtk::Menu.new.append(kind).append(mboth))
     submenus = [
       [:arquivo, [:open_file, :save_machine, :quit]],

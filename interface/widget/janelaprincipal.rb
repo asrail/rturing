@@ -111,6 +111,16 @@ class JanelaPrincipal < Gtk::Window
     update_labels
   end
 
+  def tape_both_sides(tape_both)
+    @maquina.machines[0].pos = tape_both ? 0 : 1
+    if tape_both
+      @maquina.tape.shift if @maquina.tape[0] == '#'
+    else
+      @maquina.tape.unshift('#') if @maquina.tape[0] != '#'
+      update_labels
+    end
+  end
+
   def update_labels
     @fita.set_markup("<span face=\"Courier\">#{@maquina.tape.to_s}</span>")
     @cabecote.set_markup("<span face=\"Courier\">#{"_"*@maquina.machines[-1].pos}^</span>")
