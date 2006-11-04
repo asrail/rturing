@@ -1,10 +1,8 @@
 # This files contains testcases for the Turing::Machine class
-
 require 'test/unit'
 require 'turing/machine'
 
 class MachineTests < Test::Unit::TestCase #:nodoc:
-
   def test_input_tape
     machine = Turing::Machine.from_file('machines/add.tur')
     machine.setup('01010')
@@ -69,5 +67,13 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
     machine.setup('abab')
     machine.process
     assert_equal(['#', 'b','a','b','a'], machine.tape)
+  end
+
+  def test_wies_palin
+    Turing::Machine.default_kind = "Wiesbaden"
+    machine = Turing::Machine.from_file('machines/wies_palin.tur')
+    machine.setup('_AAABBAAA')
+    machine.process
+    assert_equal(['#', '_','Y','E', 'S', '_', '_', '_', '_', '_', '_'], machine.tape)
   end
 end
