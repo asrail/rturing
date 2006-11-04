@@ -1,5 +1,5 @@
 # swap_alpha.tur: change a's for b's and b's for a's
-a a B r b
-a b A r b
-b A b r a
-b B b r a
+a a b r b
+a b a r b
+b a b r a
+b b a r a
