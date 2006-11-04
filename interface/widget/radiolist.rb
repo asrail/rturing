@@ -1,22 +1,46 @@
 require "gtk2"
+require "interface/config"
 
-class RadioList < Gtk::MenuItem
-  attr_accessor :kind
-  def initialize(name,window)
+class ConfigRadioMenuItem < Gtk::RadioMenuItem
+  attr_accessor :value, :key
+  def initialize(key,name,label,group=nil)
+    @value = name.to_s
+    @key = key
+    if group
+      super(group,label)
+    else
+      super(label)
+    end
+    if Config::client["/apps/rturing/#{@key}"] == @value
+      self.active = true
+    else
+      self.active = false
+    end
+    signal_connect("activate") {
+      Config::client["/apps/rturing/#{@key}"] = @value
+    }
+  end
+end
+
+class ConfigRadioList < Gtk::MenuItem
+  attr_accessor :kind, :key
+  def initialize(name,window,key)
     @menu = Gtk::Menu.new
     @radio = nil
     @kind = {}
+    @key = key
     @window = window
     super(name)
     set_submenu(@menu)
   end
 
   def append(item,symb)
+    
     if @radio.nil?
-      @radio = Gtk::RadioMenuItem.new(item)
+      @radio = ConfigRadioMenuItem.new(@key,symb,item)
       radio = @radio
     else
-      radio = Gtk::RadioMenuItem.new(@radio,item)
+      radio = ConfigRadioMenuItem.new(@key,symb,item,@radio)
     end
     kind[radio] = symb
     @menu.append(radio)

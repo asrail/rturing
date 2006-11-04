@@ -8,7 +8,7 @@ class Menus < Gtk::MenuBar
     Gtk::Stock.add(Gtk::Stock::EDIT, "_Fita")
     Gtk::Stock.add(Gtk::Stock::EXECUTE, "_Máquina")
     Gtk::Stock.add(Gtk::Stock::CONVERT, "_Timeout")
-    kind = RadioList.new("Tipo _de máquina",window)
+    kind = ConfigRadioList.new("Tipo _de máquina",window, "tipo")
     kind.append("_Gturing",:gturing)
     kind.append("_Wiesbaden",:wiesbaden)
     kind.add_signal("toggled") {|item,kind,window|
