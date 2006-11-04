@@ -11,9 +11,9 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
 
   def test_three_ones_to_zeros
     machine = Turing::Machine.from_file('machines/3ones2zeroes.tur')
-    machine.setup('1110111')
+    machine.setup('1110111',false)
     machine.process
-    assert_equal(['0', '0', '0', '0', '0', '0', '0' ], machine.tape)
+    assert_equal(['#', '0', '0', '0', '0', '0', '0', '0' ], machine.tape)
     assert(machine.halted)
   end
 
