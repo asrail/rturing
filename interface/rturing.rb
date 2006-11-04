@@ -1,6 +1,7 @@
 require "gtk2"
 require "turing/machine"
 require "interface/factory"
+require "mathn"
 
 class Buttons < Gtk::HBox
   attr_accessor :botoes,:first,:prev,:stop,:play,:step,:last
@@ -180,7 +181,7 @@ class JanelaPrincipal < Gtk::Window
     exec_field.pack_start(@fita,false,false,0)
     exec_field.pack_start(@cabecote,false,false,0)
     linhas.pack_start(exec_field,false,false,2)
-    linhas.pack_start(Gtk::HSeparator.new.set_size_request(400, 2),false,false,2)
+    linhas.pack_start(Gtk::HSeparator.new.set_size_request(500, 2),false,false,2)
     button_line = hcenter(Buttons.new(self))
     linhas.pack_start(button_line,false,true)
     linhas.pack_end(Gtk::VBox.new(false,0).pack_start(@status),false,false)
@@ -196,7 +197,7 @@ class JanelaPrincipal < Gtk::Window
   end
 
   def timeout=(timeout)
-    @timeout = timeout unless timeout == 0 #to create a dialog informing it
+    @timeout = timeout unless timeout.zero? #to create a dialog informing it
   end
 
   def quit
@@ -219,9 +220,10 @@ class JanelaPrincipal < Gtk::Window
   end
 
   def play(timeout=@timeout)
+    timeout,rev = timeout.polar
     @tid = Gtk::timeout_add(timeout) {
-      stop if @maquina.halted
-      step
+      stop if (rev.zero? && @maquina.halted) || (!rev.zero? && @maquina.machines == [@maquina.machines[0]])
+      rev.zero? ? step : prev
     }
   end
 
