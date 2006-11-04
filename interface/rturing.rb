@@ -232,6 +232,7 @@ class JanelaPrincipal < Gtk::Window
   end
 
   def prev
+    @maquina.unstep if @maquina.halted
     @maquina.unstep
     update_labels
   end
