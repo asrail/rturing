@@ -1,4 +1,3 @@
-require 'pp'
 module Turing #:nodoc
   class MTKind
     attr_accessor :name,:exp,:order,:move
@@ -110,7 +109,6 @@ module Turing #:nodoc
         @states[state][symb_r] = Rule.new(symb_w, dir, new_state)
       end
       if linhas_erradas != []
-        pp linhas_erradas
         raise InvalidMachine.new(linhas_erradas)
       end
     end
