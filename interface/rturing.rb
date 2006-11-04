@@ -40,20 +40,32 @@ class Buttons < Gtk::HBox
 end
 
 class RadioList < Gtk::MenuItem
+  attr_accessor :kind
   def initialize(name)
     @menu = Gtk::Menu.new
     @radio = nil
+    @kind = {}
     super(name)
     set_submenu(@menu)
   end
 
-  def append(item,active=true)
+  def append(item,symb)
     if @radio.nil?
       @radio = Gtk::RadioMenuItem.new(item)
-      @menu.append(@radio)
+      radio = @radio
     else
-      @menu.append(Gtk::RadioMenuItem.new(@radio,item))
+      radio = Gtk::RadioMenuItem.new(@radio,item)
     end
+    kind[radio] = symb
+    @menu.append(radio)
+  end
+
+  def add_signal(signal,&response)
+    self.submenu.children.each {|rb|
+      rb.signal_connect(signal) {
+        response.call(rb,kind[rb].to_s)
+      }
+    }
   end
 end
 
@@ -65,13 +77,16 @@ class Menus < Gtk::MenuBar
     Gtk::Stock.add(Gtk::Stock::EDIT, "_Fita")
     Gtk::Stock.add(Gtk::Stock::EXECUTE, "_Máquina")
     Gtk::Stock.add(Gtk::Stock::CONVERT, "_Timeout")
-    kind = RadioList.new("Tipo de máquina")
-    kind.append("Gturing")
-    kind.append("Wiesbaden")
+    kind = RadioList.new("Tipo _de máquina")
+    kind.append("_Gturing",:gturing)
+    kind.append("_Wiesbaden",:wiesbaden)
+    kind.add_signal("toggled") {|item,kind|
+      Turing::Machine.default_kind = kind if item.active?
+    }
     submenus = [
-      [:file, [:open_file, :save_machine, :quit]], 
-      [:edit, [kind, :choose_tape, :edit_machine, :choose_timeout]], 
-      [:help, [:about], 2]]
+      [:arquivo, [:open_file, :save_machine, :quit]], 
+      [:editar, [kind, :choose_tape, :edit_machine, :choose_timeout]], 
+      [:ajuda, [:about], 2]] #os nomes estao hardcodeados ainda
     mnemonics = {
       :open_file => [Gdk::Keyval::GDK_O, 
         Gdk::Window::CONTROL_MASK, 
@@ -399,7 +414,6 @@ end
 
 def main
   Gtk::init
-#  Turing::Machine.default_kind = "wiesbaden"
   w = JanelaPrincipal.new
   Gtk.main
 end
