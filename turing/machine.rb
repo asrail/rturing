@@ -220,9 +220,6 @@ module Turing #:nodoc
       elsif /wiesbaden/ =~ kind
         @@kind = @@wiesbaden
       end
-      ObjectSpace.each_object(Machine) { |m|
-        m.kindified_initialize(kind)
-      }
     end
 
     def halted
@@ -248,13 +245,9 @@ module Turing #:nodoc
     end
     
     def initialize(transf="", kind=@@kind)
-      kindified_initialize(kind)
-      @trans = TransFunction.new(transf, self.regex)
-    end
-    
-    def kindified_initialize(kind)
       @kind = kind
       self.regex = MTRegex.new(kind.exp,kind.order)
+      @trans = TransFunction.new(transf, self.regex)
     end
 
     def setup(tape)
