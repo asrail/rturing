@@ -11,7 +11,12 @@ class ConfigRadioMenuItem < Gtk::RadioMenuItem
     else
       super(label)
     end
-    self.active = Config::client["/apps/rturing/#{@key}"] == @value
+    if Config::client["/apps/rturing/#{@key}"] == @value
+      self.active = true
+      Config::client["/apps/rturing/#{@key}"] = @value
+    else
+      self.active = false
+    end
     signal_connect("activate") {
       Config::client["/apps/rturing/#{@key}"] = @value
     }
