@@ -16,7 +16,7 @@ class Menus < Gtk::MenuBar
         Turing::Machine.default_kind = kind
         window.first
         window.update_labels
-        window.edit_machine # forcing the user to validate it
+#        window.edit_machine # forcing the user to validate it
       end
     }
     submenus = [
