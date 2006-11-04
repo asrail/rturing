@@ -6,22 +6,23 @@ class Buttons < Gtk::HBox
   attr_accessor :botoes,:first,:prev,:stop,:play,:step,:last
   def initialize(window)
     super()
-    [[Gtk::Stock::MEDIA_PREVIOUS, "_Reiniciar"],
-      [Gtk::Stock::MEDIA_REWIND, "_Voltar"],
-      [Gtk::Stock::MEDIA_PAUSE, "_Parar"],
-      [Gtk::Stock::MEDIA_PLAY, "E_xecutar"],
-      [Gtk::Stock::MEDIA_FORWARD, "Ava_nçar"],
-      [Gtk::Stock::MEDIA_NEXT, "Últi_mo"]].each { |id, label|
+     [[Gtk::Stock::GOTO_FIRST, "_Reiniciar"],
+       [Gtk::Stock::GO_BACK, "_Voltar"],
+       [Gtk::Stock::STOP, "_Parar"],
+       [Gtk::Stock::YES, "E_xecutar"],
+       [Gtk::Stock::GO_FORWARD, "Ava_nçar"],
+       [Gtk::Stock::GOTO_LAST, "Últi_mo"]].each { |id, label|
       
-      Gtk::Stock.add(id, label)
-    }
-    buttons = [
-      [:first, Gtk::Stock::MEDIA_PREVIOUS], 
-      [:prev, Gtk::Stock::MEDIA_REWIND], 
-      [:stop, Gtk::Stock::MEDIA_PAUSE], 
-      [:play, Gtk::Stock::MEDIA_PLAY], 
-      [:step, Gtk::Stock::MEDIA_FORWARD],
-      [:last, Gtk::Stock::MEDIA_NEXT]]
+       Gtk::Stock.add(id, label)
+     }
+     buttons = [
+       [:first, Gtk::Stock::GOTO_FIRST], 
+       [:prev, Gtk::Stock::GO_BACK], 
+       [:stop, Gtk::Stock::STOP], 
+       [:play, Gtk::Stock::YES], 
+       [:step, Gtk::Stock::GO_FORWARD],
+       [:last, Gtk::Stock::GOTO_LAST]]
+
     buttons.each {|but, icon|
       sbut = but.to_s
       if icon
