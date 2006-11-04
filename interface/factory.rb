@@ -3,9 +3,9 @@ require 'turing/machine'
 
 
 
-class Factory < Gtk::Window
-  def initialize
-    super
+class Factory < Gtk::Dialog
+  def initialize(a,b,*c)
+    super(a,b,*c)
   end
 
   def validate(machine, dialog)
@@ -25,8 +25,10 @@ class Factory < Gtk::Window
       return false
     end
   end
+end
 
-  def edit_factory(title,input_text,text,&response) #text will be used soon
+class EditDialog < Factory
+  def initialize(title,input_text,text,&response) #text will be used soon
     Gtk::Stock.add(Gtk::Stock::APPLY, "_Validar")
     
     @control = false
@@ -34,64 +36,66 @@ class Factory < Gtk::Window
     buffer.insert_interactive_at_cursor(input_text, true)
     textentry = Gtk::TextView.new(buffer)
     textentry.accepts_tab = false
-    dialog = Gtk::Dialog.new(title,
-                             self,
-                             Gtk::Dialog::MODAL,
-                             [Gtk::Stock::APPLY, Gtk::Dialog::RESPONSE_APPLY],
-                             [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_OK],
-                             [Gtk::Stock::CANCEL, Gtk::Dialog::RESPONSE_CANCEL])
-    dialog.signal_connect("response") {|dia, action|
+    super(title,
+          nil,
+          Gtk::Dialog::MODAL,
+          [Gtk::Stock::APPLY, Gtk::Dialog::RESPONSE_APPLY],
+          [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_OK],
+          [Gtk::Stock::CANCEL, Gtk::Dialog::RESPONSE_CANCEL])
+    signal_connect("response") {|dia, action|
       if action == Gtk::Dialog::RESPONSE_OK
-        if validate(buffer.text, dialog)
-          response.call(buffer,dialog, response)
+        if validate(buffer.text, self)
+          response.call(buffer, self, response)
         end
       elsif action == Gtk::Dialog::RESPONSE_APPLY
-        validate(buffer.text, dialog)
+        validate(buffer.text, self)
       else
-        dialog.destroy
+        destroy
       end
     }
-    dialog.signal_connect("key-press-event") { |inp, ev|
+    signal_connect("key-press-event") { |inp, ev|
       if Gdk::Keyval.to_name(ev.keyval) =~ /^Control/
         @control = true
       elsif ev.keyval == Gdk::Keyval::GDK_Return or ev.keyval == Gdk::Keyval::GDK_KP_Enter
         if @control
-          dialog.signal_emit("response", Gtk::Dialog::RESPONSE_OK)
+          signal_emit("response", Gtk::Dialog::RESPONSE_OK)
           @control = false
         end
       end
     }
-    dialog.signal_connect("key-release-event") { |inp, ev|
+    signal_connect("key-release-event") { |inp, ev|
       if Gdk::Keyval.to_name(ev.keyval) =~ /^Control/
         @control = false
       end
     }
-    dialog.vbox.pack_start(textentry)
-    dialog.set_default_size(200,100)
-    dialog.show_all
+    vbox.pack_start(textentry)
+    set_default_size(200,100)
+    show_all
   end
+end
 
-  def choose_factory(title,input_text,text,&response)
+class ChooseDialog < Factory
+  def initialize(title,input_text,text,&response)
     linha = Gtk::HBox.new
-    label = Gtk::Label.new(text) # 0 parameter... la la la...
+    label = Gtk::Label.new(text)
     linha.pack_start(label)
     input = Gtk::Entry.new
-    input.text = input_text #1 parameter
+    input.text = input_text
     linha.pack_start(input)
-    dialog = Gtk::Dialog.new(title, #2 parameters
-                             self,
-                             Gtk::Dialog::MODAL,
-                             [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_NONE])
+    super(title,
+          nil,
+          Gtk::Dialog::MODAL,
+          [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_NONE])
     input.signal_connect("key_press_event") {|inp, ev|
       if ev.keyval == Gdk::Keyval::GDK_Return or ev.keyval == Gdk::Keyval::GDK_KP_Enter
-        dialog.signal_emit("response", 0)
+        signal_emit("response", 0)
       end
     }
-    dialog.signal_connect("response") {
-      response.call(input,dialog)
+    signal_connect("response") {
+      response.call(input,self)
     }
-    dialog.vbox.pack_start(linha)
-    dialog.set_default_size(200,-1)
-    dialog.show_all
+    vbox.pack_start(linha)
+    set_default_size(200,-1)
+    show_all
   end
 end

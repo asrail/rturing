@@ -163,7 +163,6 @@ class JanelaPrincipal < Gtk::Window
     }
     self.border_width = 1
     self.window_position = POS_CENTER
-    @factory = Factory.new
     @timeout = 100
     @ag = Gtk::AccelGroup.new
     self.add_accel_group(@ag)
@@ -325,7 +324,7 @@ class JanelaPrincipal < Gtk::Window
   end
 
   def choose_tape
-    @factory.choose_factory("Selecionar fita",@maquina.tape.to_s[1..-1],"Entre com a fita: #") {|input,dialog|
+    ChooseDialog.new("Selecionar fita",@maquina.tape.to_s[1..-1],"Entre com a fita: #") {|input,dialog|
       @maquina.setup(input.text)
       self.first # não faz sentido editar a fita sem ver o resultado
       self.update_labels
@@ -334,14 +333,14 @@ class JanelaPrincipal < Gtk::Window
   end
 
   def choose_timeout
-    @factory.choose_factory("Editar timeout",@timeout.to_s,"Entre com tempo desejado:") {|input,dialog|
+    ChooseDialog.new("Editar timeout",@timeout.to_s,"Entre com tempo desejado:") {|input,dialog|
       self.timeout = input.text.to_i
       dialog.destroy
     }
   end
 
   def edit_machine
-    @factory.edit_factory("Editar Máquina",@maquina.trans.to_s,"") { |maquina_atual,dialog|
+    EditDialog.new("Editar Máquina",@maquina.trans.to_s,"") { |maquina_atual,dialog|
       set_trans(maquina_atual.text, dialog)
       self.first # não faz sentido editar os estados no meio, ainda
       self.update_labels
