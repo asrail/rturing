@@ -3,11 +3,11 @@ require "interface/config"
 
 
 class ConfigEntry < Gtk::Entry
-  def initialize(key)
+  def initialize(key, default)
     super()
     @key = key
     if not Config::client["/apps/rturing/#{@key}"]
-      Config::client["/apps/rturing/#{@key}"] = 120
+      Config::client["/apps/rturing/#{@key}"] = default
     end
     self.text = Config::client["/apps/rturing/#{@key}"]
     signal_connect("key-release-event") {

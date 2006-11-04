@@ -81,7 +81,7 @@ class ChooseDialog < Factory
     label = Gtk::Label.new(text)
     linha.pack_start(label)
     if config
-      input = ConfigEntry.new(config)
+      input = ConfigEntry.new(config, input_text)
     else
       input = Gtk::Entry.new
       input.text = input_text.to_s
