@@ -270,9 +270,9 @@ module Turing #:nodoc
       end
     end
 
-    def setup(tape)
+    def setup(tape,both=@@both_sides)
       @machines = [MachineState.new(trans, Tape.new("#{'#' unless both}#{tape}"), 
-                                    trans.inicial, 1, kind)]
+                                    trans.inicial, both ? 0 : 1, kind)]
       self.halted = @trans.states.empty?
     end
 
