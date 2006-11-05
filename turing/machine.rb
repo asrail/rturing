@@ -1,3 +1,4 @@
+
 module Turing #:nodoc
   class MTKind
     attr_accessor :name,:exp,:order,:move
@@ -156,7 +157,7 @@ module Turing #:nodoc
     attr_accessor :tape
 
     def initialize(t)
-      @tape = t.split(//)
+      @tape = t.gsub(/ /,'_').split(//)
     end
     
     def get(pos)
@@ -173,7 +174,8 @@ module Turing #:nodoc
     end
     
     def to_s
-      return tape.join("")
+      tape = @tape.join("")
+      tape.gsub(/_/,' ')
     end
   end
   
@@ -268,9 +270,6 @@ module Turing #:nodoc
       self.halted = @trans.states.empty?
     end
 
-    def tape
-      @machines[0].tape
-    end
 
     def step(i = 1)
       i.times do
@@ -288,7 +287,7 @@ module Turing #:nodoc
     end
     
     def tape
-      machines[-1].tape.tape
+      machines[-1].tape
     end
 
     def print

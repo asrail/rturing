@@ -6,14 +6,14 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
   def test_input_tape
     machine = Turing::Machine.from_file('machines/add.tur')
     machine.setup('01010',false)
-    assert_equal(['#', '0', '1', '0', '1', '0'], machine.tape)
+    assert_equal(['#', '0', '1', '0', '1', '0'], machine.tape.tape)
   end
 
   def test_three_ones_to_zeros
     machine = Turing::Machine.from_file('machines/3ones2zeroes.tur')
     machine.setup('1110111',false)
     machine.process
-    assert_equal(['#', '0', '0', '0', '0', '0', '0', '0' ], machine.tape)
+    assert_equal(['#', '0', '0', '0', '0', '0', '0', '0' ], machine.tape.tape)
     assert(machine.halted)
   end
 
@@ -28,17 +28,17 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
     machine = Turing::Machine.from_file('machines/swap.tur')
     machine.setup('0101',false)
     machine.process
-    assert_equal(['#', '1','0','1','0'], machine.tape)
+    assert_equal(['#', '1','0','1','0'], machine.tape.tape)
     machine.setup('1010')
     machine.process
-    assert_equal(['0','1','0','1'], machine.tape)
+    assert_equal(['0','1','0','1'], machine.tape.tape)
   end
 
   def test_add
     machine = Turing::Machine.from_file('machines/add.tur')
     machine.setup('01010')
     machine.process
-    assert_equal(['0','1','1','0','_'], machine.tape)
+    assert_equal(['0','1','1','0','_'], machine.tape.tape)
   end
 
   def test_next
@@ -52,21 +52,21 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
     machine = Turing::Machine.from_file('machines/all_the_way_left.tur')
     machine.setup('')
     machine.step(5)
-    assert_equal(['_', '0', '0', '0', '0', '0'], machine.tape)
+    assert_equal(['_', '0', '0', '0', '0', '0'], machine.tape.tape)
   end
 
   def test_alpha
     machine = Turing::Machine.from_file('machines/swap_alpha.tur')
     machine.setup('abab',true)
     machine.process
-    assert_equal(['b','a','b','a'], machine.tape)
+    assert_equal(['b','a','b','a'], machine.tape.tape)
   end
 
   def test_alpha2
     machine = Turing::Machine.from_file('machines/swap_alpha2.tur')
     machine.setup('abab',true)
     machine.process
-    assert_equal(['b','a','b','a'], machine.tape)
+    assert_equal(['b','a','b','a'], machine.tape.tape)
   end
 
   def test_wies_palin
@@ -74,6 +74,6 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
     machine = Turing::Machine.from_file('machines/wies_palin.tur')
     machine.setup('_AAABBAAA')
     machine.process
-    assert_equal(['_','Y','E', 'S', '_', '_', '_', '_', '_', '_'], machine.tape)
+    assert_equal(['_','Y','E', 'S', '_', '_', '_', '_', '_', '_'], machine.tape.tape)
   end
 end
