@@ -64,11 +64,7 @@ class Menus < Gtk::MenuBar
       submenu.each {|sub|
         act = @actgroup.get_action(sub)
         if !act.nil?
-          p act.accel_path
-          act.connect_accelerator
           item = act.create_menu_item
-          item.accel_path = act.accel_path
-          act.connect_proxy(item)
           menu.append(item)
         end
       }
