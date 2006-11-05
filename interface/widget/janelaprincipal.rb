@@ -9,7 +9,7 @@ class JanelaPrincipal < Gtk::Window
 
   def initialize
     super
-    self.title = "RTuring"
+    self.title = "gRats"
     Turing::Machine.default_kind = Config::client["/apps/rturing/tipo"]
     Turing::Machine.both_sides = Config::client["/apps/rturing/mboth"]
     @saved = true
