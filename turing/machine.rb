@@ -138,8 +138,12 @@ module Turing #:nodoc
         newpos = kind.dir_to_amount(rule.direction) + pos
         newtape = tape.set_at(pos, new_symbol)
         if newpos < 0
-          newpos = 0
-          newtape.tape = ["_"] + newtape.tape
+          if Machine.both_sides
+            newpos = 0
+            newtape.tape = ["_"] + newtape.tape
+          else 
+            raise ExecutionEnded
+          end
         end
         return MachineState.new(trans, newtape, new_state, newpos, kind)
       rescue ExecutionEnded
