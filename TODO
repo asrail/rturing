@@ -1,0 +1,27 @@
+A pretty imense TODO file:
+
+To use Gtk::Action for every action, so we can enable and desable
+   then. It will help us with most of the GUI improvements we need.
+
+Then... this is more for designers than programmers, but we *have to*
+   use labels and tooltips for everything. We should follow
+   interface accessibility guidelines.
+
+We still allowing a tape infinite for just one side to go left... also
+   we have to test the tapes more exaustively.
+
+Another simple thing: to use a checkbox to revert the movent, instead
+   of using negative values to the timeout (have you seen the math code?)
+
+We may start using scrollbars, even if we have to limit the
+   size. 648x480 is too much for our simple interface.
+
+
+TOLATER:
+Port the graphics to gnomecanvas.
+
+To make a pretty fucking TMEGUI.
+
+
+
+OBS: Please, read the last logs in adition to this.
