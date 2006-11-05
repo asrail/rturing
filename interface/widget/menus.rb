@@ -7,9 +7,6 @@ class Menus < Gtk::MenuBar
   def initialize(window)
     super()
     @window = window
-#    Gtk::Stock.add(Gtk::Stock::EDIT, "_Fita")
-#    Gtk::Stock.add(Gtk::Stock::EXECUTE, "_Máquina")
-#    Gtk::Stock.add(Gtk::Stock::CONVERT, "_Timeout")
     kind = ConfigRadioList.new("Tipo _de máquina",window, "tipo")
     kind.append("_Gturing",:gturing)
     kind.append("_Wiesbaden",:wiesbaden)
@@ -46,7 +43,7 @@ class Menus < Gtk::MenuBar
        ["quit", Gtk::Stock::QUIT, "Sai_r",
         "<control>q", "Sai do programa", proc],
        ["choose_timeout", Gtk::Stock::CONVERT, "_Timeout",
-        "<control>t", "Permite editar o intervalo entre os passos", proc],
+        "<control>t", "Permite editar o intervalo entre os passos", proc]
      ]
     @actgroup.add_actions(@entries)
     mconfigs = Gtk::MenuItem.new("_Configurar").set_submenu(Gtk::Menu.new.append(kind).append(mboth))
@@ -65,10 +62,13 @@ class Menus < Gtk::MenuBar
       menu = Gtk::Menu.new
       submenu.each {|sub|
         act = @actgroup.get_action(sub)
-        act.connect_accelerator
-        item = act.create_menu_item
-        act.connect_proxy(item)
-        menu.append(item)
+        if !act.nil?
+          p act.accel_path
+          act.connect_accelerator
+          item = act.create_menu_item
+          act.connect_proxy(item)
+          menu.append(item)
+        end
       }
     end
     sup_menu.set_submenu(menu)
