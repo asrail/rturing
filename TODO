@@ -10,6 +10,10 @@ Then... this is more for designers than programmers, but we *have to*
 We still allowing a tape infinite for just one side to go left... also
    we have to test the tapes more exaustively.
 
+To treat '_' as true blankspaces (we don't accept spaces, we may
+   fake). It's ugly to see the _____ in the tape. It would be bad to
+   check with our current model.
+
 Another simple thing: to use a checkbox to revert the movent, instead
    of using negative values to the timeout (have you seen the math code?)
 
