@@ -11,6 +11,7 @@ class JanelaPrincipal < Gtk::Window
     super
     self.title = "RTuring"
     Turing::Machine.default_kind = Config::client["/apps/rturing/tipo"]
+    Turing::Machine.both_sides = Config::client["/apps/rturing/mboth"]
     @saved = true
     signal_connect("delete_event") {
       false
@@ -221,8 +222,9 @@ class JanelaPrincipal < Gtk::Window
   end
 
   def choose_tape
-    ChooseDialog.new("Selecionar fita",@maquina.tape.to_s[1..-1],
-                     "Entre com a fita: #", nil) {|input,dialog|
+    both = Turing::Machine.both_sides
+    ChooseDialog.new("Selecionar fita",@maquina.tape.to_s[(both ? 0 : 1)..-1],
+                     "Entre com a fita: #{'#' unless both}", nil) {|input,dialog|
       @maquina.setup(input.text)
       self.first # não faz sentido editar a fita sem ver o resultado
       self.update_labels

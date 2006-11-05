@@ -209,11 +209,11 @@ module Turing #:nodoc
     end
 
     def default_kind
-      self.default_kind
+      self.class.default_kind
     end
 
     def default_kind=(kind)
-      self.default_kind=(kind)
+      self.class.default_kind=(kind)
     end
 
     def self.default_kind=(kind)
@@ -228,20 +228,8 @@ module Turing #:nodoc
       @@both_sides
     end
 
-    def both_sides
-      self.both_sides
-    end
-
-    def toggle_both_sides
-      self.toggle_both_sides
-    end
-
     def self.toggle_both_sides
-      self.both_sides = !self.both_sides
-    end
-
-    def both_sides=(both_sides)
-      self.both_sides = both_sides
+      @@both_sides = !self.both_sides
     end
 
     def self.both_sides=(both_sides)
