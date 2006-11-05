@@ -28,11 +28,14 @@ Rake::PackageTask.new(PACKAGE, RTURING_VERSION) do |p|
   p.package_files.include('turing/*')
   p.package_files.include('rturing')
   p.package_files.include('grturing')
+  p.package_files.include('grats')
+  p.package_files.include('rats')
   p.package_files.include('machines/*')
   p.package_files.include('Rakefile')
   p.package_files.include('README')
   p.package_files.include('tests/*')
   p.package_files.include('interface/*')
+  p.package_files.include('interface/widget/*')
 end
 
 task :clean => [ :clobber_package ] do
