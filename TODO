@@ -1,30 +1,33 @@
 A pretty imense TODO file:
 
-To use Gtk::Action for every action, so we can enable and desable
-   then. It will help us with most of the GUI improvements we need.
-
-Then... this is more for designers than programmers, but we *have to*
-   use labels and tooltips for everything. We should follow
-   interface accessibility guidelines.
-
-We still allowing a tape infinite for just one side to go left... also
+=If we plan to release 0.1.3:
+==We still allowing a tape infinite for just one side to go left... also
    we have to test the tapes more exaustively.
 
-To treat '_' as true blankspaces (we don't accept spaces, we may
+==To treat '_' as true blankspaces (we don't accept spaces, we may
    fake). It's ugly to see the _____ in the tape. It would be bad to
    check with our current model.
 
-Another simple thing: to use a checkbox to revert the movent, instead
+==Another simple thing: to use a checkbox to revert the moviment, instead
    of using negative values to the timeout (have you seen the math code?)
 
-We may start using scrollbars, even if we have to limit the
+=More complex tasks:
+==To use Gtk::Action for every action, so we can enable and desable
+   then. It will help us with most of the GUI improvements we need.
+
+==Then... this is more for designers than programmers, but we *have to*
+   use labels and tooltips for everything. We should follow
+   interface accessibility guidelines.
+
+==We may start using scrollbars, even if we have to limit the
    size. 648x480 is too much for our simple interface.
 
 
 TOLATER:
-Port the graphics to gnomecanvas.
+=Much more complex tasks:
+==Port the graphics to gnomecanvas.
 
-To make a pretty fucking TMEGUI.
+==To make a pretty fucking TMEGUI.
 
 
 
