@@ -3,13 +3,13 @@ require "interface/widget/radiolist"
 require "interface/widget/cmi"
 
 class Menus < Gtk::MenuBar
-  attr_accessor :menus, :mnemonics
+  attr_accessor :menus, :entries, :actgroup
   def initialize(window)
     super()
     @window = window
-    Gtk::Stock.add(Gtk::Stock::EDIT, "_Fita")
-    Gtk::Stock.add(Gtk::Stock::EXECUTE, "_Máquina")
-    Gtk::Stock.add(Gtk::Stock::CONVERT, "_Timeout")
+#    Gtk::Stock.add(Gtk::Stock::EDIT, "_Fita")
+#    Gtk::Stock.add(Gtk::Stock::EXECUTE, "_Máquina")
+#    Gtk::Stock.add(Gtk::Stock::CONVERT, "_Timeout")
     kind = ConfigRadioList.new("Tipo _de máquina",window, "tipo")
     kind.append("_Gturing",:gturing)
     kind.append("_Wiesbaden",:wiesbaden)
@@ -28,33 +28,31 @@ class Menus < Gtk::MenuBar
       window.tape_both_sides(item.active?)
       window.update_labels
     }
-    @mnemonics = {
-      :open_file => [Gdk::Keyval::GDK_O, 
-        Gdk::Window::CONTROL_MASK, 
-        Gtk::Stock::OPEN],
-      :save_machine => [Gdk::Keyval::GDK_S, 
-        Gdk::Window::CONTROL_MASK, 
-        Gtk::Stock::SAVE],
-      :choose_tape  => [Gdk::Keyval::GDK_F, 
-        Gdk::Window::CONTROL_MASK, 
-        Gtk::Stock::EDIT],
-      :edit_machine  => [Gdk::Keyval::GDK_M, 
-        Gdk::Window::CONTROL_MASK, 
-        Gtk::Stock::EXECUTE],
-      :about => [Gdk::Keyval::GDK_F1, 
-        0,
-        Gtk::Stock::ABOUT],
-      :quit => [Gdk::Keyval::GDK_Q,
-        Gdk::Window::CONTROL_MASK,
-        Gtk::Stock::QUIT],
-      :choose_timeout => [Gdk::Keyval::GDK_T,
-        Gdk::Window::CONTROL_MASK,
-        Gtk::Stock::CONVERT],
+    @actgroup = Gtk::ActionGroup.new("Main")
+    proc = Proc.new {|actg, act|
+      @window.send(act.name)
     }
+    @entries = [
+       ["open_file", Gtk::Stock::OPEN, "_Abrir",
+        "<control>o", "Carregar uma máquina de um arquivo", proc],
+       ["save_machine", Gtk::Stock::SAVE, "_Salvar",
+        "<control>s", "Salva a máquina para um arquivo", proc],
+       ["choose_tape", Gtk::Stock::EDIT, "_Fita",
+        "<control>f", "Permite editar a fita", proc],
+       ["edit_machine", Gtk::Stock::EXECUTE, "_Máquina",
+        "<control>m", "Permite editar a máquina", proc],
+       ["about", Gtk::Stock::ABOUT, "_About",
+        "F1", "rTuring...", proc],
+       ["quit", Gtk::Stock::QUIT, "Sai_r",
+        "<control>q", "Sai do programa", proc],
+       ["choose_timeout", Gtk::Stock::CONVERT, "_Timeout",
+        "<control>t", "Permite editar o intervalo entre os passos", proc],
+     ]
+    @actgroup.add_actions(@entries)
     mconfigs = Gtk::MenuItem.new("_Configurar").set_submenu(Gtk::Menu.new.append(kind).append(mboth))
-    edit = menuItem(*["_Editar", [:choose_tape, :edit_machine, :choose_timeout]])
-    file = menuItem(*["_Arquivo", [:open_file, :save_machine, :quit]])
-    about = menuItem(*["Aj_uda", [:about]])
+    edit = menuItem(*["_Editar", ["choose_tape", "edit_machine", "choose_timeout"]])
+    file = menuItem(*["_Arquivo", ["open_file", "save_machine", "quit"]])
+    about = menuItem(*["Aj_uda", ["about"]])
     append(file)
     append(edit)
     append(mconfigs)
@@ -66,21 +64,10 @@ class Menus < Gtk::MenuBar
     if submenu
       menu = Gtk::Menu.new
       submenu.each {|sub|
-        item = sub if !sub.kind_of?Symbol
-        if sub.kind_of?Symbol
-          if mnemonics.key?sub and mnemonics[sub][2]
-            item = Gtk::ImageMenuItem.new(mnemonics[sub][2])
-          else
-            item = Gtk::MenuItem.new("_" + sub.to_s.capitalize)
-          end
-          item.signal_connect("activate") {
-            @window.send(sub)
-          }
-          if mnemonics.key?sub
-            item.add_accelerator("activate", @window.ag, mnemonics[sub][0], mnemonics[sub][1],
-                                 Gtk::ACCEL_VISIBLE)
-          end
-        end
+        act = @actgroup.get_action(sub)
+        act.connect_accelerator
+        item = act.create_menu_item
+        act.connect_proxy(item)
         menu.append(item)
       }
     end
@@ -88,5 +75,5 @@ class Menus < Gtk::MenuBar
     sup_menu
   end
 
-  private :mnemonics, :mnemonics=
+  private :entries, :entries=
 end

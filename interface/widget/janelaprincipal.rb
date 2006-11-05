@@ -22,8 +22,8 @@ class JanelaPrincipal < Gtk::Window
     self.border_width = 1
     self.window_position = POS_CENTER
     @timeout = 100
-    @ag = Gtk::AccelGroup.new
-    self.add_accel_group(@ag)
+#    @ag = Gtk::AccelGroup.new
+#    self.add_accel_group(@ag)
     @maquina = Turing::Machine.new
     @maquina.setup("")
     linhas = Gtk::VBox.new(false,0)
