@@ -121,6 +121,24 @@ class JanelaPrincipal < Gtk::Window
     end
   end
 
+  def validate(kind)
+    begin
+      t = Turing::TransFunction.new(@maquina.trans.to_s,kind)
+      return true
+    rescue Turing::InvalidMachine
+      value = false
+      message = "A máquina de turing digitada não é válida."
+      d2 = Gtk::MessageDialog.new(nil,
+                                  Gtk::MessageDialog::MODAL,
+                                  Gtk::MessageDialog::INFO,
+                                  Gtk::MessageDialog::BUTTONS_CLOSE,
+                                  message)
+      d2.run {}
+      d2.destroy
+      return false
+    end
+  end
+
   def update_labels
     @fita.set_markup("<span face=\"Courier\">#{@maquina.tape.to_s}</span>")
     @cabecote.set_markup("<span face=\"Courier\">#{"_"*@maquina.machines[-1].pos}^</span>")

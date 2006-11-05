@@ -18,7 +18,7 @@ class Menus < Gtk::MenuBar
         Turing::Machine.default_kind = kind
         window.first
         window.update_labels
-#        window.edit_machine # forcing the user to validate it
+        window.edit_machine unless window.validate(kind)
       end
     }
     mboth = ConfigCheckMenuItem.new(:mboth,"Infinita para os dois lados")
@@ -28,7 +28,7 @@ class Menus < Gtk::MenuBar
       window.tape_both_sides(item.active?)
       window.update_labels
     }
-    mconfigs = Gtk::MenuItem.new("Configurar").set_submenu(Gtk::Menu.new.append(kind).append(mboth))
+    mconfigs = Gtk::MenuItem.new("_Configurar").set_submenu(Gtk::Menu.new.append(kind).append(mboth))
     submenus = [
       [:arquivo, [:open_file, :save_machine, :quit]],
       [mconfigs],
