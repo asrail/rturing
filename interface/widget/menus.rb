@@ -51,6 +51,7 @@ class Menus < Gtk::MenuBar
     file = menuItem(*["_Arquivo", ["open_file", "save_machine", "quit"]])
     about = menuItem(*["Aj_uda", ["about"]])
     append(file)
+    @actgroup.get_action("save_machine").sensitive = false
     append(edit)
     append(mconfigs)
     append(about)
@@ -64,7 +65,14 @@ class Menus < Gtk::MenuBar
       submenu.each {|sub|
         act = @actgroup.get_action(sub)
         if !act.nil?
-          item = act.create_menu_item
+          item = Gtk::ImageMenuItem.new(act.stock_id||act.name)
+          acc_name = @entries.find {|e|
+            e[0] == act.name
+          }[3]
+           acc = Gtk::Accelerator.parse(acc_name)
+           item.add_accelerator("activate", menu.accel_group, acc[0], acc[1],
+                                  Gtk::ACCEL_VISIBLE)
+          act.connect_proxy(item)
           menu.append(item)
         end
       }
