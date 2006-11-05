@@ -3,7 +3,7 @@ require "interface/widget/radiolist"
 require "interface/widget/cmi"
 
 class Menus < Gtk::MenuBar
-  attr_accessor :menus
+  attr_accessor :menus, :mnemonics
   def initialize(window)
     super()
     @window = window
@@ -28,13 +28,7 @@ class Menus < Gtk::MenuBar
       window.tape_both_sides(item.active?)
       window.update_labels
     }
-    mconfigs = Gtk::MenuItem.new("_Configurar").set_submenu(Gtk::Menu.new.append(kind).append(mboth))
-    submenus = [
-      [:arquivo, [:open_file, :save_machine, :quit]],
-      [mconfigs],
-      [:editar, [:choose_tape, :edit_machine, :choose_timeout]], 
-      [:ajuda, [:about], 2]] #os nomes estao hardcodeados ainda
-    mnemonics = {
+    @mnemonics = {
       :open_file => [Gdk::Keyval::GDK_O, 
         Gdk::Window::CONTROL_MASK, 
         Gtk::Stock::OPEN],
@@ -57,18 +51,18 @@ class Menus < Gtk::MenuBar
         Gdk::Window::CONTROL_MASK,
         Gtk::Stock::CONVERT],
     }
-    submenus.each {|item, submenu, accel|
-      menuItem(item,mnemonics,submenu,accel)
-    }
+    mconfigs = Gtk::MenuItem.new("_Configurar").set_submenu(Gtk::Menu.new.append(kind).append(mboth))
+    edit = menuItem(*["_Editar", [:choose_tape, :edit_machine, :choose_timeout]])
+    file = menuItem(*["_Arquivo", [:open_file, :save_machine, :quit]])
+    about = menuItem(*["Aj_uda", [:about]])
+    append(file)
+    append(edit)
+    append(mconfigs)
+    append(about)
   end
 
-  def menuItem(name,mnemonics,submenu=nil,accel=nil)
-    if (name.kind_of?Symbol) || (name.kind_of?String)
-      sup_menu = Gtk::MenuItem.new(name.to_s.capitalize.insert(accel.to_i,'_'))
-    else
-      sup_menu = name
-      menu = name.submenu
-    end
+  def menuItem(name,submenu=nil)
+    sup_menu = Gtk::MenuItem.new(name)
     if submenu
       menu = Gtk::Menu.new
       submenu.each {|sub|
@@ -91,7 +85,8 @@ class Menus < Gtk::MenuBar
       }
     end
     sup_menu.set_submenu(menu)
-    append(sup_menu)
-    sup_menu.show
+    sup_menu
   end
+
+  private :mnemonics, :mnemonics=
 end
