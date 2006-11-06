@@ -37,6 +37,11 @@ class EditDialog < Factory
     buffer.insert_interactive_at_cursor(input_text.to_s, true)
     textentry = Gtk::TextView.new(buffer)
     textentry.accepts_tab = false
+    layout = Gtk::Layout.new
+    scroll = Gtk::ScrolledWindow.new
+    scroll.add(textentry)
+    scroll.hscrollbar_policy = Gtk::POLICY_AUTOMATIC
+    scroll.vscrollbar_policy = Gtk::POLICY_AUTOMATIC
     super(title,
           nil,
           Gtk::Dialog::MODAL,
@@ -69,8 +74,8 @@ class EditDialog < Factory
         @control = false
       end
     }
-    vbox.pack_start(textentry)
-    set_default_size(200,100)
+    vbox.pack_start(scroll)
+    set_default_size(340,480)
     show_all
   end
 end
