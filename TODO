@@ -4,14 +4,17 @@ A pretty imense TODO file:
 
 ==Another simple thing: to use a checkbox to revert the moviment, instead
    of using negative values to the timeout (have you seen the math code?)
+=== caio: top, deixa algo simples pra mim, favor :P.
 
 =More complex tasks:
 ==To use Gtk::Action for every action, so we can enable and desable
    then. It will help us with most of the GUI improvements we need.
+=== I, caio, am in the middle of this task.
 
 ==Then... this is more for designers than programmers, but we *have to*
    use labels and tooltips for everything. We should follow
    interface accessibility guidelines.
+=== Eu me propus a fazer isso, acho que Top não gosta disso...
 
 ==We may start using scrollbars, even if we have to limit the
    size. 648x480 is too much for our simple interface.
@@ -22,8 +25,9 @@ TOLATER:
 ==Port the graphics to gnomecanvas.
 
 ==To make a pretty fucking TMEGUI.
+=== TMEGUI stands for Turing Edit Machine GUI. Top, a gente precisa
+   das scrollbars pra poder colocar muita coisa na interface. Você
+   deve gostar de fazer isso aqui (lembre que pode ficar maior que a
+   tela carregar uma máquina grande sem scrollbars).
 
-
-
-OBS: Please, read the last logs in adition to this.
 
