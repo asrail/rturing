@@ -5,20 +5,33 @@ A pretty imense TODO file:
 ==Another simple thing: to use a checkbox to revert the moviment, instead
    of using negative values to the timeout (have you seen the math code?)
 === caio: top, deixa algo simples pra mim, favor :P.
+=== (top) sim, você quer que eu faça mais o que, então?
 
 =More complex tasks:
 ==To use Gtk::Action for every action, so we can enable and desable
    then. It will help us with most of the GUI improvements we need.
 === I, caio, am in the middle of this task.
+=== (top) tome um pouco mais de cuidado com as coisas, é por colocar
+===       não só actiongroups nas coisas como accelgroups nas coisas
+===       que tem accelerators, pra evitar assertions chatas e talvez
+===       bugs em outras versões do gtk
 
 ==Then... this is more for designers than programmers, but we *have to*
    use labels and tooltips for everything. We should follow
    interface accessibility guidelines.
-=== Eu me propus a fazer isso, acho que Top não gosta disso...
-
+=== (caio) Eu me propus a fazer isso, acho que Top não gosta disso...
+=== (top) é, top não gosta disso... ;-)
 
 TOLATER:
 =Much more complex tasks:
 ==Port the graphics to gnomecanvas.
-
+== (top): Discordo, com força. GnomeCanvas parece ser feito para
+desenhar coisinhas, não pra fazer UI per se. Se lembre que nossa UI é
+bem clássica, sem coisas muito loucas ou desenhinhos (talvez valha a
+pena colocar uma imagem para mover o cabeçote, mas até aí eu tenho
+minhas dúvidas). O diálogo de editar máquina talvez até sobreviva
+melhor com um GnomeCanvas, mas eu quero tentar com um TreeView antes,
+me parece ser mais que suficiente pelo que eu vi de TreeViews em
+outros lugares (exemplo: a edição de tags do quodlibet é um treeview,
+e tem desenhinhos, e listas, e todo o mais).
 
