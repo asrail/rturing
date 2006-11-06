@@ -46,6 +46,7 @@ class Menus < Gtk::MenuBar
         "<control>t", "Permite editar o intervalo entre os passos", proc]
      ]
     @actgroup.add_actions(@entries)
+    @accgroup = Gtk::AccelGroup.new
     mconfigs = Gtk::MenuItem.new("_Configurar").set_submenu(Gtk::Menu.new.append(kind).append(mboth))
     edit = menuItem(*["_Editar", ["choose_tape", "edit_machine", "choose_timeout"]])
     file = menuItem(*["_Arquivo", ["open_file", "save_machine", "quit"]])
@@ -71,6 +72,7 @@ class Menus < Gtk::MenuBar
            acc = Gtk::Accelerator.parse(acc_name)
            item.add_accelerator("activate", menu.accel_group, acc[0], acc[1],
                                   Gtk::ACCEL_VISIBLE)
+          act.accel_group = @accgroup
           act.connect_proxy(item)
           menu.append(item)
         end

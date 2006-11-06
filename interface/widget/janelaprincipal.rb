@@ -114,9 +114,9 @@ class JanelaPrincipal < Gtk::Window
   def tape_both_sides(tape_both)
     @maquina.machines[0].pos = tape_both ? 0 : 1
     if tape_both
-      @maquina.tape.shift if @maquina.tape[0] == '#'
+      @maquina.tape.tape.shift if @maquina.tape.tape[0] == '#'
     else
-      @maquina.tape.unshift('#') if @maquina.tape[0] != '#'
+      @maquina.tape.tape.unshift('#') if @maquina.tape.tape[0] != '#'
       update_labels
     end
   end
