@@ -21,10 +21,4 @@ TOLATER:
 =Much more complex tasks:
 ==Port the graphics to gnomecanvas.
 
-==To make a pretty fucking TMEGUI.
-=== TMEGUI stands for Turing Edit Machine GUI. Top, a gente precisa
-   das scrollbars pra poder colocar muita coisa na interface. Você
-   deve gostar de fazer isso aqui (lembre que pode ficar maior que a
-   tela carregar uma máquina grande sem scrollbars).
-
 
