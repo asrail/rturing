@@ -51,7 +51,6 @@ class Menus < Gtk::MenuBar
     file = menuItem(*["_Arquivo", ["open_file", "save_machine", "quit"]])
     about = menuItem(*["Aj_uda", ["about"]])
     append(file)
-    @actgroup.get_action("save_machine").sensitive = false
     append(edit)
     append(mconfigs)
     append(about)

@@ -13,9 +13,6 @@ class JanelaPrincipal < Gtk::Window
     Turing::Machine.default_kind = Config::client["/apps/rturing/tipo"]
     Turing::Machine.both_sides = Config::client["/apps/rturing/mboth"]
     @saved = true
-    signal_connect("delete_event") {
-      false
-    }
     signal_connect("delete-event") {
       quit
     }
@@ -46,6 +43,7 @@ class JanelaPrincipal < Gtk::Window
     linhas.pack_start(button_line,false,true)
     linhas.pack_end(Gtk::VBox.new(false,0).pack_start(@status),false,false)
     add(linhas)
+    @actgroup.get_action("save_machine").sensitive = false
     show_all
   end
 
@@ -155,6 +153,7 @@ class JanelaPrincipal < Gtk::Window
       maquina.setup(tape)
       @maquina = maquina
       @saved = saved
+      @actgroup.get_action("save_machine").sensitive = !saved
       return true
     rescue Turing::InvalidMachine => m
       dialog = ExistemErros.new(window, m.erros)
@@ -174,6 +173,7 @@ class JanelaPrincipal < Gtk::Window
           end
         elsif response == Gtk::Dialog::RESPONSE_NO
           @saved = true
+          @actgroup.get_action("save_machine").sensitive = false
           open_file
         end
         deseja_salvar.destroy
@@ -217,6 +217,7 @@ class JanelaPrincipal < Gtk::Window
         file.write(@maquina.trans.to_s)
       }
       @saved = true
+      @actgroup.get_action("save_machine").sensitive = false
     end
     dialog.destroy
     return runned == Gtk::Dialog::RESPONSE_ACCEPT
