@@ -29,6 +29,8 @@ class JanelaPrincipal < Gtk::Window
     linhas.pack_start(@menu,false,false,0)
     @fita = Gtk::Label.new
     @fita.set_alignment(0,0)
+    @fita.selectable = true
+    @fita.ellipsize = Pango::Layout::ELLIPSIZE_NONE
     @cabecote = Gtk::Label.new
     @cabecote.set_alignment(0,0)
     @status = Gtk::Statusbar.new
@@ -37,7 +39,11 @@ class JanelaPrincipal < Gtk::Window
     exec_field = Gtk::VBox.new(false,0)
     exec_field.pack_start(@fita,false,false,0)
     exec_field.pack_start(@cabecote,false,false,0)
-    linhas.pack_start(exec_field,false,false,2)
+    scroll = Gtk::ScrolledWindow.new
+    scroll.hscrollbar_policy = Gtk::POLICY_AUTOMATIC
+    scroll.vscrollbar_policy = Gtk::POLICY_AUTOMATIC
+    scroll.add_with_viewport(exec_field)
+    linhas.pack_start(scroll,false,false,2)
     linhas.pack_start(Gtk::HSeparator.new.set_size_request(500, 2),false,false,2)
     button_line = hcenter(Buttons.new(self))
     linhas.pack_start(button_line,false,true)
