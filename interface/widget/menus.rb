@@ -25,7 +25,7 @@ class Menus < Gtk::MenuBar
       window.tape_both_sides(item.active?)
       window.update_labels
     }
-    @actgroup = Gtk::ActionGroup.new("MainMenu")
+    @actgroup = window.actgroup
     proc = Proc.new {|actg, act|
       @window.send(act.name)
     }

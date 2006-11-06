@@ -4,7 +4,7 @@ require "interface/factory"
 require "mathn"
 
 class JanelaPrincipal < Gtk::Window
-  attr_accessor :ag
+  attr_accessor :ag, :actgroup
   attr_reader :timeout
 
   def initialize
@@ -24,6 +24,7 @@ class JanelaPrincipal < Gtk::Window
     @timeout = 100
     @ag = Gtk::AccelGroup.new
     self.add_accel_group(@ag)
+    @actgroup = Gtk::ActionGroup.new("MainMenu")
     @maquina = Turing::Machine.new
     @maquina.setup("")
     linhas = Gtk::VBox.new(false,0)
