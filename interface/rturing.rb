@@ -1,8 +1,8 @@
 require "interface/widget/base.rb"
 
-def main
+def main(machine, tape)
   Gtk::init
-  w = JanelaPrincipal.new
+  w = JanelaPrincipal.new(machine, tape)
   Gtk.main
 end
 

@@ -7,8 +7,8 @@ class JanelaPrincipal < Gtk::Window
   attr_accessor :ag, :actgroup
   attr_reader :timeout
 
-  def initialize
-    super
+  def initialize(m, t)
+    super()
     self.title = "gRats"
     Turing::Machine.default_kind = Config::client["/apps/rturing/tipo"]
     Turing::Machine.both_sides = Config::client["/apps/rturing/mboth"]
@@ -22,8 +22,12 @@ class JanelaPrincipal < Gtk::Window
     @ag = Gtk::AccelGroup.new
     self.add_accel_group(@ag)
     @actgroup = Gtk::ActionGroup.new("MainMenu")
-    @maquina = Turing::Machine.new
-    @maquina.setup("")
+    begin
+      @maquina = Turing::Machine.from_file(m)
+    rescue
+      @maquina = Turing::Machine.new
+    end
+    @maquina.setup((t or ""))
     linhas = Gtk::VBox.new(false,0)
     @menu = Menus.new(self)
     linhas.pack_start(@menu,false,false,0)
