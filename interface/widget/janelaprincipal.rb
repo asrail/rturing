@@ -92,7 +92,7 @@ class JanelaPrincipal < Gtk::Window
   def play(timeout=@timeout)
     timeout,rev = timeout.polar
     @tid = Gtk::timeout_add(timeout) {
-      stop if (rev.zero? && @maquina.halted) || (!rev.zero? && @maquina.machines == [@maquina.machines[0]])
+      stop if (rev.zero? && @maquina.halted) || (!rev.zero? && @maquina.maquinas == [@maquina.maquinas[0]])
       rev.zero? ? step : prev
     }
   end
@@ -108,8 +108,8 @@ class JanelaPrincipal < Gtk::Window
   end
 
   def first
-    @maquina.machines = [@maquina.machines[0]]
-    @maquina.machines[0].trans = @maquina.trans
+    @maquina.maquinas = [@maquina.maquinas[0]]
+    @maquina.maquinas[0].trans = @maquina.trans
     update_labels
   end
 
@@ -128,7 +128,7 @@ class JanelaPrincipal < Gtk::Window
   end
 
   def tape_both_sides(tape_both)
-    @maquina.machines[0].pos = tape_both ? 0 : 1
+    @maquina.maquinas[0].pos = tape_both ? 0 : 1
     if tape_both
       @maquina.tape.tape.shift if @maquina.tape.tape[0] == '#'
     else
@@ -157,7 +157,7 @@ class JanelaPrincipal < Gtk::Window
 
   def update_labels
     @fita.set_markup("<span face=\"Courier\">#{@maquina.tape.to_s}</span>")
-    @cabecote.set_markup("<span face=\"Courier\">#{"_"*@maquina.machines[-1].pos}^</span>")
+    @cabecote.set_markup("<span face=\"Courier\">#{"_"*@maquina.maquinas[-1].pos}^</span>")
     @status.pop(@status.get_context_id("estado"))
     @status.push(@status.get_context_id("estado"), "Estado atual: #{@maquina.state}")
   end
@@ -267,7 +267,7 @@ class JanelaPrincipal < Gtk::Window
   end
 
   def about
-    message = "RTuring\nUm interpretador de máquinas de turing " +
+    message = "gRats\nUm interpretador de máquinas de turing " +
       "feito por Alexandre Passos, Antonio Terceiro e " +
       "Caio Tiago Oliveira."
     about = Gtk::MessageDialog.new(@window, 
