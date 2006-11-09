@@ -25,6 +25,16 @@ class Menus < Gtk::MenuBar
       window.tape_both_sides(item.active?)
       window.update_labels
     }
+    light = ConfigCheckMenuItem.new(:light, 
+                                    "Modo \"light\" para economizar memória")
+    window.light_mode = light.active?
+    light.signal_connect("toggled") { |item, kind|
+      window.first
+      window.light_mode ^= true
+      window.botoes.prev.sensitive = !window.light_mode
+      window.update_labels
+    }
+      
     @actgroup = window.actgroup
     proc = Proc.new {|actg, act|
       @window.send(act.name)
@@ -47,7 +57,7 @@ class Menus < Gtk::MenuBar
      ]
     @actgroup.add_actions(@entries)
     @accgroup = window.ag
-    mconfigs = Gtk::MenuItem.new("_Configurar").set_submenu(Gtk::Menu.new.append(kind).append(mboth))
+    mconfigs = Gtk::MenuItem.new("_Configurar").set_submenu(Gtk::Menu.new.append(kind).append(mboth).append(light))
     edit = menuItem(*["_Editar", ["choose_tape", "edit_machine", "choose_timeout"]])
     file = menuItem(*["_Arquivo", ["open_file", "save_machine", "quit"]])
     about = menuItem(*["Aj_uda", ["about"]])

@@ -4,12 +4,13 @@ require "interface/factory"
 require "mathn"
 
 class JanelaPrincipal < Gtk::Window
-  attr_accessor :ag, :actgroup
-  attr_reader :timeout
+  attr_accessor :ag, :actgroup, :light_mode
+  attr_reader :timeout, :botoes
 
   def initialize(m, t)
     super()
     self.title = "gRats"
+    self.light_mode = false
     Turing::Machine.default_kind = Config::client["/apps/rturing/tipo"]
     Turing::Machine.both_sides = Config::client["/apps/rturing/mboth"]
     @saved = true
@@ -49,7 +50,8 @@ class JanelaPrincipal < Gtk::Window
     scroll.add_with_viewport(exec_field)
     linhas.pack_start(scroll,false,false,2)
     linhas.pack_start(Gtk::HSeparator.new.set_size_request(500, 2),false,false,2)
-    button_line = hcenter(Buttons.new(self))
+    @botoes =  Buttons.new(self)
+    button_line = hcenter(@botoes)
     linhas.pack_start(button_line,false,true)
     linhas.pack_end(Gtk::VBox.new(false,0).pack_start(@status),false,false)
     add(linhas)
@@ -117,7 +119,11 @@ class JanelaPrincipal < Gtk::Window
   end
 
   def step
-    @maquina.step
+    if light_mode
+      @maquina.light_step
+    else
+      @maquina.step
+    end
     update_labels
   end
 

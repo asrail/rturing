@@ -14,20 +14,22 @@ class Buttons < Gtk::HBox
       Gtk::Stock.add(id, label)
      }
      buttons = [
-       [:first, Gtk::Stock::GOTO_FIRST], 
-       [:prev, Gtk::Stock::GO_BACK], 
-       [:stop, Gtk::Stock::STOP], 
-       [:play, Gtk::Stock::YES], 
-       [:step, Gtk::Stock::GO_FORWARD],
-       [:last, Gtk::Stock::GOTO_LAST]]
+       [:first, Gtk::Stock::GOTO_FIRST, true], 
+       [:prev, Gtk::Stock::GO_BACK, !window.light_mode], 
+       [:stop, Gtk::Stock::STOP, true], 
+       [:play, Gtk::Stock::YES, true], 
+       [:step, Gtk::Stock::GO_FORWARD, true],
+       [:last, Gtk::Stock::GOTO_LAST, true]]
 
-    buttons.each {|but, icon|
+    buttons.each {|but, icon, sensitive|
       sbut = but.to_s
       if icon
-        send(sbut+"=", Gtk::Button.new(icon,true))
+        botao = Gtk::Button.new(icon,true)
       else
-        send(sbut+"=", Gtk::Button.new(sbut.capitalize,true))
+        botao = Gtk::Button.new(sbut.capitalize,true)
       end
+      botao.sensitive = sensitive
+      send(sbut+"=",botao)
       send(sbut).signal_connect("clicked") {
         window.send(sbut)
       }

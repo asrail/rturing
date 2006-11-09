@@ -278,6 +278,11 @@ module Turing #:nodoc
       end
     end
     
+    def light_step
+      return if halted
+      @machines = [machines[0], machines[-1].next]
+    end
+    
     def unstep(i = 1)
       i.times do 
         if machines[1]
