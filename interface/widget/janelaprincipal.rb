@@ -10,7 +10,7 @@ class JanelaPrincipal < Gtk::Window
   def initialize(m, t)
     super()
     self.title = "gRats"
-    self.light_mode = false
+    self.light_mode = Config::client["/apps/rturing/light"]
     Turing::Machine.default_kind = Config::client["/apps/rturing/tipo"]
     Turing::Machine.both_sides = Config::client["/apps/rturing/mboth"]
     @saved = true
