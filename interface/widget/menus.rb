@@ -27,7 +27,6 @@ class Menus < Gtk::MenuBar
     }
     light = ConfigCheckMenuItem.new(:light, 
                                     "Modo \"light\" para economizar memória")
-    window.light_mode = light.active?
     light.signal_connect("toggled") { |item, kind|
       window.first
       window.light_mode ^= true
