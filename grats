@@ -1,1 +1,5 @@
-grturing
+#!/usr/bin/ruby
+
+require 'interface/rturing'
+
+main(ARGV[0], ARGV[1])

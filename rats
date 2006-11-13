@@ -1,1 +1,5 @@
-rturing
+#!/usr/bin/ruby
+
+require 'turing/machine'
+
+main()
