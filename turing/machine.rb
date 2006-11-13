@@ -90,7 +90,7 @@ module Turing #:nodoc
       @original = aut
       aut.each_line do |line|
         n_linha += 1
-        next if line =~ /^\s*#/
+        next if line =~ /^\s*(#|$)/
         md = regex.match(line)
         if not md
           linhas_erradas.push([n_linha, line])
