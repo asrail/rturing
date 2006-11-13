@@ -159,7 +159,15 @@ class JanelaPrincipal < Gtk::Window
     @fita.set_markup("<span face=\"Courier\">#{@maquina.tape.to_s}</span>")
     @cabecote.set_markup("<span face=\"Courier\">#{"_"*@maquina.maquinas[-1].pos}^</span>")
     @status.pop(@status.get_context_id("estado"))
-    @status.push(@status.get_context_id("estado"), "Estado atual: #{@maquina.state}")
+    i = 0
+    @maquina.tape.tape.each { |char|
+      if not ((char == " ") or (char == "#") or (char == "_"))
+        i += 1
+      end
+    }
+    @status.push(@status.get_context_id("estado"), "Estado atual: #{@maquina.state}, " +
+                 "#{i} caracteres não-nulos")
+    
   end
 
   def set_trans(trans, window, saved=false)
