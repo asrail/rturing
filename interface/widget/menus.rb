@@ -30,7 +30,7 @@ class Menus < Gtk::MenuBar
     light.signal_connect("toggled") { |item, kind|
       window.first
       window.light_mode ^= true
-      window.botoes.prev.sensitive = !window.light_mode
+      window.but_actgroup.get_action("prev").sensitive = !window.light_mode
       window.update_labels
     }
       
