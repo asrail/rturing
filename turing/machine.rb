@@ -1,3 +1,4 @@
+require 'turing/model'
 
 module Turing #:nodoc
   class MTKind
@@ -83,6 +84,12 @@ module Turing #:nodoc
     end
 
     def initialize(aut,regex)
+      if regex.kind_of?String
+        regex = Model.send(regex)
+      end
+      if regex.kind_of?Array
+        regex = MTRegex.new(MTKind.new(*regex))
+      end
       @inicial = nil
       linhas_erradas = []
       n_linha = 0
@@ -178,33 +185,15 @@ module Turing #:nodoc
       tape.gsub(/_/,' ')
     end
   end
-  
+
   class Machine
     attr_accessor :trans, :machines, :regex, :kind, :both
 
     @@both_sides = true
-    @@gturing = MTKind.new(:gturing,
-%r((?x)
-  ^\s*(\S+)
-   \s*(\S+)
-   \s*(\S+)
-   \s*(l|r|e|d)
-   \s*(\S+)
-   (\s*(.*))?$
-), [1,2,3,4,5], {:l => ['e','l'],:r => ['d','r']})
-    @@wiesbaden = MTKind.new(:wiesbaden,
-%r((?x)
-  ^\s*((?:\w|\d)+)
-   ,?\s*((?:\w|\d|[-+\/!@%^&=.()$#*_])+)
-   ,?\s*((?:\w|\d)+)
-   ,?\s*((?:\w|\d|[-+\/!@%^&=.()$#*_])+)
-   ,?\s*(<|>)$
-), [1,2,4,5,3], {:l => ['<'], :r => ['>']})
-    @@kind = @@gturing
-
+    @@kind = Model::gturing
     
-    def initialize(transf="", both_sides=@@both_sides, kind=@@kind)
-      @kind = kind
+    def initialize(transf="", both_sides=@@both_sides, kind_m=@@kind)
+      @kind = MTKind.new(*kind_m)
       @both = both_sides
       self.regex = MTRegex.new(kind)
       @trans = TransFunction.new(transf, self.regex)
@@ -224,9 +213,9 @@ module Turing #:nodoc
 
     def self.default_kind=(kind)
       if /(?i)gturing/ =~ kind
-        @@kind = @@gturing
+        @@kind = Model::gturing
       elsif /(?i)wiesbaden/ =~ kind
-        @@kind = @@wiesbaden
+        @@kind = Model::wiesbaden
       end
     end
 
