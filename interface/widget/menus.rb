@@ -80,9 +80,9 @@ class Menus < Gtk::MenuBar
           acc_name = @entries.find {|e|
             e[0] == act.name
           }[3]
-           acc = Gtk::Accelerator.parse(acc_name)
-           item.add_accelerator("activate", menu.accel_group, acc[0], acc[1],
-                                  Gtk::ACCEL_VISIBLE)
+          acc = Gtk::Accelerator.parse(acc_name)
+          item.add_accelerator("activate", menu.accel_group, acc[0], acc[1],
+                               Gtk::ACCEL_VISIBLE)
           act.accel_group = @accgroup
           act.connect_proxy(item)
           menu.append(item)
