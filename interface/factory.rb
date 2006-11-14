@@ -11,7 +11,7 @@ class Factory < Gtk::Dialog
 
   def validate(machine, dialog)
     begin
-      t = Turing::TransFunction.new(machine,Turing::MTRegex.new(Turing::Machine.default_kind))
+      t = Turing::TransFunction.new(machine,Turing::Machine.default_kind)
       return true
     rescue Turing::InvalidMachine
       value = false
