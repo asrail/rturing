@@ -3,7 +3,7 @@ require "turing/machine"
 require "interface/factory"
 require "mathn"
 
-class JanelaPrincipal < Gtk::Window
+class MainWindow < Gtk::Window
   attr_accessor :ag, :actgroup, :light_mode
   attr_reader :timeout, :botoes
 

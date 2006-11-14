@@ -2,7 +2,7 @@ require "interface/widget/base.rb"
 
 def main(machine, tape)
   Gtk::init
-  w = JanelaPrincipal.new(machine, tape)
+  w = MainWindow.new(machine, tape)
   Gtk.main
 end
 
