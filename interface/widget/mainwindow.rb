@@ -144,15 +144,6 @@ class MainWindow < Gtk::Window
       t = Turing::TransFunction.new(@machine.trans.to_s,kind)
       return true
     rescue Turing::InvalidMachine
-      value = false
-      message = "A máquina de turing digitada não é válida."
-      d2 = Gtk::MessageDialog.new(nil,
-                                  Gtk::MessageDialog::MODAL,
-                                  Gtk::MessageDialog::INFO,
-                                  Gtk::MessageDialog::BUTTONS_CLOSE,
-                                  message)
-      d2.run {}
-      d2.destroy
       return false
     end
   end
