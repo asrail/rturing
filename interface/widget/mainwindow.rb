@@ -172,7 +172,8 @@ class MainWindow < Gtk::Window
 
   def set_trans(trans, window, saved=false)
     begin
-      tape = @maquina.tape.to_s[1..-1]
+      both = Turing::Machine.both_sides
+      tape = @maquina.tape.to_s[(both ? 0 : 1)..-1]
       maquina = Turing::Machine.new(trans)
       maquina.setup(tape)
       @maquina = maquina
