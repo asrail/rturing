@@ -56,6 +56,7 @@ class MainWindow < Gtk::Window
     linhas.pack_end(Gtk::VBox.new(false,0).pack_start(@status),false,false)
     add(linhas)
     @actgroup.get_action("save_machine").sensitive = false
+    @actgroup.get_action("save_machine_as").sensitive = false
     show_all
   end
 
@@ -228,6 +229,10 @@ class MainWindow < Gtk::Window
   end
 
   def save_machine
+    save_machine_as
+  end
+
+  def save_machine_as
     dialog = Gtk::FileChooserDialog.new("Salvar Máquina",
                                         self,
                                         Gtk::FileChooser::ACTION_SAVE,

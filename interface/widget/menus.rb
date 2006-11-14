@@ -43,6 +43,8 @@ class Menus < Gtk::MenuBar
         "<control>o", "Carregar uma máquina de um arquivo", proc],
        ["save_machine", Gtk::Stock::SAVE, "_Salvar",
         "<control>s", "Salva a máquina para um arquivo", proc],
+       ["save_machine_as", Gtk::Stock::SAVE_AS, "Salvar _como",
+        "<control><shift>s", "Salva a máquina para um novo arquivo", proc],
        ["choose_tape", Gtk::Stock::EDIT, "_Fita",
         "<control>f", "Permite editar a fita", proc],
        ["edit_machine", Gtk::Stock::EXECUTE, "_Máquina",
@@ -58,7 +60,7 @@ class Menus < Gtk::MenuBar
     @accgroup = window.ag
     mconfigs = Gtk::MenuItem.new("_Configurar").set_submenu(Gtk::Menu.new.append(kind).append(mboth).append(light))
     edit = menuItem(*["_Editar", ["choose_tape", "edit_machine", "choose_timeout"]])
-    file = menuItem(*["_Arquivo", ["open_file", "save_machine", "quit"]])
+    file = menuItem(*["_Arquivo", ["open_file", "save_machine", "save_machine_as", "quit"]])
     about = menuItem(*["Aj_uda", ["about"]])
     append(file)
     append(edit)
