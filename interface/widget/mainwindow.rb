@@ -4,7 +4,7 @@ require "interface/factory"
 require "mathn"
 
 class MainWindow < Gtk::Window
-  attr_accessor :ag, :actgroup, :light_mode
+  attr_accessor :ag, :actgroup, :light_mode, :file
   attr_reader :timeout, :botoes
 
   def initialize(m, t)
@@ -56,7 +56,6 @@ class MainWindow < Gtk::Window
     linhas.pack_end(Gtk::VBox.new(false,0).pack_start(@status),false,false)
     add(linhas)
     @actgroup.get_action("save_machine").sensitive = false
-    @actgroup.get_action("save_machine_as").sensitive = false
     show_all
   end
 
@@ -228,8 +227,20 @@ class MainWindow < Gtk::Window
     end
   end
 
+  def write_machine(filename)
+      File.open(filename, "w") { |file|
+        file.write(@maquina.trans.to_s)
+      }
+      @saved = true
+      @actgroup.get_action("save_machine").sensitive = false
+  end
+
   def save_machine
-    save_machine_as
+    if self.file.nil?
+      save_machine_as
+    else
+      write_machine(self.file)
+    end
   end
 
   def save_machine_as
@@ -242,11 +253,8 @@ class MainWindow < Gtk::Window
     
     runned = dialog.run
     if runned == Gtk::Dialog::RESPONSE_ACCEPT
-      File.open(dialog.filename, "w") { |file|
-        file.write(@maquina.trans.to_s)
-      }
-      @saved = true
-      @actgroup.get_action("save_machine").sensitive = false
+      self.file = dialog.filename
+      write_machine(self.file)
     end
     dialog.destroy
     return runned == Gtk::Dialog::RESPONSE_ACCEPT
