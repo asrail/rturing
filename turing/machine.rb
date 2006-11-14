@@ -180,7 +180,7 @@ module Turing #:nodoc
   end
   
   class Machine
-    attr_accessor :trans, :maquinas, :regex, :kind, :both
+    attr_accessor :trans, :machines, :regex, :kind, :both
 
     @@both_sides = true
     @@gturing = MTKind.new(:gturing,
@@ -243,15 +243,15 @@ module Turing #:nodoc
     end
 
     def halted
-      @maquinas[-1].halted
+      @machines[-1].halted
     end
     
     def halted=(value)
-      @maquinas[-1].halted = value
+      @machines[-1].halted = value
     end
     
     def state
-      @maquinas[-1].state
+      @machines[-1].state
     end
 
     def self.from_file(filename = nil)
@@ -265,7 +265,7 @@ module Turing #:nodoc
     end
 
     def setup(tape,both=@@both_sides)
-      @maquinas = [MachineState.new(trans, Tape.new("#{'#' unless both}#{tape}"), 
+      @machines = [MachineState.new(trans, Tape.new("#{'#' unless both}#{tape}"), 
                                     trans.inicial, both ? 0 : 1, kind)]
       self.halted = @trans.states.empty?
     end
@@ -274,29 +274,29 @@ module Turing #:nodoc
     def step(i = 1)
       i.times do
         return if halted
-        maquinas.push(maquinas[-1].next) 
+        machines.push(machines[-1].next) 
       end
     end
     
     def light_step
       return if halted
-      @maquinas = [maquinas[0], maquinas[-1].next]
+      @machines = [machines[0], machines[-1].next]
     end
     
     def unstep(i = 1)
       i.times do 
-        if maquinas[1]
-          maquinas.pop 
+        if machines[1]
+          machines.pop 
         end
       end
     end
     
     def tape
-      maquinas[-1].tape
+      machines[-1].tape
     end
 
     def print
-      estado = @maquinas[-1]
+      estado = @machines[-1]
       fita = estado.tape
       puts fita
       puts " "*estado.pos + "^"

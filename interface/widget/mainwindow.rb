@@ -25,11 +25,11 @@ class MainWindow < Gtk::Window
     @actgroup = Gtk::ActionGroup.new("MainMenu")
     @but_actgroup = Gtk::ActionGroup.new("GUIButtons")
     begin
-      @maquina = Turing::Machine.from_file(m)
+      @machine = Turing::Machine.from_file(m)
     rescue
-      @maquina = Turing::Machine.new
+      @machine = Turing::Machine.new
     end
-    @maquina.setup((t or ""))
+    @machine.setup((t or ""))
     linhas = Gtk::VBox.new(false,0)
     @menu = Menus.new(self)
     linhas.pack_start(@menu,false,false,0)
@@ -94,7 +94,7 @@ class MainWindow < Gtk::Window
   def play(timeout=@timeout)
     timeout,rev = timeout.polar
     @tid = Gtk::timeout_add(timeout) {
-      stop if (rev.zero? && @maquina.halted) || (!rev.zero? && @maquina.maquinas == [@maquina.maquinas[0]])
+      stop if (rev.zero? && @machine.halted) || (!rev.zero? && @machine.machines == [@machine.machines[0]])
       rev.zero? ? step : prev
     }
   end
@@ -104,14 +104,14 @@ class MainWindow < Gtk::Window
   end
 
   def prev
-    @maquina.unstep if @maquina.halted
-    @maquina.unstep
+    @machine.unstep if @machine.halted
+    @machine.unstep
     update_labels
   end
 
   def first
-    @maquina.maquinas = [@maquina.maquinas[0]]
-    @maquina.maquinas[0].trans = @maquina.trans
+    @machine.machines = [@machine.machines[0]]
+    @machine.machines[0].trans = @machine.trans
     update_labels
   end
 
@@ -122,26 +122,26 @@ class MainWindow < Gtk::Window
 
   def step
     if light_mode
-      @maquina.light_step
+      @machine.light_step
     else
-      @maquina.step
+      @machine.step
     end
     update_labels
   end
 
   def tape_both_sides(tape_both)
-    @maquina.maquinas[0].pos = tape_both ? 0 : 1
+    @machine.machines[0].pos = tape_both ? 0 : 1
     if tape_both
-      @maquina.tape.tape.shift if @maquina.tape.tape[0] == '#'
+      @machine.tape.tape.shift if @machine.tape.tape[0] == '#'
     else
-      @maquina.tape.tape.unshift('#') if @maquina.tape.tape[0] != '#'
+      @machine.tape.tape.unshift('#') if @machine.tape.tape[0] != '#'
       update_labels
     end
   end
 
   def validate(kind)
     begin
-      t = Turing::TransFunction.new(@maquina.trans.to_s,kind)
+      t = Turing::TransFunction.new(@machine.trans.to_s,kind)
       return true
     rescue Turing::InvalidMachine
       value = false
@@ -158,16 +158,16 @@ class MainWindow < Gtk::Window
   end
 
   def update_labels
-    @fita.set_markup("<span face=\"Courier\">#{@maquina.tape.to_s}</span>")
-    @cabecote.set_markup("<span face=\"Courier\">#{"_"*@maquina.maquinas[-1].pos}^</span>")
+    @fita.set_markup("<span face=\"Courier\">#{@machine.tape.to_s}</span>")
+    @cabecote.set_markup("<span face=\"Courier\">#{"_"*@machine.machines[-1].pos}^</span>")
     @status.pop(@status.get_context_id("estado"))
     i = 0
-    @maquina.tape.tape.each { |char|
+    @machine.tape.tape.each { |char|
       if not ((char == " ") or (char == "#") or (char == "_"))
         i += 1
       end
     }
-    @status.push(@status.get_context_id("estado"), "Estado atual: #{@maquina.state}, " +
+    @status.push(@status.get_context_id("estado"), "Estado atual: #{@machine.state}, " +
                  "#{i} caracteres não-nulos")
     
   end
@@ -175,10 +175,10 @@ class MainWindow < Gtk::Window
   def set_trans(trans, window, saved=false)
     begin
       both = Turing::Machine.both_sides
-      tape = @maquina.tape.to_s[(both ? 0 : 1)..-1]
-      maquina = Turing::Machine.new(trans)
-      maquina.setup(tape)
-      @maquina = maquina
+      tape = @machine.tape.to_s[(both ? 0 : 1)..-1]
+      machine = Turing::Machine.new(trans)
+      machine.setup(tape)
+      @machine = machine
       @saved = saved
       @actgroup.get_action("save_machine").sensitive = !saved
       return true
@@ -221,7 +221,7 @@ class MainWindow < Gtk::Window
         File.open(dialog.filename) { |file|
           success = set_trans(file.read, dialog, true)
         }
-        @maquina.setup ""
+        @machine.setup ""
       end
       dialog.destroy
       if runned == Gtk::Dialog::RESPONSE_ACCEPT and success
@@ -232,7 +232,7 @@ class MainWindow < Gtk::Window
 
   def write_machine(filename)
       File.open(filename, "w") { |file|
-        file.write(@maquina.trans.to_s)
+        file.write(@machine.trans.to_s)
       }
       @saved = true
       @actgroup.get_action("save_machine").sensitive = false
@@ -265,9 +265,9 @@ class MainWindow < Gtk::Window
 
   def choose_tape
     both = Turing::Machine.both_sides
-    ChooseDialog.new("Selecionar fita",@maquina.tape.to_s[(both ? 0 : 1)..-1],
+    ChooseDialog.new("Selecionar fita",@machine.tape.to_s[(both ? 0 : 1)..-1],
                      "Entre com a fita: #{'#' unless both}", nil) {|input,dialog|
-      @maquina.setup(input.text)
+      @machine.setup(input.text)
       self.first # não faz sentido editar a fita sem ver o resultado
       self.update_labels
       dialog.destroy
@@ -282,8 +282,8 @@ class MainWindow < Gtk::Window
   end
 
   def edit_machine
-    EditDialog.new("Editar Máquina",@maquina.trans.to_s,"") { |maquina_atual,dialog|
-      set_trans(maquina_atual.text, dialog)
+    EditDialog.new("Editar Máquina",@machine.trans.to_s,"") { |machine_atual,dialog|
+      set_trans(machine_atual.text, dialog)
       self.first # não faz sentido editar os estados no meio, ainda
       self.update_labels
       dialog.destroy
