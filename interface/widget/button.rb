@@ -4,36 +4,26 @@ class Buttons < Gtk::HBox
   attr_accessor :botoes,:first,:prev,:stop,:play,:step,:last
   def initialize(window)
     super()
-     [[Gtk::Stock::GOTO_FIRST, "_Reiniciar"],
-       [Gtk::Stock::GO_BACK, "_Voltar"],
-       [Gtk::Stock::STOP, "_Parar"],
-       [Gtk::Stock::YES, "E_xecutar"],
-       [Gtk::Stock::GO_FORWARD, "Ava_nçar"],
-       [Gtk::Stock::GOTO_LAST, "Últi_mo"]
-     ].each { |id, label|
-      Gtk::Stock.add(id, label)
-     }
-     buttons = [
-       [:first, Gtk::Stock::GOTO_FIRST, true], 
-       [:prev, Gtk::Stock::GO_BACK, !window.light_mode], 
-       [:stop, Gtk::Stock::STOP, true], 
-       [:play, Gtk::Stock::YES, true], 
-       [:step, Gtk::Stock::GO_FORWARD, true],
-       [:last, Gtk::Stock::GOTO_LAST, true]]
-
-    buttons.each {|but, icon, sensitive|
-      sbut = but.to_s
-      if icon
-        botao = Gtk::Button.new(icon,true)
-      else
-        botao = Gtk::Button.new(sbut.capitalize,true)
+    @actgroup = window.but_actgroup
+    proc = Proc.new {|actg, act|
+      window.send(act.name)
+    }
+    buttons = [
+       ["first", Gtk::Stock::GOTO_FIRST, "_Reiniciar", "", "Retorna ao estado inicial", proc], 
+       ["prev", Gtk::Stock::GO_BACK, "_Voltar", "", "Retrocede um passo", proc],
+       ["stop", Gtk::Stock::STOP, "_Parar", "", "Interrompe a execução", proc], 
+       ["play", Gtk::Stock::YES, "E_xecutar", "", "Inicia a execução", proc], 
+       ["step", Gtk::Stock::GO_FORWARD, "Ava_nçar", "", "Avança um passo", proc],
+       ["last", Gtk::Stock::GOTO_LAST, "Últi_mo", "", "Avança até o último passo ou primeiro loop infinito", proc]]
+    @actgroup.add_actions(buttons)
+    buttons.each {|but|
+      act = @actgroup.get_action(but[0])
+      if !act.nil?
+        item = Gtk::Button.new(act.stock_id.to_sym||act.name)
+        act.accel_group = @accgroup
+        act.connect_proxy(item)
+        pack_start(item,false,false,1)
       end
-      botao.sensitive = sensitive
-      send(sbut+"=",botao)
-      send(sbut).signal_connect("clicked") {
-        window.send(sbut)
-      }
-      pack_start(send(sbut),false,false,1)
     }
   end
 end
