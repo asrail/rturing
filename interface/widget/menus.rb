@@ -8,16 +8,11 @@ class Menus < Gtk::MenuBar
     super()
     @window = window
     kind = ConfigRadioList.new("Tipo _de máquina",window, "tipo")
-    kind.append("_Gturing",:gturing)
-    kind.append("_Wiesbaden",:wiesbaden)
-    kind.add_signal("toggled") {|item,kind,window|
-      if item.active?
-        Turing::Machine.default_kind = kind
-        window.first
-        window.update_labels
-        window.edit_machine unless window.validate(kind)
-      end
+    kind.add_signal("activate") {|item,kind,window|
+      window.actgroup.get_action(kind).sensitive = window.validate(kind)
+      false
     }
+
     mboth = ConfigCheckMenuItem.new(:mboth,"Infinita para os dois lados")
     mboth.signal_connect("toggled") {|item,kind|
       Turing::Machine.toggle_both_sides
