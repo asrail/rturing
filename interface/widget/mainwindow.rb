@@ -4,7 +4,7 @@ require "interface/factory"
 require "mathn"
 
 class MainWindow < Gtk::Window
-  attr_accessor :ag, :actgroup, :light_mode, :file
+  attr_accessor :ag, :actgroup, :light_mode, :file, :but_actgroup
   attr_reader :timeout, :botoes
 
   def initialize(m, t)
@@ -23,6 +23,7 @@ class MainWindow < Gtk::Window
     @ag = Gtk::AccelGroup.new
     self.add_accel_group(@ag)
     @actgroup = Gtk::ActionGroup.new("MainMenu")
+    @but_actgroup = Gtk::ActionGroup.new("GUIButtons")
     begin
       @maquina = Turing::Machine.from_file(m)
     rescue
@@ -56,6 +57,7 @@ class MainWindow < Gtk::Window
     linhas.pack_end(Gtk::VBox.new(false,0).pack_start(@status),false,false)
     add(linhas)
     @actgroup.get_action("save_machine").sensitive = false
+    @but_actgroup.get_action("prev").sensitive = !self.light_mode
     show_all
   end
 
