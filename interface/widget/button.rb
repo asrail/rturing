@@ -8,6 +8,15 @@ class Buttons < Gtk::HBox
     proc = Proc.new {|actg, act|
       window.send(act.name)
     }
+     [[Gtk::Stock::GOTO_FIRST, "_Reiniciar"],
+       [Gtk::Stock::GO_BACK, "_Voltar"],
+       [Gtk::Stock::STOP, "_Parar"],
+       [Gtk::Stock::YES, "E_xecutar"],
+       [Gtk::Stock::GO_FORWARD, "Ava_nçar"],
+       [Gtk::Stock::GOTO_LAST, "Últi_mo"]
+     ].each { |id, label|
+      Gtk::Stock.add(id, label)
+    }
     buttons = [
        ["first", Gtk::Stock::GOTO_FIRST, "_Reiniciar", "", "Retorna ao estado inicial", proc], 
        ["prev", Gtk::Stock::GO_BACK, "_Voltar", "", "Retrocede um passo", proc],
