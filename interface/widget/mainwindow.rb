@@ -160,8 +160,6 @@ class MainWindow < Gtk::Window
   end
 
   def step
-    @but_actgroup.get_action("last").sensitive = false
-    @but_actgroup.get_action("step").sensitive = false
     m_step
     @but_actgroup.get_action("prev").sensitive = !self.light_mode && @machine.machines.size > 1
     @but_actgroup.get_action("last").sensitive = !@machine.halted
