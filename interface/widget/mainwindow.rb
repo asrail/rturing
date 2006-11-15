@@ -58,6 +58,7 @@ class MainWindow < Gtk::Window
     add(linhas)
     @actgroup.get_action("save_machine").sensitive = false
     @but_actgroup.get_action("prev").sensitive = !self.light_mode
+    @but_actgroup.get_action("stop").sensitive = false
     show_all
   end
 
@@ -92,6 +93,7 @@ class MainWindow < Gtk::Window
   end
 
   def play(timeout=@timeout)
+    @but_actgroup.get_action("stop").sensitive = true
     timeout,rev = timeout.polar
     @tid = Gtk::timeout_add(timeout) {
       stop if (rev.zero? && @machine.halted) || (!rev.zero? && @machine.machines == [@machine.machines[0]])
@@ -116,6 +118,7 @@ class MainWindow < Gtk::Window
   end
 
   def stop
+    @but_actgroup.get_action("stop").sensitive = false
     Gtk::timeout_remove(@tid) if @tid
     @tid = nil
   end
