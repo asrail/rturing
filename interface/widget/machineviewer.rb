@@ -11,13 +11,18 @@ class MachineViewer < Gtk::VBox
     @fita.ellipsize = Pango::Layout::ELLIPSIZE_NONE
     @cabecote = Gtk::Label.new
     @cabecote.set_alignment(0,0)
-    @halted = Gtk::Label.new
+    @halted = Gtk::Image.new(Gtk::Stock::YES, Gtk::IconSize::MENU)
+    @event = Gtk::EventBox.new
+    @event.add(@halted)
+    @tips = Gtk::Tooltips.new
+    @tips.set_tip(@event, "A máquina não foi carregada.", "")
+    @tips.enable
     @estado = Gtk::Label.new
     @chars = Gtk::Label.new
     self.pack_start(@fita, false, false, 0)
     self.pack_start(@cabecote, false, false, 0)
     hb = Gtk::HBox.new
-    hb.pack_start(@halted, false, false, 0)
+    hb.pack_start(@event, false, false, 0)
     hb.pack_start(@estado, false, false, 0)
     hb.pack_start(@chars, false, false, 0)
     self.pack_start(hb, false, false, 0)
@@ -28,9 +33,12 @@ class MachineViewer < Gtk::VBox
     @fita.set_markup("<span face=\"Courier\">#{@machine.tape.to_s}</span>")
     @cabecote.set_markup("<span face=\"Courier\">#{"_"*@machine.machines[-1].pos}^</span>")
     if @machine.halted 
-      @halted.set_markup("Parada. ")
+      @halted.set(Gtk::Stock::YES, Gtk::IconSize::MENU)
+      @tips.set_tip(@event, "A máquina está parada " + 
+                    "(ie, a função de transição não está definida).", "")
     else
-      @halted.set_markup("Rodando. ")
+      @halted.set(Gtk::Stock::NO, Gtk::IconSize::MENU)
+      @tips.set_tip(@event, "A máquina ainda não chegou ao fim.", "")
     end
     @estado.set_markup("Estado atual: #{@machine.state}. ")
     i = 0
