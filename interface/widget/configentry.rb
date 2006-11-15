@@ -1,7 +1,6 @@
 require "gtk2"
 require "interface/config"
 
-
 class ConfigEntry < Gtk::Entry
   def initialize(key, default)
     super()
@@ -17,5 +16,4 @@ class ConfigEntry < Gtk::Entry
       Config::client["/apps/rturing/#{@key}"] = self.text
     }
   end
-
 end
