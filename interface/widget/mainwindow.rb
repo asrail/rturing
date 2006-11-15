@@ -94,6 +94,7 @@ class MainWindow < Gtk::Window
 
   def play(timeout=@timeout)
     @but_actgroup.get_action("stop").sensitive = true
+    @but_actgroup.get_action("play").sensitive = false
     timeout,rev = timeout.polar
     @tid = Gtk::timeout_add(timeout) {
       stop if (rev.zero? && @machine.halted) || (!rev.zero? && @machine.machines == [@machine.machines[0]])
@@ -119,6 +120,7 @@ class MainWindow < Gtk::Window
 
   def stop
     @but_actgroup.get_action("stop").sensitive = false
+    @but_actgroup.get_action("play").sensitive = true
     Gtk::timeout_remove(@tid) if @tid
     @tid = nil
   end
