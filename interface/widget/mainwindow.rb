@@ -1,6 +1,7 @@
 require "gtk2"
 require "turing/machine"
 require "interface/factory"
+require "interface/widget/machineviewer"
 require "mathn"
 
 class MainWindow < Gtk::Window
@@ -33,28 +34,20 @@ class MainWindow < Gtk::Window
     linhas = Gtk::VBox.new(false,0)
     @menu = Menus.new(self)
     linhas.pack_start(@menu,false,false,0)
-    @fita = Gtk::Label.new
-    @fita.set_alignment(0,0)
-    @fita.selectable = true
-    @fita.ellipsize = Pango::Layout::ELLIPSIZE_NONE
-    @cabecote = Gtk::Label.new
-    @cabecote.set_alignment(0,0)
-    @status = Gtk::Statusbar.new
-    @status.push(@status.get_context_id("estado"), "nunca aparece")
-    self.update_labels
-    exec_field = Gtk::VBox.new(false,0)
-    exec_field.pack_start(@fita,false,false,0)
-    exec_field.pack_start(@cabecote,false,false,0)
+    @mview = MachineViewer.new(@machine)
+    @mview.update_labels
+    #exec_field = Gtk::VBox.new(false,0)
+    #exec_field.pack_start(@fita,false,false,0)
+    #exec_field.pack_start(@cabecote,false,false,0)
     scroll = Gtk::ScrolledWindow.new
     scroll.hscrollbar_policy = Gtk::POLICY_AUTOMATIC
     scroll.vscrollbar_policy = Gtk::POLICY_AUTOMATIC
-    scroll.add_with_viewport(exec_field)
+    scroll.add_with_viewport(@mview)
     linhas.pack_start(scroll,false,false,2)
     linhas.pack_start(Gtk::HSeparator.new.set_size_request(500, 2),false,false,2)
     @botoes =  Buttons.new(self)
     button_line = hcenter(@botoes)
     linhas.pack_start(button_line,false,true)
-    linhas.pack_end(Gtk::VBox.new(false,0).pack_start(@status),false,false)
     add(linhas)
     @actgroup.get_action("save_machine").sensitive = false
     @but_actgroup.get_action("prev").sensitive = false
@@ -158,18 +151,7 @@ class MainWindow < Gtk::Window
   end
 
   def update_labels
-    @fita.set_markup("<span face=\"Courier\">#{@machine.tape.to_s}</span>")
-    @cabecote.set_markup("<span face=\"Courier\">#{"_"*@machine.machines[-1].pos}^</span>")
-    @status.pop(@status.get_context_id("estado"))
-    i = 0
-    @machine.tape.tape.each { |char|
-      if not ((char == " ") or (char == "#") or (char == "_"))
-        i += 1
-      end
-    }
-    @status.push(@status.get_context_id("estado"), "Estado atual: #{@machine.state}, " +
-                 "#{i} caracteres não-nulos")
-    
+    @mview.update_labels
   end
 
   def set_trans(trans, window, saved=false)
@@ -179,6 +161,7 @@ class MainWindow < Gtk::Window
       machine = Turing::Machine.new(trans)
       machine.setup(tape)
       @machine = machine
+      @mview.machine = machine
       @saved = saved
       @actgroup.get_action("save_machine").sensitive = !saved
       return true
