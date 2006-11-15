@@ -57,7 +57,7 @@ class MainWindow < Gtk::Window
     linhas.pack_end(Gtk::VBox.new(false,0).pack_start(@status),false,false)
     add(linhas)
     @actgroup.get_action("save_machine").sensitive = false
-    @but_actgroup.get_action("prev").sensitive = !self.light_mode
+    @but_actgroup.get_action("prev").sensitive = false
     @but_actgroup.get_action("stop").sensitive = false
     show_all
   end
@@ -109,12 +109,15 @@ class MainWindow < Gtk::Window
   def prev
     @machine.unstep if @machine.halted
     @machine.unstep
+    @but_actgroup.get_action("prev").sensitive = !self.light_mode && @machine.machines.size > 1
+
     update_labels
   end
 
   def first
     @machine.machines = [@machine.machines[0]]
     @machine.machines[0].trans = @machine.trans
+    @but_actgroup.get_action("prev").sensitive = false
     update_labels
   end
 
@@ -126,6 +129,7 @@ class MainWindow < Gtk::Window
   end
 
   def step
+    @but_actgroup.get_action("prev").sensitive = !self.light_mode && @machine.machines.size > 0
     if light_mode
       @machine.light_step
     else
