@@ -85,49 +85,87 @@ class MainWindow < Gtk::Window
     end
   end
 
-  def play(timeout=@timeout)
-    @but_actgroup.get_action("stop").sensitive = true
-    @but_actgroup.get_action("play").sensitive = false
+  def m_play(timeout)
     timeout,rev = timeout.polar
     @tid = Gtk::timeout_add(timeout) {
       stop if (rev.zero? && @machine.halted) || (!rev.zero? && @machine.machines == [@machine.machines[0]])
-      rev.zero? ? step : prev
+      rev.zero? ? m_step : m_prev
+      update_labels
     }
   end
 
+  def play(timeout=@timeout)
+    @but_actgroup.get_action("stop").sensitive = true
+    @but_actgroup.get_action("play").sensitive = false
+    @but_actgroup.get_action("last").sensitive = false
+    @but_actgroup.get_action("step").sensitive = false
+    @but_actgroup.get_action("prev").sensitive = false
+    m_play(timeout)
+    @but_actgroup.get_action("prev").sensitive = !self.light_mode && @machine.machines.size > 1
+  end
+
   def last
-    play(0)
+    @but_actgroup.get_action("last").sensitive = false
+    @but_actgroup.get_action("step").sensitive = false
+    @but_actgroup.get_action("prev").sensitive = false
+    m_play(0)
+  end
+
+  def m_prev
+    @machine.unstep if @machine.halted
+    @machine.unstep
   end
 
   def prev
-    @machine.unstep if @machine.halted
-    @machine.unstep
+    m_prev
     @but_actgroup.get_action("prev").sensitive = !self.light_mode && @machine.machines.size > 1
-
+    @but_actgroup.get_action("last").sensitive = true
+    @but_actgroup.get_action("step").sensitive = true
     update_labels
   end
 
-  def first
+  def m_first
     @machine.machines = [@machine.machines[0]]
     @machine.machines[0].trans = @machine.trans
+  end
+
+  def first
+    m_first
     @but_actgroup.get_action("prev").sensitive = false
+    @but_actgroup.get_action("step").sensitive = true
+    @but_actgroup.get_action("last").sensitive = true
     update_labels
+  end
+
+  def m_stop
+    Gtk::timeout_remove(@tid) if @tid
+    @tid = nil
   end
 
   def stop
     @but_actgroup.get_action("stop").sensitive = false
     @but_actgroup.get_action("play").sensitive = true
-    Gtk::timeout_remove(@tid) if @tid
-    @tid = nil
+    m_stop
+    @but_actgroup.get_action("last").sensitive = !@machine.halted
+    @but_actgroup.get_action("step").sensitive = !@machine.halted
+    @but_actgroup.get_action("prev").sensitive = !self.light_mode && @machine.machines.size > 1
   end
 
-  def step
-    @but_actgroup.get_action("prev").sensitive = !self.light_mode && @machine.machines.size > 0
+  def m_step
     if light_mode
       @machine.light_step
     else
       @machine.step
     end
+  end
+
+  def step
+    @but_actgroup.get_action("last").sensitive = false
+    @but_actgroup.get_action("step").sensitive = false
+    m_step
+    @but_actgroup.get_action("prev").sensitive = !self.light_mode && @machine.machines.size > 1
+    @but_actgroup.get_action("last").sensitive = !@machine.halted
+    @but_actgroup.get_action("step").sensitive = !@machine.halted
     update_labels
   end
 
