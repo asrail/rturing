@@ -243,6 +243,7 @@ class MainWindow < Gtk::Window
           success = set_trans(file.read, dialog, true)
         }
         @machine.setup ""
+        self.file = dialog.filename
       end
       dialog.destroy
       if runned == Gtk::Dialog::RESPONSE_ACCEPT and success
