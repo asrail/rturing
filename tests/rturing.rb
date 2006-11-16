@@ -48,11 +48,21 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
     assert(!machine.halted)
   end
   
+  def test_prev
+    machine = Turing::Machine.from_file('machines/add.tur')
+    machine.setup('011010')
+    5.times { machine.step }
+    5.times { machine.unstep }
+    assert_equal(machine.tape.tape, machine.first_tape.tape)
+  end
+
   def test_both_sides
     machine = Turing::Machine.from_file('machines/all_the_way_left.tur')
     machine.setup('')
     5.times { machine.step }
     assert_equal(['_', '0', '0', '0', '0', '0'], machine.tape.tape)
+    5.times {machine.unstep }
+    assert_equal("", machine.tape.tape.to_s.gsub(/(^( |_)*)|(( |_)*$)/, ""))
   end
 
   def test_alpha

@@ -72,7 +72,7 @@ module Turing #:nodoc
   end
 
   class TransFunction
-    attr_reader :states, :original, :inicial
+    attr_reader :states, :original, :initial
 
     def get(state, symbol)
       return ((@states[state] and 
@@ -90,7 +90,7 @@ module Turing #:nodoc
       if regex.kind_of?Array
         regex = MTRegex.new(MTKind.new(*regex))
       end
-      @inicial = nil
+      @initial = nil
       linhas_erradas = []
       n_linha = 0
       @states = {}
@@ -104,8 +104,8 @@ module Turing #:nodoc
           next
         end
         state = md.state
-        if !@inicial
-          @inicial = state
+        if !@initial
+          @initial = state
         end
         symb_r = md.symb_r
         symb_w = md.symb_w
@@ -126,35 +126,66 @@ module Turing #:nodoc
     end
   end
   
+  class Delta
+    attr_accessor :symb_removed, :symb_written, :pos, :kind, :rule
+    def initialize(tape, pos, rule, kind)
+      @symb_removed = tape.get(pos)
+      @symb_written = rule.written_symbol
+      @pos = pos
+      @rule = rule
+      @kind = kind
+    end
+    
+    def apply(tape)
+      tape.set_at(pos, symb_written)
+      if Machine.both_sides && (kind.dir_to_amount(rule.direction) + pos) < 0
+        tape.grow_left('_')
+      end
+    end
+    
+    def unapply(tape)
+      if Machine.both_sides && (kind.dir_to_amount(rule.direction) + pos) < 0
+        tape.shrink
+      end
+      tape.set_at(pos, symb_removed)
+    end
+  end
+  
   class MachineState
-    attr_accessor :tape, :state, :pos, :trans, :halted, :kind, :prev
+    attr_accessor :tape, :state, :pos, :trans, :halted, :kind, :prev, :delta
 
     def initialize(trans, tape, state, pos, kind, prev, halt=false)
       @trans = trans
-      @tape = tape
       @state = state
       @pos = pos
+      begin
+        @delta = Delta.new(tape, pos, @trans.get(state, tape.get(pos)), kind)
+      rescue ExecutionEnded
+        @delta = nil
+      end
       @kind = kind
       @prev = prev
       self.halted = halt
     end
     
-    def next
+    def next(tape)
       begin
-        rule = @trans.get(state, @tape.get(pos))
+        rule = @trans.get(state, tape.get(pos))
         new_state = rule.new_state
-        new_symbol =  rule.written_symbol
         newpos = kind.dir_to_amount(rule.direction) + pos
-        newtape = tape.set_at(pos, new_symbol)
-        if newpos < 0
+        if @delta
+          @delta.apply(tape)
+        else
+          raise ExecutionEnded
+        end
+        if newpos < 0 
           if Machine.both_sides
             newpos = 0
-            newtape.tape = ["_"] + newtape.tape
-          else 
+          else
             raise ExecutionEnded
           end
         end
-        return MachineState.new(trans, newtape, new_state, newpos, kind, self)
+        return MachineState.new(trans, tape, new_state, newpos, kind, self)
       rescue ExecutionEnded
         return MachineState.new(trans, tape, state, pos, kind, self, true)
       end
@@ -176,9 +207,15 @@ module Turing #:nodoc
       while pos >= tape.size do
         tape.push("_")
       end
-      ntape = Array.new(tape)
-      ntape[pos] = val
-      return Tape.new(ntape.join(""))
+      tape[pos] = val
+    end
+    
+    def grow_left(char)
+      @tape = [char] + @tape
+    end
+
+    def shrink
+      @tape = @tape[1..-1]
     end
     
     def to_s
@@ -189,7 +226,7 @@ module Turing #:nodoc
   
 
   class Machine
-    attr_accessor :trans, :first, :current, :regex, :kind, :both
+    attr_accessor :trans, :first, :current, :regex, :kind, :both, :tape, :first_tape
 
     @@both_sides = true
     @@kind = Model::gturing
@@ -258,15 +295,16 @@ module Turing #:nodoc
     
 
     def setup(tape,both=@@both_sides)
-      @first = @current = MachineState.new(trans, Tape.new("#{'#' unless both}#{tape}"), 
-                                           trans.inicial, both ? 0 : 1, kind, nil)
+      @tape = Tape.new("#{'#' unless both}#{tape}")
+      @first_tape = Tape.new("#{'#' unless both}#{tape}")
+      @first = @current = MachineState.new(trans, @tape, trans.initial, both ? 0 : 1, kind, nil)
       self.halted = @trans.states.empty?
     end
-
+    
 
     def step
       return if halted
-      @current = @current.next
+      @current = @current.next(tape)
     end
     
     def on_start?
@@ -275,20 +313,17 @@ module Turing #:nodoc
     
     def light_step
       return if halted
-      @current = @current.next
+      @current = @current.next(tape)
       @current.prev = @first
     end
     
     def unstep
       if @current != @first
         @current = @current.prev
+        @current.delta.unapply(@tape)
       end
     end
     
-    def tape
-      @current.tape
-    end
-
     def print
       fita = current.tape
       puts fita
