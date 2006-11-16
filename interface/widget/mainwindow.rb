@@ -20,6 +20,7 @@ class MainWindow < Gtk::Window
     }
     self.border_width = 1
     self.window_position = POS_CENTER
+    @playing = false
     @timeout = 100
     @ag = Gtk::AccelGroup.new
     self.add_accel_group(@ag)
@@ -50,8 +51,7 @@ class MainWindow < Gtk::Window
     linhas.pack_start(button_line,false,true)
     add(linhas)
     @actgroup.get_action("save_machine").sensitive = false
-    @but_actgroup.get_action("prev").sensitive = false
-    @but_actgroup.get_action("stop").sensitive = false
+    check_buts
     show_all
   end
 
@@ -98,21 +98,23 @@ class MainWindow < Gtk::Window
     @but_actgroup.get_action(act).sensitive = st
   end
 
+  def check_buts
+    turn_but_act("stop",@playing)
+    turn_but_act("play",!@playing)
+    turn_but_act("last",!@playing && !@machine.halted)
+    turn_but_act("step",!@playing && !@machine.halted)
+    turn_but_act("prev",!@playing && !self.light_mode && @machine.machines.size > 1)
+    turn_but_act("first",!@playing && @machine.machines.size > 1)
+  end
+
   def play(timeout=@timeout)
-    turn_but_act("stop",true)
-    turn_but_act("play",false)
-    turn_but_act("last",false)
-    turn_but_act("step",false)
-    turn_but_act("prev",false)
-    turn_but_act("first",false)
+    @playing = true
+    check_buts
     m_play(timeout)
   end
 
   def last
-    turn_but_act("last",false)
-    turn_but_act("step",false)
-    turn_but_act("prev",false)
-    turn_but_act("first",false)
+    check_buts
     m_play(0)
   end
 
@@ -123,10 +125,7 @@ class MainWindow < Gtk::Window
 
   def prev
     m_prev
-    turn_but_act("prev",!self.light_mode && @machine.machines.size > 1)
-    turn_but_act("first",@machine.machines.size > 1)
-    turn_but_act("last",true)
-    turn_but_act("step",true)
+    check_buts
     update_labels
   end
 
@@ -137,10 +136,7 @@ class MainWindow < Gtk::Window
 
   def first
     m_first
-    turn_but_act("prev",false)
-    turn_but_act("step",true)
-    turn_but_act("last",true)
-    turn_but_act("first",false)
+    check_buts
     update_labels
   end
 
@@ -150,13 +146,9 @@ class MainWindow < Gtk::Window
   end
 
   def stop
-    turn_but_act("stop",false)
-    turn_but_act("play",true)
+    @playing = false
     m_stop
-    turn_but_act("last",!@machine.halted)
-    turn_but_act("step",!@machine.halted)
-    turn_but_act("prev",!self.light_mode && @machine.machines.size > 1)
-    turn_but_act("first",@machine.machines.size > 1)
+    check_buts
   end
 
   def m_step
