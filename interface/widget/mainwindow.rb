@@ -94,20 +94,25 @@ class MainWindow < Gtk::Window
     }
   end
 
+  def turn_but_act(act,st)
+    @but_actgroup.get_action(act).sensitive = st
+  end
+
   def play(timeout=@timeout)
-    @but_actgroup.get_action("stop").sensitive = true
-    @but_actgroup.get_action("play").sensitive = false
-    @but_actgroup.get_action("last").sensitive = false
-    @but_actgroup.get_action("step").sensitive = false
-    @but_actgroup.get_action("prev").sensitive = false
+    turn_but_act("stop",true)
+    turn_but_act("play",false)
+    turn_but_act("last",false)
+    turn_but_act("step",false)
+    turn_but_act("prev",false)
+    turn_but_act("first",false)
     m_play(timeout)
-    @but_actgroup.get_action("prev").sensitive = !self.light_mode && @machine.machines.size > 1
   end
 
   def last
-    @but_actgroup.get_action("last").sensitive = false
-    @but_actgroup.get_action("step").sensitive = false
-    @but_actgroup.get_action("prev").sensitive = false
+    turn_but_act("last",false)
+    turn_but_act("step",false)
+    turn_but_act("prev",false)
+    turn_but_act("first",false)
     m_play(0)
   end
 
@@ -118,9 +123,10 @@ class MainWindow < Gtk::Window
 
   def prev
     m_prev
-    @but_actgroup.get_action("prev").sensitive = !self.light_mode && @machine.machines.size > 1
-    @but_actgroup.get_action("last").sensitive = true
-    @but_actgroup.get_action("step").sensitive = true
+    turn_but_act("prev",!self.light_mode && @machine.machines.size > 1)
+    turn_but_act("first",@machine.machines.size > 1)
+    turn_but_act("last",true)
+    turn_but_act("step",true)
     update_labels
   end
 
@@ -131,9 +137,10 @@ class MainWindow < Gtk::Window
 
   def first
     m_first
-    @but_actgroup.get_action("prev").sensitive = false
-    @but_actgroup.get_action("step").sensitive = true
-    @but_actgroup.get_action("last").sensitive = true
+    turn_but_act("prev",false)
+    turn_but_act("step",true)
+    turn_but_act("last",true)
+    turn_but_act("first",false)
     update_labels
   end
 
@@ -143,12 +150,13 @@ class MainWindow < Gtk::Window
   end
 
   def stop
-    @but_actgroup.get_action("stop").sensitive = false
-    @but_actgroup.get_action("play").sensitive = true
+    turn_but_act("stop",false)
+    turn_but_act("play",true)
     m_stop
-    @but_actgroup.get_action("last").sensitive = !@machine.halted
-    @but_actgroup.get_action("step").sensitive = !@machine.halted
-    @but_actgroup.get_action("prev").sensitive = !self.light_mode && @machine.machines.size > 1
+    turn_but_act("last",!@machine.halted)
+    turn_but_act("step",!@machine.halted)
+    turn_but_act("prev",!self.light_mode && @machine.machines.size > 1)
+    turn_but_act("first",@machine.machines.size > 1)
   end
 
   def m_step
@@ -161,9 +169,10 @@ class MainWindow < Gtk::Window
 
   def step
     m_step
-    @but_actgroup.get_action("prev").sensitive = !self.light_mode && @machine.machines.size > 1
-    @but_actgroup.get_action("last").sensitive = !@machine.halted
-    @but_actgroup.get_action("step").sensitive = !@machine.halted
+    turn_but_act("first",@machine.machines.size > 1)
+    turn_but_act("prev",!self.light_mode && @machine.machines.size > 1)
+    turn_but_act("last",!@machine.halted)
+    turn_but_act("step",!@machine.halted)
     update_labels
   end
 
