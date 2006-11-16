@@ -88,7 +88,8 @@ class MainWindow < Gtk::Window
   def m_play(timeout)
     timeout,rev = timeout.polar
     @tid = Gtk::timeout_add(timeout) {
-      stop if (rev.zero? && @machine.halted) || (!rev.zero? && @machine.machines == [@machine.machines[0]])
+      stop if ((rev.zero? && @machine.halted) || 
+        (!rev.zero? && @machine.first == @machine.current))
       rev.zero? ? m_step : m_prev
       update_labels
     }
@@ -103,8 +104,8 @@ class MainWindow < Gtk::Window
     turn_but_act("play", !@playing)
     turn_but_act("last", !@playing && !@machine.halted)
     turn_but_act("step", !@playing && !@machine.halted)
-    turn_but_act("prev", !@playing && !self.light_mode && @machine.machines.size > 1)
-    turn_but_act("first", !@playing && @machine.machines.size > 1)
+    turn_but_act("prev", !@playing && !self.light_mode && !@machine.on_start?)
+    turn_but_act("first", !@playing && !@machine.on_start?)
   end
 
   def play(timeout=@timeout)
@@ -130,8 +131,8 @@ class MainWindow < Gtk::Window
   end
 
   def m_first
-    @machine.machines = [@machine.machines[0]]
-    @machine.machines[0].trans = @machine.trans
+    @machine.current = @machine.first
+    @machine.first.trans = @machine.trans
   end
 
   def first
@@ -166,7 +167,7 @@ class MainWindow < Gtk::Window
   end
 
   def tape_both_sides(tape_both)
-    @machine.machines[0].pos = tape_both ? 0 : 1
+    @machine.first.pos = tape_both ? 0 : 1
     if tape_both
       @machine.tape.tape.shift if @machine.tape.tape[0] == '#'
     else

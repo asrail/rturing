@@ -127,14 +127,15 @@ module Turing #:nodoc
   end
   
   class MachineState
-    attr_accessor :tape, :state, :pos, :trans, :halted, :kind
+    attr_accessor :tape, :state, :pos, :trans, :halted, :kind, :prev
 
-    def initialize(trans, tape, state, pos, kind, halt=false)
+    def initialize(trans, tape, state, pos, kind, prev, halt=false)
       @trans = trans
       @tape = tape
       @state = state
       @pos = pos
       @kind = kind
+      @prev = prev
       self.halted = halt
     end
     
@@ -153,9 +154,9 @@ module Turing #:nodoc
             raise ExecutionEnded
           end
         end
-        return MachineState.new(trans, newtape, new_state, newpos, kind)
+        return MachineState.new(trans, newtape, new_state, newpos, kind, self)
       rescue ExecutionEnded
-        return MachineState.new(trans, tape, state, pos, kind, true)
+        return MachineState.new(trans, tape, state, pos, kind, self, true)
       end
     end
   end
@@ -185,14 +186,16 @@ module Turing #:nodoc
       tape.gsub(/_/,' ')
     end
   end
+  
 
   class Machine
-    attr_accessor :trans, :machines, :regex, :kind, :both
+    attr_accessor :trans, :first, :current, :regex, :kind, :both
 
     @@both_sides = true
     @@kind = Model::gturing
     
     def initialize(transf="", both_sides=@@both_sides, kind_m=@@kind)
+      @first = @current = nil
       @kind = MTKind.new(*kind_m)
       @both = both_sides
       self.regex = MTRegex.new(kind)
@@ -232,15 +235,15 @@ module Turing #:nodoc
     end
 
     def halted
-      @machines[-1].halted
+      @current.halted
     end
     
     def halted=(value)
-      @machines[-1].halted = value
+      @current.halted = value
     end
     
     def state
-      @machines[-1].state
+      @current.state
     end
 
     def self.from_file(filename = nil)
@@ -252,43 +255,44 @@ module Turing #:nodoc
         Machine.new("")
       end
     end
+    
 
     def setup(tape,both=@@both_sides)
-      @machines = [MachineState.new(trans, Tape.new("#{'#' unless both}#{tape}"), 
-                                    trans.inicial, both ? 0 : 1, kind)]
+      @first = @current = MachineState.new(trans, Tape.new("#{'#' unless both}#{tape}"), 
+                                           trans.inicial, both ? 0 : 1, kind, nil)
       self.halted = @trans.states.empty?
     end
 
 
-    def step(i = 1)
-      i.times do
-        return if halted
-        machines.push(machines[-1].next) 
-      end
+    def step
+      return if halted
+      @current = @current.next
+    end
+    
+    def on_start?
+      first == current
     end
     
     def light_step
       return if halted
-      @machines = [machines[0], machines[-1].next]
+      @current = @current.next
+      @current.prev = @first
     end
     
-    def unstep(i = 1)
-      i.times do 
-        if machines[1]
-          machines.pop 
-        end
+    def unstep
+      if @current != @first
+        @current = @current.prev
       end
     end
     
     def tape
-      machines[-1].tape
+      @current.tape
     end
 
     def print
-      estado = @machines[-1]
-      fita = estado.tape
+      fita = current.tape
       puts fita
-      puts " "*estado.pos + "^"
+      puts " "*current.pos + "^"
     end
    
     def to_s

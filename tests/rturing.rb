@@ -20,7 +20,7 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
   def test_empty
     machine = Turing::Machine.from_file("machines/empty.tur")
     machine.setup('0')
-    assert_equal(1, machine.machines.size)
+    assert(machine.on_start?)
     assert(machine.halted)
   end
 
@@ -51,7 +51,7 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
   def test_both_sides
     machine = Turing::Machine.from_file('machines/all_the_way_left.tur')
     machine.setup('')
-    machine.step(5)
+    5.times { machine.step }
     assert_equal(['_', '0', '0', '0', '0', '0'], machine.tape.tape)
   end
 

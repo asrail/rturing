@@ -31,7 +31,7 @@ class MachineViewer < Gtk::VBox
   
   def update_labels
     @fita.set_markup("<span face=\"Courier\">#{@machine.tape.to_s}</span>")
-    @cabecote.set_markup("<span face=\"Courier\">#{"_"*@machine.machines[-1].pos}^</span>")
+    @cabecote.set_markup("<span face=\"Courier\">#{"_"*@machine.current.pos}^</span>")
     if @machine.halted 
       @halted.set(Gtk::Stock::YES, Gtk::IconSize::MENU)
       @tips.set_tip(@event, "A máquina está parada " + 
