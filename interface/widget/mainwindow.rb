@@ -99,12 +99,12 @@ class MainWindow < Gtk::Window
   end
 
   def check_buts
-    turn_but_act("stop",@playing)
-    turn_but_act("play",!@playing)
-    turn_but_act("last",!@playing && !@machine.halted)
-    turn_but_act("step",!@playing && !@machine.halted)
-    turn_but_act("prev",!@playing && !self.light_mode && @machine.machines.size > 1)
-    turn_but_act("first",!@playing && @machine.machines.size > 1)
+    turn_but_act("stop", @playing)
+    turn_but_act("play", !@playing)
+    turn_but_act("last", !@playing && !@machine.halted)
+    turn_but_act("step", !@playing && !@machine.halted)
+    turn_but_act("prev", !@playing && !self.light_mode && @machine.machines.size > 1)
+    turn_but_act("first", !@playing && @machine.machines.size > 1)
   end
 
   def play(timeout=@timeout)
@@ -161,10 +161,7 @@ class MainWindow < Gtk::Window
 
   def step
     m_step
-    turn_but_act("first",@machine.machines.size > 1)
-    turn_but_act("prev",!self.light_mode && @machine.machines.size > 1)
-    turn_but_act("last",!@machine.halted)
-    turn_but_act("step",!@machine.halted)
+    check_buts
     update_labels
   end
 
