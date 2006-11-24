@@ -76,7 +76,7 @@ module Turing #:nodoc
 
     def get(state, symbol)
       return ((@states[state] and 
-               @states[state][symbol]) or raise ExecutionEnded)
+               @states[state][symbol]) or [])
     end
     
     def set(state, symbol, rule)
@@ -114,7 +114,10 @@ module Turing #:nodoc
         if !@states[state] then
           @states[state] = Hash.new
         end
-        @states[state][symb_r] = Rule.new(symb_w, dir, new_state)
+        if !@states[state][symb_r]
+          @states[state][symb_r] = []
+        end
+        @states[state][symb_r].push(Rule.new(symb_w, dir, new_state))
       end
       if linhas_erradas != []
         raise InvalidMachine.new(linhas_erradas)
@@ -154,41 +157,55 @@ module Turing #:nodoc
   class MachineState
     attr_accessor :tape, :state, :pos, :trans, :halted, :kind, :prev, :delta
 
-    def initialize(trans, tape, state, pos, kind, prev, halt=false)
+    def initialize(trans, tape, state, pos, kind, prev, delta=nil, halt=false)
       @trans = trans
       @state = state
       @pos = pos
-      begin
-        @delta = Delta.new(tape, pos, @trans.get(state, tape.get(pos)), kind)
-      rescue ExecutionEnded
-        @delta = nil
-      end
+      @delta = delta
       @kind = kind
       @prev = prev
       self.halted = halt
     end
+
+    def calculate_from_rule(this_rule, tape)
+      if !this_rule
+        return MachineState.new(trans, tape, state, pos, kind, self, nil, true)
+      end
+      new_state = this_rule.new_state
+      delta = Delta.new(tape, pos, this_rule, kind)
+      newpos = kind.dir_to_amount(this_rule.direction) + pos
+      if delta
+        delta.apply(tape)
+      else
+        return calculate_from_rule(nil, tape)
+      end
+      if newpos < 0 
+        if Machine.both_sides
+          newpos = 0
+        else
+          return calculate_from_rule(nil, tape)
+        end
+      end
+      return MachineState.new(trans, tape, new_state, newpos, kind, self, delta)
+    end
     
     def next(tape)
-      begin
-        rule = @trans.get(state, tape.get(pos))
-        new_state = rule.new_state
-        newpos = kind.dir_to_amount(rule.direction) + pos
-        if @delta
-          @delta.apply(tape)
-        else
-          raise ExecutionEnded
-        end
-        if newpos < 0 
-          if Machine.both_sides
-            newpos = 0
-          else
-            raise ExecutionEnded
-          end
-        end
-        return MachineState.new(trans, tape, new_state, newpos, kind, self)
-      rescue ExecutionEnded
-        return MachineState.new(trans, tape, state, pos, kind, self, true)
-      end
+      rules = @trans.get(state, tape.get(pos)).reverse
+      this_rule = rules.pop()
+      new_tape = Tape.new(tape.to_s) if rules != [] # isso faz uma diferença
+                                                    # absurda no tempo de execução.
+                                                    # o test_stress sai de 1.8 pra uns
+                                                    # 30 segundos se eu tirar o if.
+                                                    # Não-determinismo é pior do que
+                                                    # eu pensava
+      this_next = calculate_from_rule(this_rule, tape)
+      machines = []
+      rules.each { |r|
+        tape = Tape.new(new_tape.to_s)
+        s = calculate_from_rule(r, tape)
+        machines.push(Machine.from_machinestate(trans, nil, s, tape))
+      }
+      return this_next, machines
     end
   end
   
@@ -239,6 +256,34 @@ module Turing #:nodoc
       @trans = TransFunction.new(transf, self.regex)
     end
 
+    def self.from_file(filename = nil)
+      if filename
+        File.open(filename) do |file| 
+          Machine.new(file.read)
+        end
+      else
+        Machine.new("")
+      end
+    end    
+
+    def setup(tape,both=@@both_sides)
+      @tape = Tape.new("#{'#' unless both}#{tape}")
+      @first_tape = Tape.new("#{'#' unless both}#{tape}")
+      @first = MachineState.new(trans, @tape, trans.initial, both ? 0 : 1, kind, nil)
+      @current = @first
+      self.halted = @trans.states.empty?
+    end
+    
+    def self.from_machinestate(transf, first, current, tape)
+      m = Machine.new("")
+      m.trans = transf
+      m.first = first
+      m.current = current
+      m.current.prev = m.first
+      m.tape = tape
+      m
+    end
+
     def self.default_kind
       @@kind
     end
@@ -283,28 +328,10 @@ module Turing #:nodoc
       @current.state
     end
 
-    def self.from_file(filename = nil)
-      if filename
-        File.open(filename) do |file| 
-          Machine.new(file.read)
-        end
-      else
-        Machine.new("")
-      end
-    end
-    
-
-    def setup(tape,both=@@both_sides)
-      @tape = Tape.new("#{'#' unless both}#{tape}")
-      @first_tape = Tape.new("#{'#' unless both}#{tape}")
-      @first = @current = MachineState.new(trans, @tape, trans.initial, both ? 0 : 1, kind, nil)
-      self.halted = @trans.states.empty?
-    end
-    
-
     def step
       return if halted
-      @current = @current.next(tape)
+      @current, machines = @current.next(tape)
+      return machines
     end
     
     def on_start?
@@ -313,21 +340,25 @@ module Turing #:nodoc
     
     def light_step
       return if halted
-      @current = @current.next(tape)
+      machines = step
+      machines.each { |m|
+        m.current.prev = m.first
+      }
       @current.prev = @first
+      machines
     end
     
     def unstep
-      if @current != @first
+      if @current != @first && @current
+        @current.delta.unapply(@tape) if @current.delta
         @current = @current.prev
-        @current.delta.unapply(@tape)
       end
     end
     
     def print
-      fita = current.tape
+      fita = @current.tape
       puts fita
-      puts " "*current.pos + "^"
+      puts " "*@current.pos + "^"
     end
    
     def to_s

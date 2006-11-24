@@ -27,23 +27,25 @@ class MainWindow < Gtk::Window
     @actgroup = Gtk::ActionGroup.new("MainMenu")
     @but_actgroup = Gtk::ActionGroup.new("GUIButtons")
     begin
-      @machine = Turing::Machine.from_file(m)
+      machine = Turing::Machine.from_file(m)
     rescue
-      @machine = Turing::Machine.new
+      machine = Turing::Machine.new
     end
-    @machine.setup((t or ""))
+    machine.setup((t or ""))
     linhas = Gtk::VBox.new(false,0)
     @menu = Menus.new(self)
     linhas.pack_start(@menu,false,false,0)
-    @mview = MachineViewer.new(@machine)
+    @mview = MachineViewer.new(machine, self)
     @mview.update_labels
-    #exec_field = Gtk::VBox.new(false,0)
-    #exec_field.pack_start(@fita,false,false,0)
-    #exec_field.pack_start(@cabecote,false,false,0)
     scroll = Gtk::ScrolledWindow.new
     scroll.hscrollbar_policy = Gtk::POLICY_AUTOMATIC
     scroll.vscrollbar_policy = Gtk::POLICY_AUTOMATIC
-    scroll.add_with_viewport(@mview)
+    #scroll.add_with_viewport(@mview)
+    hadj = Gtk::Adjustment.new(100, 100, 1000, 1, 1, 1)
+    vadj = Gtk::Adjustment.new(50, 50, 1000, 1, 1, 1)
+    vp = Gtk::Viewport.new(hadj, vadj)
+    vp.add(@mview)
+    scroll.add(vp)
     linhas.pack_start(scroll,false,false,2)
     linhas.pack_start(Gtk::HSeparator.new.set_size_request(500, 2),false,false,2)
     @botoes =  Buttons.new(self)
@@ -88,8 +90,8 @@ class MainWindow < Gtk::Window
   def m_play(timeout)
     timeout,rev = timeout.polar
     @tid = Gtk::timeout_add(timeout) {
-      stop if ((rev.zero? && @machine.halted) || 
-        (!rev.zero? && @machine.first == @machine.current))
+      stop if ((rev.zero? && @mview.halted) || 
+               (!rev.zero? && @mview.on_start?))
       rev.zero? ? m_step : m_prev
       update_labels
     }
@@ -102,10 +104,10 @@ class MainWindow < Gtk::Window
   def check_buts
     turn_but_act("stop", @playing)
     turn_but_act("play", !@playing)
-    turn_but_act("last", !@playing && !@machine.halted)
-    turn_but_act("step", !@playing && !@machine.halted)
-    turn_but_act("prev", !@playing && !self.light_mode && !@machine.on_start?)
-    turn_but_act("first", !@playing && !@machine.on_start?)
+    turn_but_act("last", !@playing && !@mview.halted)
+    turn_but_act("step", !@playing && !@mview.halted)
+    turn_but_act("prev", !@playing && !self.light_mode && !@mview.on_start?)
+    turn_but_act("first", !@playing && !@mview.on_start?)
   end
 
   def play(timeout=@timeout)
@@ -120,8 +122,7 @@ class MainWindow < Gtk::Window
   end
 
   def m_prev
-    @machine.unstep if @machine.halted
-    @machine.unstep
+    @mview.unstep
   end
 
   def prev
@@ -131,8 +132,7 @@ class MainWindow < Gtk::Window
   end
 
   def m_first
-    @machine.current = @machine.first
-    @machine.first.trans = @machine.trans
+    @mview.go_to_start
   end
 
   def first
@@ -154,9 +154,9 @@ class MainWindow < Gtk::Window
 
   def m_step
     if light_mode
-      @machine.light_step
+      @mview.light_step
     else
-      @machine.step
+      @mview.step
     end
   end
 
@@ -167,18 +167,12 @@ class MainWindow < Gtk::Window
   end
 
   def tape_both_sides(tape_both)
-    @machine.first.pos = tape_both ? 0 : 1
-    if tape_both
-      @machine.tape.tape.shift if @machine.tape.tape[0] == '#'
-    else
-      @machine.tape.tape.unshift('#') if @machine.tape.tape[0] != '#'
-      update_labels
-    end
+    @mview.tape_both_sides(tape_both)
   end
 
   def validate(kind)
     begin
-      t = Turing::TransFunction.new(@machine.trans.to_s,kind)
+      t = Turing::TransFunction.new(@mview.trans.to_s,kind)
       return true
     rescue Turing::InvalidMachine
       return false
@@ -192,10 +186,9 @@ class MainWindow < Gtk::Window
   def set_trans(trans, window, saved=false)
     begin
       both = Turing::Machine.both_sides
-      tape = @machine.tape.to_s[(both ? 0 : 1)..-1]
+      tape = @mview.tape.to_s[(both ? 0 : 1)..-1]
       machine = Turing::Machine.new(trans)
       machine.setup(tape)
-      @machine = machine
       @mview.machine = machine
       @saved = saved
       @actgroup.get_action("save_machine").sensitive = !saved
@@ -239,7 +232,7 @@ class MainWindow < Gtk::Window
         File.open(dialog.filename) { |file|
           success = set_trans(file.read, dialog, true)
         }
-        @machine.setup ""
+        @mview.setup ""
         self.file = dialog.filename
       end
       dialog.destroy
@@ -251,7 +244,7 @@ class MainWindow < Gtk::Window
 
   def write_machine(filename)
       File.open(filename, "w") { |file|
-        file.write(@machine.trans.to_s)
+        file.write(@mview.trans.to_s)
       }
       @saved = true
       @actgroup.get_action("save_machine").sensitive = false
@@ -284,9 +277,9 @@ class MainWindow < Gtk::Window
 
   def choose_tape
     both = Turing::Machine.both_sides
-    ChooseDialog.new("Selecionar fita",@machine.tape.to_s[(both ? 0 : 1)..-1],
+    ChooseDialog.new("Selecionar fita",@mview.tape.to_s[(both ? 0 : 1)..-1],
                      "Entre com a fita: #{'#' unless both}", nil) {|input,dialog|
-      @machine.setup(input.text)
+      @mview.setup(input.text)
       self.first # não faz sentido editar a fita sem ver o resultado
       self.update_labels
       dialog.destroy
@@ -301,7 +294,7 @@ class MainWindow < Gtk::Window
   end
 
   def edit_machine
-    EditDialog.new("Editar Máquina",@machine.trans.to_s,"") { |machine_atual,dialog|
+    EditDialog.new("Editar Máquina",@mview.trans.to_s,"") { |machine_atual,dialog|
       set_trans(machine_atual.text, dialog)
       self.first # não faz sentido editar os estados no meio, ainda
       self.update_labels

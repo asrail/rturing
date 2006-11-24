@@ -65,6 +65,17 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
     assert_equal("", machine.tape.tape.to_s.gsub(/(^( |_)*)|(( |_)*$)/, ""))
   end
 
+  def test_non_det
+    machine = Turing::Machine.from_file('machines/all_the_way_nondet.tur')
+    machine.setup('')
+    m1 = machine.step[0]
+    assert_equal(['_', '1'], m1.tape.tape)
+    assert_equal(['_', '0'], machine.tape.tape)
+    #puts "mi.tape: #{m1.tape}"
+    #puts "machine.tape: #{machine.tape}"
+  end
+
+
   def test_stress
     machine = Turing::Machine.from_file('machines/all_the_way_left.tur')
     machine.setup('')
