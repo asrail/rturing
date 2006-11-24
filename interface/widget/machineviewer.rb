@@ -34,6 +34,9 @@ class MachineViewer < Gtk::VBox
   end
   
   def update_labels
+    @sons.each { |s|
+      s.update_labels
+    }
     @fita.set_markup("<span face=\"Courier\">#{@machine.tape.to_s}</span>")
     @cabecote.set_markup("<span face=\"Courier\">#{"_"*@machine.current.pos}^</span>")
     if @machine.halted 
