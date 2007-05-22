@@ -53,6 +53,8 @@ class Menus < Gtk::MenuBar
      ]
     @actgroup.add_actions(@entries)
     @accgroup = window.ag
+    ## FIXME: para reabilitar wiesbaden, adicionar um .append(kind)
+    ## na linha abaixo e descomentar o bloco acima
     mconfigs = Gtk::MenuItem.new("_Configurar").set_submenu(Gtk::Menu.new.append(mboth).append(light))
     edit = menuItem(*["_Editar", ["choose_tape", "edit_machine", "choose_timeout"]])
     file = menuItem(*["_Arquivo", ["open_file", "save_machine", "save_machine_as", "quit"]])
