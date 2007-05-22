@@ -7,11 +7,11 @@ class Menus < Gtk::MenuBar
   def initialize(window)
     super()
     @window = window
-    kind = ConfigRadioList.new("Tipo _de máquina",window, "tipo")
-    kind.add_signal("activate") {|item,kind,window|
-      window.actgroup.get_action(kind).sensitive = window.validate(kind)
-      false
-    }
+    #kind = ConfigRadioList.new("Tipo _de máquina",window, "tipo")
+    #kind.add_signal("activate") {|item,kind,window|
+    #  window.actgroup.get_action(kind).sensitive = window.validate(kind)
+    #  false
+    #}
 
     mboth = ConfigCheckMenuItem.new(:mboth,"Infinita para os dois lados")
     mboth.signal_connect("toggled") {|item,kind|
@@ -53,7 +53,7 @@ class Menus < Gtk::MenuBar
      ]
     @actgroup.add_actions(@entries)
     @accgroup = window.ag
-    mconfigs = Gtk::MenuItem.new("_Configurar").set_submenu(Gtk::Menu.new.append(kind).append(mboth).append(light))
+    mconfigs = Gtk::MenuItem.new("_Configurar").set_submenu(Gtk::Menu.new.append(mboth).append(light))
     edit = menuItem(*["_Editar", ["choose_tape", "edit_machine", "choose_timeout"]])
     file = menuItem(*["_Arquivo", ["open_file", "save_machine", "save_machine_as", "quit"]])
     about = menuItem(*["Aj_uda", ["about"]])
