@@ -103,7 +103,7 @@ class MainWindow < Gtk::Window
 
   def check_buts
     turn_but_act("stop", @playing)
-    turn_but_act("play", !@playing)
+    turn_but_act("play", !@playing && !@mview.halted)
     turn_but_act("last", !@playing && !@mview.halted)
     turn_but_act("step", !@playing && !@mview.halted)
     turn_but_act("prev", !@playing && !self.light_mode && !@mview.on_start?)
