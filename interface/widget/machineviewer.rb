@@ -78,6 +78,9 @@ class MachineViewer < Gtk::VBox
     show_all
     @machine.unstep if @machine.halted
     @machine.unstep
+    if @machine.on_start?
+      self.first
+    end
   end
 
   def halted
@@ -110,6 +113,7 @@ class MachineViewer < Gtk::VBox
   
   def first
     @machine.current = @machine.first
+    @machine.tape = Turing::Tape.new(@machine.first_tape.to_s)
   end
   
   def go_to_start

@@ -98,6 +98,22 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
     assert_equal(['b','a','b','a'], machine.tape.tape)
   end
 
+  def test_all_left_return
+    machine = Turing::Machine.from_file('machines/all_the_way_left.tur')
+    machine.setup('',true)
+    Turing::Machine.toggle_both_sides
+    assert_equal([], machine.tape.tape)
+    machine.step
+    assert_equal(['0'], machine.tape.tape)
+    machine.step
+    assert_equal(['0'], machine.tape.tape)
+    machine.unstep
+    assert_equal(['0'], machine.tape.tape)
+    machine.unstep
+    assert_equal(['0'], machine.tape.tape)
+    Turing::Machine.toggle_both_sides
+  end
+
   def test_wies_palin
     Turing::Machine.default_kind = "Wiesbaden"
     machine = Turing::Machine.from_file('machines/wies_palin.tur')
