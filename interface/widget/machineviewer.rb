@@ -127,11 +127,19 @@ class MachineViewer < Gtk::VBox
   end
 
   def step
-    @sons.each { |s|
-      s.step
+    generic_step(@machine.step)
+  end
+  
+  def light_step
+    generic_step(@machine.light_step)
+  end
+
+  def generic_step(step)
+    @sons.each {|s|
+      s.light_step
       Gtk.main_iteration
     }
-    resultados = @machine.step
+    resultados = step
     if resultados then
       resultados.each { |machine|
         a = MachineViewer.new(machine, self)
@@ -139,22 +147,7 @@ class MachineViewer < Gtk::VBox
         @sons.push(a)
         self.pack_start(a)
       }
-      update_labels
-      show_all
     end
-  end
-  
-  def light_step
-    @sons.each {|s|
-      s.light_step
-      Gtk.main_iteration
-    }
-    @machine.light_step.each { |machine|
-      a = MachineViewer.new(machine, self)
-      Gtk.main_iteration
-      @sons.push(a)
-      self.pack_start(a)
-    }
   end
 
   def trans
