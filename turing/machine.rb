@@ -86,8 +86,7 @@ module Turing #:nodoc
     def initialize(aut,regex)
       if regex.kind_of?String
         regex = Model.send(regex)
-      end
-      if regex.kind_of?Array
+      elsif regex.kind_of?Array
         regex = MTRegex.new(MTKind.new(*regex))
       end
       @initial = nil
@@ -131,23 +130,24 @@ module Turing #:nodoc
   
   class Delta
     attr_accessor :symb_removed, :symb_written, :pos, :kind, :rule
-    def initialize(tape, pos, rule, kind)
+    def initialize(tape, pos, rule, kind, both_sides)
       @symb_removed = tape.get(pos)
       @symb_written = rule.written_symbol
       @pos = pos
       @rule = rule
       @kind = kind
+      @both = both_sides
     end
     
     def apply(tape)
       tape.set_at(pos, symb_written)
-      if Machine.both_sides && (kind.dir_to_amount(rule.direction) + pos) < 0
+      if @both && (kind.dir_to_amount(rule.direction) + pos) < 0 # hehe
         tape.grow_left('_')
       end
     end
     
     def unapply(tape)
-      if Machine.both_sides && (kind.dir_to_amount(rule.direction) + pos) < 0
+      if @both && (kind.dir_to_amount(rule.direction) + pos) < 0 # hehe
         tape.shrink
       end
       tape.set_at(pos, symb_removed)
@@ -156,23 +156,25 @@ module Turing #:nodoc
   
   class MachineState
     attr_accessor :tape, :state, :pos, :trans, :halted, :kind, :prev, :delta
+    attr_reader :both
 
-    def initialize(trans, tape, state, pos, kind, prev, delta=nil, halt=false)
+    def initialize(trans, tape, state, pos, kind, prev, both_sides, delta=nil, halt=false)
       @trans = trans
       @state = state
       @pos = pos
       @delta = delta
       @kind = kind
       @prev = prev
+      @both = both_sides
       self.halted = halt
     end
 
     def calculate_from_rule(this_rule, tape)
       if !this_rule
-        return MachineState.new(trans, tape, state, pos, kind, self, nil, true)
+        return MachineState.new(trans, tape, state, pos, kind, self, both, nil, true)
       end
       new_state = this_rule.new_state
-      delta = Delta.new(tape, pos, this_rule, kind)
+      delta = Delta.new(tape, pos, this_rule, kind, both)
       newpos = kind.dir_to_amount(this_rule.direction) + pos
       if delta
         delta.apply(tape)
@@ -180,13 +182,13 @@ module Turing #:nodoc
         return calculate_from_rule(nil, tape)
       end
       if newpos < 0 
-        if Machine.both_sides
+        if both                 # hehe
           newpos = 0
         else
           return calculate_from_rule(nil, tape)
         end
       end
-      return MachineState.new(trans, tape, new_state, newpos, kind, self, delta)
+      return MachineState.new(trans, tape, new_state, newpos, kind, self, both, delta)
     end
     
     def next(tape)
@@ -203,7 +205,7 @@ module Turing #:nodoc
       rules.each { |r|
         tape = Tape.new(new_tape.to_s)
         s = calculate_from_rule(r, tape)
-        machines.push(Machine.from_machinestate(trans, nil, s, tape))
+        machines.push(Machine.from_machinestate(trans, nil, s, tape, both, kind))
       }
       return this_next, machines
     end
@@ -245,38 +247,42 @@ module Turing #:nodoc
   class Machine
     attr_accessor :trans, :first, :current, :regex, :kind, :both, :tape, :first_tape
 
-    @@both_sides = true
     @@kind = Model::gturing
     
-    def initialize(transf="", both_sides=@@both_sides, kind_m=nil)
+    def initialize(transf="", both_sides=nil, kind_m=nil)
       @first = @current = nil
-      @kind = MTKind.new(*(kind_m or @@kind))
-      @both = both_sides unless both_sides.nil?
+      kind_m = Machine.default_kind_for(kind_m) if kind_m.kind_of?String
+      if kind_m.kind_of?MTKind
+        @kind = kind_m
+      else
+        @kind = MTKind.new(*(kind_m or @@kind))
+      end
+      @both = both_sides
       self.regex = MTRegex.new(kind)
       @trans = TransFunction.new(transf, self.regex)
     end
 
-    def self.from_file(filename=nil, kind_str=nil, both_sides=@@both_sides)
+    def self.from_file(filename=nil, kind_str=nil, both_sides=nil)
       if filename
         File.open(filename) do |file| 
-          kind_m = self.default_kind_for(kind_str) or @@kind
-          Machine.new(file.read, both_sides, kind_m)
+          Machine.new(file.read, both_sides, kind_str)
         end
       else
-        Machine.new("")
+        Machine.new("", both_sides, kind_m)
       end
     end    
 
-    def setup(tape,both=@@both_sides)
-      @tape = Tape.new("#{'#' unless both}#{tape}")
-      @first_tape = Tape.new("#{'#' unless both}#{tape}")
-      @first = MachineState.new(trans, @tape, trans.initial, both ? 0 : 1, kind, nil)
+    def setup(tape, both=nil)
+      @both = both unless both.nil?
+      @tape = Tape.new("#{'#' unless @both}#{tape}")
+      @first_tape = Tape.new("#{'#' unless @both}#{tape}")
+      @first = MachineState.new(trans, @tape, trans.initial, @both ? 0 : 1, kind, nil, @both)
       @current = @first
       self.halted = @trans.states.empty?
     end
     
-    def self.from_machinestate(transf, first, current, tape)
-      m = Machine.new("")
+    def self.from_machinestate(transf, first, current, tape, both, kind)
+      m = Machine.new("", both, kind)
       m.trans = transf
       m.first = first
       m.current = current
@@ -310,16 +316,8 @@ module Turing #:nodoc
       end
     end
 
-    def self.both_sides
-      @@both_sides
-    end
-
-    def self.toggle_both_sides
-      @@both_sides = !self.both_sides
-    end
-
-    def self.both_sides=(both_sides)
-        @@both_sides = both_sides
+    def toggle_both_sides
+      @both = !@both
     end
 
     def halted

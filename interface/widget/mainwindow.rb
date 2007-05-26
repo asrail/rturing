@@ -5,15 +5,19 @@ require "interface/widget/machineviewer"
 require "mathn"
 
 class MainWindow < Gtk::Window
-  attr_accessor :ag, :actgroup, :light_mode, :file, :but_actgroup
-  attr_reader :timeout, :botoes
+  attr_accessor :ag, :actgroup, :light_mode, :file, :but_actgroup, :both_sides
+  attr_reader :timeout, :botoes, :mview
+
+  def toggle_both_sides
+    @both_sides = !@both_sides
+  end
 
   def initialize(m, t)
     super()
     self.title = "gRats"
     self.light_mode = Config::client["/apps/rturing/light"]
     Turing::Machine.default_kind = Config::client["/apps/rturing/tipo"]
-    Turing::Machine.both_sides = Config::client["/apps/rturing/mboth"]
+    self.both_sides = Config::client["/apps/rturing/mboth"]
     @saved = true
     signal_connect("delete-event") {
       quit
@@ -27,9 +31,9 @@ class MainWindow < Gtk::Window
     @actgroup = Gtk::ActionGroup.new("MainMenu")
     @but_actgroup = Gtk::ActionGroup.new("GUIButtons")
     begin
-      machine = Turing::Machine.from_file(m)
+      machine = Turing::Machine.from_file(m, Turing::Machine.default_kind, self.both_sides)
     rescue
-      machine = Turing::Machine.new
+      machine = Turing::Machine.new("", self.both_sides, Turing::Machine.default_kind)
     end
     machine.setup((t or ""))
     linhas = Gtk::VBox.new(false,0)
@@ -185,9 +189,9 @@ class MainWindow < Gtk::Window
 
   def set_trans(trans, window, saved=false)
     begin
-      both = Turing::Machine.both_sides
+      both = true # Turing::Machine.both_sides
       tape = @mview.tape.to_s[(both ? 0 : 1)..-1]
-      machine = Turing::Machine.new(trans)
+      machine = Turing::Machine.new(trans, self.both_sides, Turing::Machine.default_kind)
       machine.setup(tape)
       @mview.machine = machine
       @saved = saved
@@ -276,7 +280,7 @@ class MainWindow < Gtk::Window
   end
 
   def choose_tape
-    both = Turing::Machine.both_sides
+    both = true # Turing::Machine.both_sides
     ChooseDialog.new("Selecionar fita",@mview.tape.to_s[(both ? 0 : 1)..-1],
                      "Entre com a fita: #{'#' unless both}", nil) {|input,dialog|
       @mview.setup(input.text)
