@@ -4,12 +4,14 @@ require 'turing/machine'
 
 class MachineTests < Test::Unit::TestCase #:nodoc:
   def test_input_tape
+    Turing::Machine.default_kind = "Gturing"
     machine = Turing::Machine.from_file('machines/add.tur')
     machine.setup('01010',false)
     assert_equal(['#', '0', '1', '0', '1', '0'], machine.tape.tape)
   end
 
   def test_three_ones_to_zeros
+    Turing::Machine.default_kind = "Gturing"
     machine = Turing::Machine.from_file('machines/3ones2zeroes.tur')
     machine.setup('1110111',false)
     machine.process
@@ -18,6 +20,7 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
   end
 
   def test_empty
+    Turing::Machine.default_kind = "Gturing"
     machine = Turing::Machine.from_file("machines/empty.tur")
     machine.setup('0')
     assert(machine.on_start?)
@@ -25,6 +28,7 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
   end
 
   def test_step
+    Turing::Machine.default_kind = "Gturing"
     machine = Turing::Machine.from_file('machines/swap.tur')
     machine.setup('0101',false)
     machine.process
@@ -35,6 +39,7 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
   end
 
   def test_add
+    Turing::Machine.default_kind = "Gturing"
     machine = Turing::Machine.from_file('machines/add.tur')
     machine.setup('01010')
     machine.process
@@ -42,6 +47,7 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
   end
 
   def test_next
+    Turing::Machine.default_kind = "Gturing"
     machine = Turing::Machine.from_file('machines/swap.tur')
     machine.setup('01010',false)
     machine.step
@@ -49,7 +55,7 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
   end
   
   def test_prev
-    machine = Turing::Machine.from_file('machines/add.tur')
+    machine = Turing::Machine.from_file('machines/add.tur', Model::gturing)
     machine.setup('011010')
     5.times { machine.step }
     5.times { machine.unstep }
@@ -57,6 +63,7 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
   end
 
   def test_both_sides
+    Turing::Machine.default_kind = "Gturing"
     machine = Turing::Machine.from_file('machines/all_the_way_left.tur')
     machine.setup('')
     5.times { machine.step }
@@ -66,6 +73,7 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
   end
 
   def test_non_det
+    Turing::Machine.default_kind = "Gturing"
     machine = Turing::Machine.from_file('machines/all_the_way_nondet.tur')
     machine.setup('')
     m1 = machine.step[0]
@@ -77,6 +85,7 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
 
 
   def test_stress
+    Turing::Machine.default_kind = "Gturing"
     machine = Turing::Machine.from_file('machines/all_the_way_left.tur')
     machine.setup('')
     10000.times { machine.step }
@@ -85,6 +94,7 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
   end
 
   def test_alpha
+    Turing::Machine.default_kind = "Gturing"
     machine = Turing::Machine.from_file('machines/swap_alpha.tur')
     machine.setup('abab',true)
     machine.process
@@ -92,6 +102,7 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
   end
 
   def test_alpha2
+    Turing::Machine.default_kind = "Gturing"
     machine = Turing::Machine.from_file('machines/swap_alpha2.tur')
     machine.setup('abab',true)
     machine.process
@@ -99,8 +110,9 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
   end
 
   def test_all_left_return
-    machine = Turing::Machine.from_file('machines/all_the_way_left.tur')
-    machine.setup('',true)
+    Turing::Machine.default_kind = "Gturing"
+    machine = Turing::Machine.from_file('machines/all_the_way_left.tur', nil, true)
+    machine.setup('')
     Turing::Machine.toggle_both_sides
     assert_equal([], machine.tape.tape)
     machine.step
