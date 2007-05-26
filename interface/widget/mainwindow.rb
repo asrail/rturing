@@ -189,7 +189,7 @@ class MainWindow < Gtk::Window
 
   def set_trans(trans, window, saved=false)
     begin
-      both = true # Turing::Machine.both_sides
+      both = self.both_sides
       tape = @mview.tape.to_s[(both ? 0 : 1)..-1]
       machine = Turing::Machine.new(trans, self.both_sides, Turing::Machine.default_kind)
       machine.setup(tape)
@@ -280,7 +280,7 @@ class MainWindow < Gtk::Window
   end
 
   def choose_tape
-    both = true # Turing::Machine.both_sides
+    both = self.both_sides
     ChooseDialog.new("Selecionar fita",@mview.tape.to_s[(both ? 0 : 1)..-1],
                      "Entre com a fita: #{'#' unless both}", nil) {|input,dialog|
       @mview.setup(input.text)
