@@ -55,7 +55,7 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
   end
   
   def test_prev
-    machine = Turing::Machine.from_file('machines/add.tur', Model::gturing)
+    machine = Turing::Machine.from_file('machines/add.tur', "gturing")
     machine.setup('011010')
     5.times { machine.step }
     5.times { machine.unstep }

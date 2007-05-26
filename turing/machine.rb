@@ -256,9 +256,10 @@ module Turing #:nodoc
       @trans = TransFunction.new(transf, self.regex)
     end
 
-    def self.from_file(filename=nil, kind_m=@@kind, both_sides=@@both_sides)
+    def self.from_file(filename=nil, kind_str=nil, both_sides=@@both_sides)
       if filename
         File.open(filename) do |file| 
+          kind_m = self.default_kind_for(kind_str) or @@kind
           Machine.new(file.read, both_sides, kind_m)
         end
       else
@@ -297,10 +298,15 @@ module Turing #:nodoc
     end
 
     def self.default_kind=(kind)
+      new_kind = self.default_kind_for(kind)
+      @@kind = new_kind unless new_kind.nil?
+    end
+
+    def self.default_kind_for(kind)
       if /(?i)gturing/ =~ kind
-        @@kind = Model::gturing
+        Model::gturing
       elsif /(?i)wiesbaden/ =~ kind
-        @@kind = Model::wiesbaden
+        Model::wiesbaden
       end
     end
 
