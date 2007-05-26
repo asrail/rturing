@@ -248,18 +248,18 @@ module Turing #:nodoc
     @@both_sides = true
     @@kind = Model::gturing
     
-    def initialize(transf="", both_sides=@@both_sides, kind_m=@@kind)
+    def initialize(transf="", both_sides=@@both_sides, kind_m=nil)
       @first = @current = nil
-      @kind = MTKind.new(*kind_m)
-      @both = both_sides
+      @kind = MTKind.new(*(kind_m or @@kind))
+      @both = both_sides unless both_sides.nil?
       self.regex = MTRegex.new(kind)
       @trans = TransFunction.new(transf, self.regex)
     end
 
-    def self.from_file(filename = nil)
+    def self.from_file(filename=nil, kind_m=@@kind, both_sides=@@both_sides)
       if filename
         File.open(filename) do |file| 
-          Machine.new(file.read)
+          Machine.new(file.read, both_sides, kind_m)
         end
       else
         Machine.new("")
