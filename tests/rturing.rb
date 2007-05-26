@@ -105,13 +105,13 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
     machine.toggle_both_sides
     assert_equal([], machine.tape.tape)
     machine.step
-    assert_equal(['0'], machine.tape.tape)
+    assert_equal(['_', '0'], machine.tape.tape)
     machine.step
-    assert_equal(['0'], machine.tape.tape)
+    assert_equal(['_', '0', '0'], machine.tape.tape)
     machine.unstep
-    assert_equal(['0'], machine.tape.tape)
+    assert_equal(['_', '0'], machine.tape.tape)
     machine.unstep
-    assert_equal(['0'], machine.tape.tape)
+    assert_equal(['_'], machine.tape.tape)
     machine.toggle_both_sides
   end
 
