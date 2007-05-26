@@ -16,7 +16,6 @@ class Menus < Gtk::MenuBar
     mboth = ConfigCheckMenuItem.new(:mboth,"Infinita para os dois lados")
     mboth.signal_connect("toggled") {|item,kind|
       window.toggle_both_sides
-      window.mview              # XXX: do something
       window.first
       window.tape_both_sides(item.active?)
       window.update_labels
