@@ -43,7 +43,7 @@ module Turing #:nodoc
       File.open(file) {|f|
         # throw se o arquivo não existir
       }  
-      self.ret = ret
+      self.ret = ret + " "
       @regex = regex
       @transf = transf
     end
@@ -221,7 +221,7 @@ module Turing #:nodoc
       delta = Delta.new(tape, pos, this_rule, kind, both)
       newpos = kind.dir_to_amount(this_rule.direction) + pos
       if !delta and /_/.match @state then
-          rule = Rule.new(this_rule.symb,this_rule.dir, @state.split(/_/)[0])
+          rule = Rule.new(this_rule.symb,this_rule.dir, @state.split(/ /)[0..-2].join(" "))
           delta = Delta.new(tape, pos,rule)
       end
       if delta
