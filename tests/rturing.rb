@@ -3,6 +3,13 @@ require 'test/unit'
 require 'turing/machine'
 
 class MachineTests < Test::Unit::TestCase #:nodoc:
+  def test_a_sub_machine
+    machine = Turing::Machine.from_file('machines/submaquina.tur', "Gturing")
+    machine.setup('0',true)
+    machine.process
+    assert_equal(['_','0','0','0', '0'], machine.tape.tape)
+  end
+
   def test_input_tape
     machine = Turing::Machine.from_file('machines/add.tur', "Gturing")
     machine.setup('01010', false)

@@ -36,6 +36,31 @@ module Turing #:nodoc
     end
   end
   
+  class SubMT
+    attr_accessor :file, :ret
+    def initialize (file, ret, regex, transf)
+      self.file = file
+      File.open(file) {|f|
+        # throw se o arquivo não existir
+      }  
+      self.ret = ret
+      @regex = regex
+      @transf = transf
+    end
+    
+    def parse
+      trans = File.open(self.file) {|f|
+        TransFunction.new(f, @regex, ret)
+      }
+      @transf.merge_with(trans)
+      return trans.initial
+    end
+    
+    def to_s
+      return "Sou uma submáquina"
+    end
+  end
+  
   class ExecutionEnded < RuntimeError
   end
 
@@ -48,10 +73,11 @@ module Turing #:nodoc
   end
   
   class MTMatcher
-    attr_accessor :state,:symb_r,:symb_w,:dir,:new_state
+    attr_accessor :state,:symb_r,:symb_w,:dir,:acao,:arq,:ret,:est
 
     def initialize(md,order)
-      self.state,self.symb_r,self.symb_w,self.dir,self.new_state = order.map { |x|
+      self.state,self.symb_r,self.symb_w,
+      self.dir,self.acao,self.arq,self.ret,self.est = order.map { |x|
         md[x]
       }
     end
@@ -80,10 +106,14 @@ module Turing #:nodoc
     end
     
     def set(state, symbol, rule)
+      if !@states[state] then
+        @states[state] = Hash.new
+      end
       @states[state][symbol] = rule
     end
 
-    def initialize(aut,regex)
+    def initialize(aut,o_regex,pilha="")
+      regex = o_regex
       if regex.kind_of?String
         regex = Model.send(regex)
       elsif regex.kind_of?Array
@@ -102,18 +132,19 @@ module Turing #:nodoc
           linhas_erradas.push([n_linha, line])
           next
         end
-        state = md.state
+        state = pilha + md.state
         if !@initial
           @initial = state
         end
         symb_r = md.symb_r
         symb_w = md.symb_w
         dir = md.dir
-        new_state = md.new_state
-        if !@states[state] then
-          @states[state] = Hash.new
+        if md.acao == 'call' then
+          acao = SubMT.new(md.arq, pilha + md.ret, o_regex, self)
+        else
+          acao = pilha + md.est
         end
-        @states[state][symb_r] = Rule.new(symb_w, dir, new_state)
+        self.set(state,symb_r,Rule.new(symb_w, dir, acao))
       end
       if linhas_erradas != []
         raise InvalidMachine.new(linhas_erradas)
@@ -123,6 +154,18 @@ module Turing #:nodoc
     def to_s
       @original
     end
+
+    def merge_with(other_transf)
+      other_transf.states.each { |estado, simbs|
+        if @states[estado]
+          raise InvalidMachine.new("")
+        end
+        simbs.each {|simb,acao|
+          self.set(estado, simb, acao)
+        }
+      }
+    end
+
   end
   
   class Delta
@@ -169,13 +212,21 @@ module Turing #:nodoc
     def calculate_from_rule(this_rule, tape)
       if !this_rule
         return MachineState.new(trans, tape, state, pos, kind, self, both, nil, true)
+      end 
+      if this_rule.new_state.class == SubMT then
+        this_rule.new_state = this_rule.new_state.parse
+        @trans.set(state, tape.get(pos), this_rule) # se submáquina, carregá-la
       end
       new_state = this_rule.new_state
       delta = Delta.new(tape, pos, this_rule, kind, both)
       newpos = kind.dir_to_amount(this_rule.direction) + pos
+      if !delta and /_/.match @state then
+          rule = Rule.new(this_rule.symb,this_rule.dir, @state.split(/_/)[0])
+          delta = Delta.new(tape, pos,rule)
+      end
       if delta
         delta.apply(tape)
-      else
+      else 
         return calculate_from_rule(nil, tape)
       end
       if newpos < 0 
