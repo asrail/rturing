@@ -76,7 +76,7 @@ module Turing #:nodoc
 
     def get(state, symbol)
       return ((@states[state] and 
-               @states[state][symbol]) or [])
+               @states[state][symbol]) or nil)
     end
     
     def set(state, symbol, rule)
@@ -113,10 +113,7 @@ module Turing #:nodoc
         if !@states[state] then
           @states[state] = Hash.new
         end
-        if !@states[state][symb_r]
-          @states[state][symb_r] = []
-        end
-        @states[state][symb_r].push(Rule.new(symb_w, dir, new_state))
+        @states[state][symb_r] = Rule.new(symb_w, dir, new_state)
       end
       if linhas_erradas != []
         raise InvalidMachine.new(linhas_erradas)
@@ -192,22 +189,8 @@ module Turing #:nodoc
     end
     
     def next(tape)
-      rules = @trans.get(state, tape.get(pos)).reverse
-      this_rule = rules.pop()
-      new_tape = Tape.new(tape.to_s) if rules != [] # isso faz uma diferença
-                                                    # absurda no tempo de execução.
-                                                    # o test_stress sai de 1.8 pra uns
-                                                    # 30 segundos se eu tirar o if.
-                                                    # Não-determinismo é pior do que
-                                                    # eu pensava
+      this_rule = @trans.get(state, tape.get(pos))
       this_next = calculate_from_rule(this_rule, tape)
-      machines = []
-      rules.each { |r|
-        tape = Tape.new(new_tape.to_s)
-        s = calculate_from_rule(r, tape)
-        machines.push(Machine.from_machinestate(trans, nil, s, tape, both, kind))
-      }
-      return this_next, machines
     end
   end
   
@@ -334,8 +317,7 @@ module Turing #:nodoc
 
     def step
       return if halted
-      @current, machines = @current.next(tape)
-      return machines
+      @current = @current.next(tape)
     end
     
     def on_start?
@@ -344,12 +326,8 @@ module Turing #:nodoc
     
     def light_step
       return if halted
-      machines = step
-      machines.each { |m|
-        m.current.prev = m.first
-      }
+      step
       @current.prev = @first
-      machines
     end
     
     def unstep

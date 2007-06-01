@@ -14,7 +14,6 @@ class MachineViewer < Gtk::VBox
     @cabecote.set_alignment(0,0)
     @halted = Gtk::Image.new(Gtk::Stock::YES, Gtk::IconSize::MENU)
     @event = Gtk::EventBox.new
-    @sons = []
     @event.add(@halted)
     @tips = Gtk::Tooltips.new
     @tips.set_tip(@event, "A máquina não foi carregada.", "")
@@ -34,9 +33,6 @@ class MachineViewer < Gtk::VBox
   end
   
   def update_labels
-    @sons.each { |s|
-      s.update_labels
-    }
     @fita.set_markup("<span face=\"Courier\">#{@machine.tape.to_s}</span>")
     @cabecote.set_markup("<span face=\"Courier\">#{"_"*@machine.current.pos}^</span>")
     if @machine.halted 
@@ -64,18 +60,7 @@ class MachineViewer < Gtk::VBox
   end
 
   def unstep
-    new_sons = []
-    @sons.each {|s|
-      s.unstep
-      if s.machine.on_start?
-        self.remove(s)
-      else
-        new_sons.push(s)
-      end
-    }
-    @sons = new_sons
     update_labels
-    show_all
     @machine.unstep if @machine.halted
     @machine.unstep
     if @machine.on_start?
@@ -84,12 +69,7 @@ class MachineViewer < Gtk::VBox
   end
 
   def halted
-    halt = false
-    @sons.each {|s|
-      halt |= s.halted
-    }
-    halt |= @machine.halted
-    return halt
+    @machine.halted
   end
   
   def tape_both_sides(tape_both)
@@ -104,10 +84,6 @@ class MachineViewer < Gtk::VBox
   
   def setup(tape)
     @machine.first
-    @sons.each {|s|
-      self.remove(s)
-    }
-    @sons = []
     @machine.setup(tape)
   end
   
@@ -120,34 +96,14 @@ class MachineViewer < Gtk::VBox
     first
   end
   
-  def clear
-    self.each {|child|
-      self.remove(child)
-    }
-  end
-
   def step
-    generic_step(@machine.step)
+    @machine.step
+    update_labels
   end
   
   def light_step
-    generic_step(@machine.light_step)
-  end
-
-  def generic_step(step)
-    @sons.each {|s|
-      s.light_step
-      Gtk.main_iteration
-    }
-    resultados = step
-    if resultados then
-      resultados.each { |machine|
-        a = MachineViewer.new(machine, self)
-        Gtk.main_iteration
-        @sons.push(a)
-        self.pack_start(a)
-      }
-    end
+    @machine.light_step
+    update_labels
   end
 
   def trans
