@@ -16,7 +16,7 @@ class MainWindow < Gtk::Window
     super()
     self.title = "gRats"
     self.light_mode = false # Config::client["/apps/rturing/light"]
-    Turing::Machine.default_kind = "wiesbaden" # Config::client["/apps/rturing/tipo"]
+    Turing::Machine.default_kind = "gturing" # Config::client["/apps/rturing/tipo"]
     self.both_sides = Config::client["/apps/rturing/mboth"]
     @saved = true
     signal_connect("delete-event") {
