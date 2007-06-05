@@ -224,10 +224,12 @@ module Turing #:nodoc
     def calculate_from_rule(this_rule, tape)
       if !this_rule
         if / /.match @state then
-          rule = Rule.new(tape.get(pos),0, @state.split(/ /)[0..-2].join(" "))
-          return calculate_from_rule(rule,tape)
+          this_rule = @trans.get(@state.split(/ /)[0..-2].join(" "), tape.get(pos))
+          this_rule ||=  Rule.new(tape.get(pos), 0, @state.split(/ /)[0..-2].join(" "))
+          return calculate_from_rule(this_rule,tape)
+        else
+          return MachineState.new(trans, tape, state, pos, kind, self, both, nil, true)
         end
-        return MachineState.new(trans, tape, state, pos, kind, self, both, nil, true)
       end 
       if this_rule.new_state.class == SubMT then
         this_rule.new_state = this_rule.new_state.parse(@trans)
