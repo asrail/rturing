@@ -38,12 +38,18 @@ module Turing #:nodoc
   
   class SubMT
     attr_accessor :file, :ret
+    @@sep = ""
+
+    def self.gensym
+      @@sep += " "
+    end
+    
     def initialize (file, ret, regex)
       self.file = file
       File.open(file) {|f|
         # throw se o arquivo não existir
       }  
-      self.ret = ret + " "
+      self.ret = ret + SubMT.gensym
       @regex = regex
     end
     
@@ -165,6 +171,7 @@ module Turing #:nodoc
     def merge_with(other_transf)
       other_transf.states.each { |estado, simbs|
         if @states[estado]
+          putstr
           raise InvalidMachine.new("")
         end
         simbs.each {|simb,acao|
@@ -224,8 +231,9 @@ module Turing #:nodoc
     def calculate_from_rule(this_rule, tape)
       if !this_rule
         if / /.match @state then
-          this_rule = @trans.get(@state.split(/ /)[0..-2].join(" "), tape.get(pos))
-          this_rule ||=  Rule.new(tape.get(pos), 0, @state.split(/ /)[0..-2].join(" "))
+          @state = /(.*\s*\w+)\s+\w+/.match(@state)[1]
+          this_rule = @trans.get(@state, tape.get(pos))
+          this_rule ||=  Rule.new(tape.get(pos), 0, @state)
           return calculate_from_rule(this_rule,tape)
         else
           return MachineState.new(trans, tape, state, pos, kind, self, both, nil, true)

@@ -55,6 +55,12 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
     machine.step
     assert(!machine.halted)
   end
+
+  def test_multi_recurse
+    machine = Turing::Machine.from_file('machines/ordena.tur', "Gturing", false)
+    machine.setup('01 00 11 10')
+    machine.process
+  end
   
   def test_prev
     machine = Turing::Machine.from_file('machines/add.tur', "Gturing")
