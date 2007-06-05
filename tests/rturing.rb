@@ -68,7 +68,7 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
     machine = Turing::Machine.from_file('machines/recursive.tur', "Gturing")
     machine.setup('00000')
     machine.process
-    assert_equal(machine.tape.tape, ['#','a','a','a','a','a'])
+    assert_equal(machine.tape.tape, ['#','a','a','a','a','a', '_'])
   end
 
   def test_both_sides

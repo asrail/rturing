@@ -193,6 +193,11 @@ module Turing #:nodoc
       end
     end
     
+    def to_s
+      "\#<Turing::Delta @symb_removed=#{@symb_removed}, @symb_written=#{@symb_written}, 
+      @pos=#{@pos}, @rule{rule}, @kind=#{kind}, @both=#{@both}>"
+    end
+    
     def unapply(tape)
       if @both && (kind.dir_to_amount(rule.direction) + pos) < 0 # hehe
         tape.shrink
@@ -218,6 +223,10 @@ module Turing #:nodoc
 
     def calculate_from_rule(this_rule, tape)
       if !this_rule
+        if / /.match @state then
+          rule = Rule.new(tape.get(pos),0, @state.split(/ /)[0..-2].join(" "))
+          return calculate_from_rule(rule,tape)
+        end
         return MachineState.new(trans, tape, state, pos, kind, self, both, nil, true)
       end 
       if this_rule.new_state.class == SubMT then
@@ -227,19 +236,17 @@ module Turing #:nodoc
       new_state = this_rule.new_state
       delta = Delta.new(tape, pos, this_rule, kind, both)
       newpos = kind.dir_to_amount(this_rule.direction) + pos
-      if !delta and / /.match @state then
-          rule = Rule.new(this_rule.symb,this_rule.dir, @state.split(/ /)[0..-2].join(" "))
-          delta = Delta.new(tape, pos,rule)
-      end
       if delta
         delta.apply(tape)
       else 
+        puts "errado"
         return calculate_from_rule(nil, tape)
       end
       if newpos < 0 
         if both
           newpos = 0
         else
+          puts "muito errado"
           return calculate_from_rule(nil, tape)
         end
       end
