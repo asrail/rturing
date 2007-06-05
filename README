@@ -45,6 +45,28 @@ Exemplo:
 Execute grturing, abra a MT e edite a fita.
 Escolha um tempo de intervalo para cada passo que seja conveniente.
 
+=== Submáquinas
+
+O rturing suporta o conceito de submáquinas de turing, usando uma
+extensão da sintaxe do gturing. Em vez do <estado novo> em
+
+  <estado> <símbolo lido> <escrito> <dir> <estado novo>
+
+você pode colocar
+
+  call "/caminho/completo/da/maquina.tur" <estado de retorno>
+
+e a máquina de turing encontrada em "/caminho/completo/da/maquina.tur"
+será carregada como submáquina. Quando a sua execução terminar ela irá
+para o estado de retorno especificado. Por exemplo, a máquina
+
+0 0 a d call "/home/amt/machines/recursive.tur" 0
+
+se colocada no arquivo "/home/amt/machines/recursive.tur" chama a si
+própria recursivamente para sempre. Uma submáquina pode ser recursiva,
+e pode chamar quantas submáquinas quiser recursivamente.
+
+
 == Copyright
 
 rturing - a Turing Machine simulator written in Ruby
