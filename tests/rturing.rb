@@ -57,7 +57,7 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
   end
 
   def test_multi_recurse
-    machine = Turing::Machine.from_file('machines/ordena.tur', "Gturing", false)
+    machine = Turing::Machine.from_file('machines/quadrifurca.tur', "Gturing", false)
     machine.setup('01 00 11 10')
     machine.process
   end
