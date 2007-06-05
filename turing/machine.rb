@@ -32,32 +32,31 @@ module Turing #:nodoc
     end
     
     def to_s
-      "#{@written_symbol} #{@direction} #{@new_state}"
+      "#{@written_symbol} #{@direction} \"#{@new_state}\""
     end
   end
   
   class SubMT
     attr_accessor :file, :ret
-    def initialize (file, ret, regex, transf)
+    def initialize (file, ret, regex)
       self.file = file
       File.open(file) {|f|
         # throw se o arquivo não existir
       }  
       self.ret = ret + " "
       @regex = regex
-      @transf = transf
     end
     
-    def parse
+    def parse(trans_pai)
       trans = File.open(self.file) {|f|
         TransFunction.new(f, @regex, ret)
       }
-      @transf.merge_with(trans)
+      trans_pai.merge_with(trans)
       return trans.initial
     end
     
     def to_s
-      return "Sou uma submáquina"
+      return "Sou uma submáquina de prefixo \"#{ret}\""
     end
   end
   
@@ -112,6 +111,14 @@ module Turing #:nodoc
       @states[state][symbol] = rule
     end
 
+    def putstr
+      @states.each { |s,d|
+        d.each { |q,r|
+          puts "\"#{s}\" #{q} => #{r}"
+        }
+      }
+    end
+
     def initialize(aut,o_regex,pilha="")
       regex = o_regex
       if regex.kind_of?String
@@ -140,7 +147,7 @@ module Turing #:nodoc
         symb_w = md.symb_w
         dir = md.dir
         if md.acao == 'call' then
-          acao = SubMT.new(md.arq, pilha + md.ret, o_regex, self)
+          acao = SubMT.new(md.arq, pilha + md.ret, o_regex)
         else
           acao = pilha + md.est
         end
@@ -214,13 +221,13 @@ module Turing #:nodoc
         return MachineState.new(trans, tape, state, pos, kind, self, both, nil, true)
       end 
       if this_rule.new_state.class == SubMT then
-        this_rule.new_state = this_rule.new_state.parse
+        this_rule.new_state = this_rule.new_state.parse(@trans)
         @trans.set(state, tape.get(pos), this_rule) # se submáquina, carregá-la
       end
       new_state = this_rule.new_state
       delta = Delta.new(tape, pos, this_rule, kind, both)
       newpos = kind.dir_to_amount(this_rule.direction) + pos
-      if !delta and /_/.match @state then
+      if !delta and / /.match @state then
           rule = Rule.new(this_rule.symb,this_rule.dir, @state.split(/ /)[0..-2].join(" "))
           delta = Delta.new(tape, pos,rule)
       end
@@ -230,7 +237,7 @@ module Turing #:nodoc
         return calculate_from_rule(nil, tape)
       end
       if newpos < 0 
-        if both                 # hehe
+        if both
           newpos = 0
         else
           return calculate_from_rule(nil, tape)

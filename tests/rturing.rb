@@ -64,6 +64,13 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
     assert_equal(machine.tape.tape, machine.first_tape.tape)
   end
 
+  def test_recurse
+    machine = Turing::Machine.from_file('machines/recursive.tur', "Gturing")
+    machine.setup('00000')
+    machine.process
+    assert_equal(machine.tape.tape, ['#','a','a','a','a','a'])
+  end
+
   def test_both_sides
     machine = Turing::Machine.from_file('machines/all_the_way_left.tur', "Gturing", true)
     machine.setup('')
