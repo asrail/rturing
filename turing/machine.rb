@@ -236,17 +236,11 @@ module Turing #:nodoc
       new_state = this_rule.new_state
       delta = Delta.new(tape, pos, this_rule, kind, both)
       newpos = kind.dir_to_amount(this_rule.direction) + pos
-      if delta
-        delta.apply(tape)
-      else 
-        puts "errado"
-        return calculate_from_rule(nil, tape)
-      end
+      delta.apply(tape)
       if newpos < 0 
         if both
           newpos = 0
         else
-          puts "muito errado"
           return calculate_from_rule(nil, tape)
         end
       end
