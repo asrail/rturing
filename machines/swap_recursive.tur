@@ -1,0 +1,4 @@
+# swap.tur: change one for zeros and zeros for ones, recursive
+0 0 1 r call "machines/swap_recursive.tur" 0
+0 1 0 r call "machines/swap_recursive.tur" 0
+0 _ a d 1
