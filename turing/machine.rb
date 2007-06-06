@@ -49,7 +49,7 @@ module Turing #:nodoc
       File.open(file) {|f|
         # throw se o arquivo não existir
       }  
-      self.ret = ret + SubMT.gensym
+      self.ret = ret + SubMT.gensym + file + "->"
       @regex = regex
     end
     
