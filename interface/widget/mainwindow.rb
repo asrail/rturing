@@ -55,6 +55,10 @@ class MainWindow < Gtk::Window
     @botoes =  Buttons.new(self)
     button_line = hcenter(@botoes)
     linhas.pack_start(button_line,false,true)
+    @editor = Editor.new(machine.trans)
+    scroll2 = Gtk::ScrolledWindow.new
+    scroll2.add_with_viewport(@editor)
+    linhas.pack_start(scroll2)
     add(linhas)
     @actgroup.get_action("save_machine").sensitive = false
     check_buts

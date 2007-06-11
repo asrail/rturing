@@ -1,4 +1,5 @@
 require 'gtk2'
+require 'interface/widget/editor.rb'
 
 class MachineViewer < Gtk::VBox
   attr_accessor :machine, :fita, :cabecote, :estado, :chars
