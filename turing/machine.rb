@@ -407,8 +407,7 @@ module Turing #:nodoc
     end
     
     def print
-      fita = @current.tape
-      puts fita
+      puts tape
       puts " "*@current.pos + "^"
     end
    
@@ -423,19 +422,6 @@ module Turing #:nodoc
       end
     end
   end
-end
-
-
-def main
-  if ARGV.size == 2
-    machine = Turing::Machine.from_file(ARGV[0])
-    machine.setup(ARGV[1])
-    machine.process(:print)
-  end
-end
-
-if __FILE__ == $0
-  main()
 end
 
 

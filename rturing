@@ -1,5 +1,33 @@
 #!/usr/bin/ruby
+# == Synopsis
+#
+# rturing:
+#    Um simulador de Máquinas de Turing, interface de linha de co-
+#    mando (veja também grturing).
+#
+# == Usage
+#
+# rturing [OPTION] ... MAQUINA FITA
+#
+# -h, --help:
+#    exibe o modo de uso do simulador.
+#
+# -i y|n, --interactive-mode y|n:
+#    Habilita (y) ou desabilita (n) o modo interativo da máquina.
+#    No modo interativo a cada passo de execução da MT  o  estado
+#    atual da fita é  exibido na tela. No  modo não  interativo o
+#    estado da fita somente é exibido quando a MT parar. O padrão
+#    é habilitada.
+#
+# -b, --both:
+#    Define que a fita será infinita para os dois lados. O padrão
+#    é infinita apenas para a direita.
+#
+# MAQUINA:
+#    O nome (com caminho relativo ou completo) do arquivo conten-
+#    do a MT.
+#
+# FITA: 
+#    O conteúdo inicial da fita.
 
-require 'turing/machine'
-
-main()
+require 'interface/cli'
