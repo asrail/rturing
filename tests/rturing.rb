@@ -109,7 +109,7 @@ class MachineTests < Test::Unit::TestCase #:nodoc:
   end
 
   def test_all_left_return
-    machine = Turing::Machine.from_file('machines/all_the_way_left.tur', "Gturing", true)
+    machine = Turing::Machine.from_file('machines/all_the_way_left.tur', "Gturing", false)
     machine.setup('')
     machine.toggle_both_sides
     assert_equal([], machine.tape.tape)

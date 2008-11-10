@@ -214,8 +214,7 @@ module Turing #:nodoc
   end
   
   class MachineState
-    attr_accessor :tape, :state, :pos, :trans, :halted, :kind, :prev, :delta
-    attr_reader :both
+    attr_accessor :tape, :state, :pos, :trans, :halted, :kind, :prev, :delta, :both
 
     def initialize(trans, tape, state, pos, kind, prev, both_sides, delta=nil, halt=false)
       @trans = trans
@@ -231,7 +230,7 @@ module Turing #:nodoc
     def calculate_from_rule(this_rule, tape)
       if !this_rule
         if / /.match @state then
-          @state = /(.*\s*\w+)\s+\w+/.match(@state)[1]
+          @state = /(.*\s*\w+)\s+(.+)/.match(@state)[1]
           this_rule = @trans.get(@state, tape.get(pos))
           this_rule ||=  Rule.new(tape.get(pos), 0, @state)
           return calculate_from_rule(this_rule,tape)
@@ -370,6 +369,16 @@ module Turing #:nodoc
 
     def toggle_both_sides
       @both = !@both
+      @first.both = @both
+      @current.both = @both
+      @first.pos = @both ? 0 : 1
+      if @both
+        @tape.tape.shift if @tape.tape[0] == '#'
+        @first_tape.tape.shift if @first_tape.tape[0] == '#'
+      else
+        @tape.tape.unshift('#') if @tape.tape[0] != '#'
+        @first_tape.tape.unshift('#') if @first_tape.tape[0] != '#'
+      end
     end
 
     def halted

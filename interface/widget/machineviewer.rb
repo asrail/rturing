@@ -74,13 +74,7 @@ class MachineViewer < Gtk::VBox
   end
   
   def tape_both_sides(tape_both)
-    @machine.first.pos = tape_both ? 0 : 1
-    if tape_both
-      @machine.tape.tape.shift if @machine.tape.tape[0] == '#'
-    else
-      @machine.tape.tape.unshift('#') if @machine.tape.tape[0] != '#'
-      update_labels
-    end
+    @machine.toggle_both_sides
   end
   
   def setup(tape)
