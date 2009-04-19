@@ -1,7 +1,7 @@
 require 'Qt4'
 require 'turing/machine'
 
-class MainWindow < Qt::Widget
+class MainWindow < Qt::MainWindow
   attr_accessor :light_mode, :file, :both_sides
   attr_reader :timeout, :both_sides, :mview
 
@@ -22,7 +22,9 @@ class MainWindow < Qt::Widget
     @mview.update_labels
     vp = Qt::VBoxLayout.new
     vp.addLayout(mview)
-    setLayout(vp)
+    central = Qt::Widget.new
+    central.setLayout(vp)
+    setCentralWidget(central)
   end
 end
 

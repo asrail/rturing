@@ -10,8 +10,8 @@ class MachineViewer < Qt::VBoxLayout
 #    @fita.ellipsize = Pango::Layout::ELLIPSIZE_NONE
     @cabecote = Qt::Label.new
     @halted = "halted" #Gtk::Image.new(Gtk::Stock::YES, Gtk::IconSize::MENU)
-    @event = Qt::StatusBar.new(parent)
-    @event.setObjectName('statusbar')
+#    @event = Qt::StatusBar.new(parent)
+#    @event.setObjectName('statusbar')
 ##    parent.setStatusBar(@event)
 #    @event.addWidget(@halted)
 #    @tips = Gtk::Tooltips.new
@@ -23,7 +23,7 @@ class MachineViewer < Qt::VBoxLayout
     @this_m.addWidget(@fita)
     @this_m.addWidget(@cabecote)
     hb = Qt::HBoxLayout.new
-    hb.addWidget(@event)
+#    hb.addWidget(@event)
     hb.addWidget(@estado)
     hb.addWidget(@chars)
     @this_m.addLayout(hb)
@@ -32,8 +32,8 @@ class MachineViewer < Qt::VBoxLayout
   end
 
   def update_labels
-    @fita.setText("<span face=\"Courier\">#{@machine.tape.to_s}</span>")
-    @cabecote.setText("<span face=\"Courier\">#{"_"*@machine.current.pos}^</span>")
+    @fita.setText(tr("<span face=\"Courier\">#{@machine.tape.to_s}</span>"))
+    @cabecote.setText(tr("<span face=\"Courier\">#{"_"*@machine.current.pos}^</span>"))
     if @machine.halted 
       @halted = "Yes" #.set(Gtk::Stock::YES, Gtk::IconSize::MENU)
 #      @tips.set_tip(@event, "A máquina está parada " + 
@@ -42,7 +42,7 @@ class MachineViewer < Qt::VBoxLayout
       @halted = "No" #.set(Gtk::Stock::NO, Gtk::IconSize::MENU)
 #      @tips.set_tip(@event, "A máquina ainda não chegou ao fim.", "")
     end
-    @estado.setText("Estado atual: #{@machine.state}. ")
+    @estado.setText(tr("Estado atual: #{@machine.state}. "))
     i = 0
     @machine.tape.tape.each { |char|
       if not ((char == " ") or (char == "#") or (char == "_"))
@@ -50,11 +50,11 @@ class MachineViewer < Qt::VBoxLayout
       end
     }
     if i > 1
-      @chars.setText("#{i} caracteres não nulos.")
+      @chars.setText(tr("#{i} caracteres não nulos."))
     elsif i == 1
-      @chars.setText("1 caractere não nulo.")
+      @chars.setText(tr("1 caractere não nulo."))
     else
-      @chars.setText("Nenhum caracter não-nulo.")
+      @chars.setText(tr("Nenhum caracter não-nulo."))
     end
   end
 
