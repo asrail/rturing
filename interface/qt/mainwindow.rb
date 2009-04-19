@@ -5,7 +5,7 @@ require 'salvaantes'
 require 'existemerros'
 
 class MainWindow < Qt::MainWindow
-  attr_accessor :light_mode, :file, :both_sides
+  attr_accessor :light_mode, :file, :both_sides, :actions
   attr_reader :timeout, :both_sides, :mview
   slots :first, :prev, :stop, :play, :step, :last, :quit
 
@@ -15,7 +15,9 @@ class MainWindow < Qt::MainWindow
     self.light_mode = false
     Turing::Machine.default_kind = "gturing"
     self.both_sides = false #Config::client["/apps/rturing/mboth"]
-    @saved = false #true
+    @saved = true
+    @timeout = 100
+    @actions = {}
     begin
       machine = Turing::Machine.from_file(m, Turing::Machine.default_kind, self.both_sides)
     rescue
@@ -28,15 +30,15 @@ class MainWindow < Qt::MainWindow
     vp.addLayout(mview)
     toolbar = Qt::ToolBar.new(self)
 
-    aux_actions = [
+    aux_commands_actions = [
        ["first()", "images/32/go-first.png", "&Reiniciar", "", "Retorna ao estado inicial"], 
        ["prev()", "images/32/go-previous.png", "&Voltar", "", "Retrocede um passo"],
        ["stop()", "images/32/process-stop.png", "&Parar", "", "Interrompe a execução"], 
-       ["quit()", "images/32/media-playback-start.png", "E&xecutar", "Ctrl+R", "Inicia a execução"], 
+       ["play()", "images/32/media-playback-start.png", "E&xecutar", "Ctrl+R", "Inicia a execução"], 
        ["step()", "images/32/go-next.png", "Ava&nçar", "", "Avança um passo"],
        ["last()", "images/32/go-last.png", "Últi&mo", "", "Avança até o último passo ou primeiro loop infinito"]]
 
-    @actions = aux_actions.map {|but|
+    @commands_actions = aux_commands_actions.map {|but|
       act = Qt::Action.new(self)
       act.setText(but[2])
       act.setIcon(Qt::Icon.new(but[1]))
@@ -45,19 +47,21 @@ class MainWindow < Qt::MainWindow
       connect(act, SIGNAL('triggered()'), self, SLOT(but[0]))
       act
     }
-    @actions.each {|act|
+    @actions[:commands] = @commands_actions
+    @commands_actions.each {|act|
       toolbar.addAction(act)
     }
- #   @menubar = Qt::MenuBar.new(self)
- #   @menubar.objectName = "menubar"
- #   @menubar.geometry = Qt::Rect.new(0, 0, 800, 23)
-#    @menuFile = Qt::Menu.new(@menubar)
-#    @menuFile.objectName = "menuFile"
-   # setMenuBar(@menubar)
-#    @menubar.addAction(@menuFile.menuAction())
-#    @actions.each {|act|
- #     @menuFile.addAction(act)
- #   }
+    @menubar = Qt::MenuBar.new(self)
+    @menubar.objectName = "menubar"
+    @menuCommands = Qt::Menu.new(@menubar)
+    @menuCommands.objectName = "menuCommands"
+    @menuCommands.title = "&Commands"
+    @menubar.addAction(@menuCommands.menuAction())
+    @commands_actions.each {|act|
+      @menuCommands.addAction(act)
+    }
+    setMenuBar(@menubar)
+
     addToolBar(toolbar)
     central = Qt::Widget.new(self)
     central.setLayout(vp)
@@ -198,5 +202,121 @@ class MainWindow < Qt::MainWindow
       return false
     end
   end
+
+  def open_file
+    if not @saved
+      deseja_salvar = SalvaAntes.new("abrir outra máquina", self)
+      deseja_salvar.run { |response|
+        if response == Gtk::Dialog::RESPONSE_YES
+          if save_machine
+            open_file
+          end
+        elsif response == Gtk::Dialog::RESPONSE_NO
+          @saved = true
+          @actgroup.get_action("save_machine").sensitive = false
+          open_file
+        end
+        deseja_salvar.destroy
+      }
+    # else
+    #   dialog = Gtk::FileChooserDialog.new("Open File",
+    #                                       self,
+    #                                       Gtk::FileChooser::ACTION_OPEN,
+    #                                       nil,
+    #                                       [Gtk::Stock::CANCEL, 
+    #                                         Gtk::Dialog::RESPONSE_CANCEL],
+    #                                       [Gtk::Stock::OPEN, 
+    #                                         Gtk::Dialog::RESPONSE_ACCEPT])
+      
+    #   runned = dialog.run
+    #   success = false
+    #   if runned == Gtk::Dialog::RESPONSE_ACCEPT
+    #     File.open(dialog.filename) { |file|
+    #       success = set_trans(file.read, dialog, true)
+    #     }
+    #     @mview.setup ""
+    #     self.file = dialog.filename
+    #   end
+    #   dialog.destroy
+    #   if runned == Gtk::Dialog::RESPONSE_ACCEPT and success
+    #     self.choose_tape
+    #   end
+    end
+  end
+
+  def write_machine(filename)
+      File.open(filename, "w") { |file|
+        file.write(@mview.trans.to_s)
+      }
+      @saved = true
+#      @actgroup.get_action("save_machine").sensitive = false
+  end
+
+  def save_machine
+    if self.file.nil?
+      save_machine_as
+    else
+      write_machine(self.file)
+    end
+  end
+
+  def save_machine_as
+    # dialog = Gtk::FileChooserDialog.new("Salvar Máquina",
+    #                                     self,
+    #                                     Gtk::FileChooser::ACTION_SAVE,
+    #                                     nil,
+    #                                     [Gtk::Stock::CANCEL, Gtk::Dialog::RESPONSE_CANCEL],
+    #                                     [Gtk::Stock::SAVE, Gtk::Dialog::RESPONSE_ACCEPT])
+    
+    # runned = dialog.run
+    # if runned == Gtk::Dialog::RESPONSE_ACCEPT
+    #   self.file = dialog.filename
+    #   write_machine(self.file)
+    # end
+    # dialog.destroy
+    # return runned == Gtk::Dialog::RESPONSE_ACCEPT
+  end
+
+  def choose_tape
+    both = self.both_sides
+    # ChooseDialog.new("Selecionar fita",@mview.tape.to_s[(both ? 0 : 1)..-1],
+    #                  "Entre com a fita: #{'#' unless both}", nil) {|input,dialog|
+    #   @mview.setup(input.text)
+    #   self.first # não faz sentido editar a fita sem ver o resultado
+    #   self.update_labels
+    #   dialog.destroy
+    # }
+  end
+
+  def choose_timeout
+    # ChooseDialog.new("Editar timeout",@timeout.to_s,"Entre com tempo desejado:","timeout") {|input,dialog|
+    #   self.timeout = input.text.to_i
+    #   dialog.destroy
+    # }
+  end
+
+  def edit_machine
+    # EditDialog.new("Editar Máquina",@mview.trans.to_s,"") { |machine_atual,dialog|
+    #   set_trans(machine_atual.text, dialog)
+    #   self.first # não faz sentido editar os estados no meio, ainda
+    #   self.update_labels
+    #   dialog.destroy
+    # }
+  end
+
+  def about
+    message = "gRats\nUm interpretador de máquinas de turing " +
+      "feito por Alexandre Passos, Antonio Terceiro e " +
+      "Caio Tiago Oliveira."
+    # about = Gtk::MessageDialog.new(@window, 
+    #                                Gtk::MessageDialog::MODAL, 
+    #                                Gtk::MessageDialog::INFO, 
+    #                                Gtk::MessageDialog::BUTTONS_CLOSE,
+    #                                message)
+    # about.run
+    # about.destroy
+  end
+
+
 end
 
