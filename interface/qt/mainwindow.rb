@@ -41,10 +41,10 @@ class MainWindow < Qt::MainWindow
 
     @commands_actions = aux_commands_actions.map {|but|
       act = Qt::Action.new(self)
-      act.setText(but[2])
-      act.setIcon(Qt::Icon.new(but[1]))
-      act.setShortcut(but[3]) if but[3]
-      act.setStatusTip(but[4])
+      act.text = but[2]
+      act.icon = Qt::Icon.new(but[1])
+      act.shortcut = but[3] if but[3]
+      act.statusTip = but[4]
       connect(act, SIGNAL('triggered()'), self, SLOT(but[0]))
       act
     }
@@ -62,7 +62,7 @@ class MainWindow < Qt::MainWindow
       @menuCommands.addAction(act)
     }
     setMenuBar(@menubar)
-
+    toolbar.tool_button_style = Qt::ToolButtonTextBesideIcon ##XXXasrail: preferencia...
     addToolBar(toolbar)
     central = Qt::Widget.new(self)
     central.setLayout(vp)
