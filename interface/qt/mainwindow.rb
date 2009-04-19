@@ -5,6 +5,11 @@ require 'salvaantes'
 require 'existemerros'
 $KCODE='utf8'
 
+class Qt::Action
+  ##XXXasrail
+  attr_accessor :name
+end
+
 class MainWindow < Qt::MainWindow
   attr_accessor :light_mode, :file, :both_sides, :actions
   attr_reader :timeout, :both_sides, :mview
@@ -73,6 +78,7 @@ class MainWindow < Qt::MainWindow
         act.icon = Qt::Icon.new(but[1]) if but[1]
         act.shortcut = but[3] if but[3]
         act.statusTip = but[4]
+        act.name = but[0]
         connect(act, SIGNAL(:triggered), self, SLOT(but[0]))
         act
       }
@@ -107,6 +113,7 @@ class MainWindow < Qt::MainWindow
     central.setLayout(vp)
     setCentralWidget(central)
     Qt::MetaObject.connectSlotsByName(self)
+    check_buts
   end
 
   def timeout=(timeout)
@@ -141,16 +148,17 @@ class MainWindow < Qt::MainWindow
   end
 
   def turn_but_act(act,st)
-#    @but_actgroup.get_action(act).sensitive = st
+    ##XXXasrail: requer Qt::Action.name (não padrão)
+    @actions[:commands].find {|action| action.name == act}.enabled = st
   end
 
   def check_buts
-    turn_but_act("stop", @playing)
-    turn_but_act("play", !@playing && !@mview.halted)
-    turn_but_act("last", !@playing && !@mview.halted)
-    turn_but_act("step", !@playing && !@mview.halted)
-    turn_but_act("prev", !@playing && !self.light_mode && !@mview.on_start?)
-    turn_but_act("first", !@playing && !@mview.on_start?)
+    turn_but_act(:stop, @playing)
+    turn_but_act(:play, !@playing && !@mview.halted)
+    turn_but_act(:last, !@playing && !@mview.halted)
+    turn_but_act(:step, !@playing && !@mview.halted)
+    turn_but_act(:prev, !@playing && !self.light_mode && !@mview.on_start?)
+    turn_but_act(:first, !@playing && !@mview.on_start?)
   end
 
   def play(timeout=@timeout)
