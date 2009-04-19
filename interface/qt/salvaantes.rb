@@ -9,11 +9,11 @@ class SalvaAntes
   def run
     message = Qt::Object::tr("Existem alterações não gravadas na máquina.\n" +
       "Deseja salvar antes de #{@operacao}?")
-    Qt::MessageBox::warning(@parent,
-                            Qt::Object::tr("Deseja #{@operacao} sem salvar?"),
-                            message,
-                            Qt::MessageBox::Yes | Qt::MessageBox::Default,
-                            Qt::MessageBox::No,
-                            Qt::MessageBox::Cancel | Qt::MessageBox::Escape);
+    yield Qt::MessageBox::warning(@parent,
+                                  Qt::Object::tr("Deseja #{@operacao} sem salvar?"),
+                                  message,
+                                  Qt::MessageBox::Yes | Qt::MessageBox::Default,
+                                  Qt::MessageBox::No,
+                                  Qt::MessageBox::Cancel | Qt::MessageBox::Escape);
   end
 end

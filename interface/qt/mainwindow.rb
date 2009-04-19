@@ -71,16 +71,16 @@ class MainWindow < Qt::MainWindow
 
   def quit
     if @saved
-      close()
+      emit close()
     else
       deseja_salvar = SalvaAntes.new(tr("sair"), self)
       deseja_salvar.run { |response|
-        if response == QMessageBox::Yes
+        if response == Qt::MessageBox::Yes
           if save_machine
-            close()
+            emit close()
           end
-        elsif response == QMessageBox::Cancel
-          close()
+        elsif response == Qt::MessageBox::No
+          emit close()
         end
       }
     end
@@ -194,7 +194,7 @@ class MainWindow < Qt::MainWindow
       return true
     rescue Turing::InvalidMachine => m
       dialog = ExistemErros.new(window, m.erros)
-      dialog.run
+      dialog.run {}
       return false
     end
   end

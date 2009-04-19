@@ -17,5 +17,6 @@ class ExistemErros
     Qt::MessageBox::error(parent,
                           Qt::Object::tr("Erro"),
                           message)
+    yield
   end
 end
