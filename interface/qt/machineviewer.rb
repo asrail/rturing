@@ -50,10 +50,9 @@ class MachineViewer < Qt::VBoxLayout
         i += 1
       end
     }
-    if i > 1
-      @chars.setText(tr("#{i} caracteres não nulos."))
-    elsif i == 1
-      @chars.setText(tr("1 caractere não nulo."))
+
+    if i > 0
+      @chars.setText(tr("%n caracteres não nulos.", "Number of non-null characters on tape", i))
     else
       @chars.setText(tr("Nenhum caracter não-nulo."))
     end

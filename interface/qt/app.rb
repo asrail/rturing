@@ -4,7 +4,8 @@ require 'machineviewer'
 
 def main(machine, tape)
   app = Qt::Application.new(ARGV)
-  
+  Qt::TextCodec::setCodecForTr(Qt::TextCodec::codecForName("utf8"))
+
   mw = MainWindow.new(machine, tape)
   mw.show()
 
