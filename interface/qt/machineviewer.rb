@@ -1,4 +1,5 @@
 require 'Qt4'
+$KCODE='utf8'
 
 class MachineViewer < Qt::VBoxLayout
   attr_accessor :machine, :fita, :cabecote, :estado, :chars

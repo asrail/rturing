@@ -3,6 +3,7 @@ require 'turing/machine'
 require 'mathn'
 require 'salvaantes'
 require 'existemerros'
+$KCODE='utf8'
 
 class MainWindow < Qt::MainWindow
   attr_accessor :light_mode, :file, :both_sides, :actions
