@@ -8,7 +8,7 @@ $KCODE='utf8'
 class MainWindow < Qt::MainWindow
   attr_accessor :light_mode, :file, :both_sides, :actions
   attr_reader :timeout, :both_sides, :mview
-  slots :first, :prev, :stop, :play, :step, :last, :quit
+  slots :first, :prev, :stop, :play, :step, :last, :quit, :open_file, :save_machine, :save_machine_as, :choose_tape, :edit_machine, :choose_timeout, :about
 
   def initialize(m, t, parent = nil)
     super()
@@ -18,6 +18,7 @@ class MainWindow < Qt::MainWindow
     self.both_sides = false #Config::client["/apps/rturing/mboth"]
     @saved = true
     @timeout = 100
+    aux_actions = {}
     @actions = {}
     begin
       machine = Turing::Machine.from_file(m, Turing::Machine.default_kind, self.both_sides)
@@ -31,35 +32,73 @@ class MainWindow < Qt::MainWindow
     vp.addLayout(mview)
     toolbar = Qt::ToolBar.new(self)
 
-    aux_commands_actions = [
-       ["first()", "images/32/go-first.png", "&Reiniciar", "", "Retorna ao estado inicial"], 
-       ["prev()", "images/32/go-previous.png", "&Voltar", "", "Retrocede um passo"],
-       ["stop()", "images/32/process-stop.png", "&Parar", "", "Interrompe a execução"], 
-       ["play()", "images/32/media-playback-start.png", "E&xecutar", "Ctrl+R", "Inicia a execução"], 
-       ["step()", "images/32/go-next.png", "Ava&nçar", "", "Avança um passo"],
-       ["last()", "images/32/go-last.png", "Últi&mo", "", "Avança até o último passo ou primeiro loop infinito"]]
+    aux_actions[:commands] = [
+       [:first, "images/32/go-first.png", "&Reiniciar", "", "Retorna ao estado inicial"], 
+       [:prev, "images/32/go-previous.png", "&Voltar", "", "Retrocede um passo"],
+       [:stop, "images/32/process-stop.png", "&Parar", "", "Interrompe a execução"], 
+       [:play, "images/32/media-playback-start.png", "E&xecutar", "Ctrl+r", "Inicia a execução"], 
+       [:step, "images/32/go-next.png", "Ava&nçar", "", "Avança um passo"],
+       [:last, "images/32/go-last.png", "Últi&mo", "", "Avança até o último passo ou primeiro loop infinito"]
+    ]
 
-    @commands_actions = aux_commands_actions.map {|but|
-      act = Qt::Action.new(self)
-      act.text = but[2]
-      act.icon = Qt::Icon.new(but[1])
-      act.shortcut = but[3] if but[3]
-      act.statusTip = but[4]
-      connect(act, SIGNAL('triggered()'), self, SLOT(but[0]))
-      act
+    aux_actions[:file] = [
+       [:open_file, "images/32/document-open.png", "&Abrir",
+        "Ctrl+o", "Carregar uma máquina de um arquivo"],
+       [:save_machine, "images/32/document-save.png", "&Salvar",
+        "Ctrl+s", "Salva a máquina para um arquivo"],
+       [:save_machine_as, "images/32/document-save-as.png", "Salvar &como",
+        "Ctrl+Shift+s", "Salva a máquina para um novo arquivo"],
+       [:quit, "images/32/system-log-out.png", "Sai&r",
+        "Ctrl+q", "Sai do programa"]
+    ]
+
+    aux_actions[:edit] = [
+       [:choose_tape, nil, "&Fita",
+        "Ctrl+f", "Permite editar a fita"],
+       [:edit_machine, "images/32/emblem-system.png", "&Máquina",
+        "Ctrl+m", "Permite editar a máquina"],
+       [:choose_timeout, nil, "&Timeout",
+        "Ctrl+t", "Permite editar o intervalo entre os passos"]
+     ]
+
+     aux_actions[:about] = [
+        [:about, nil, "&Sobre",
+        "F1", "rTuring..."]
+     ]
+
+    aux_actions.each {|group, actions|      
+      @actions[group] = actions.map {|but|
+        act = Qt::Action.new(self)
+        act.text = but[2]
+        act.icon = Qt::Icon.new(but[1]) if but[1]
+        act.shortcut = but[3] if but[3]
+        act.statusTip = but[4]
+        connect(act, SIGNAL(:triggered), self, SLOT(but[0]))
+        act
+      }
     }
-    @actions[:commands] = @commands_actions
-    @commands_actions.each {|act|
-      toolbar.addAction(act)
-    }
+
     @menubar = Qt::MenuBar.new(self)
     @menubar.objectName = "menubar"
-    @menuCommands = Qt::Menu.new(@menubar)
-    @menuCommands.objectName = "menuCommands"
-    @menuCommands.title = "&Commands"
-    @menubar.addAction(@menuCommands.menuAction())
-    @commands_actions.each {|act|
-      @menuCommands.addAction(act)
+
+    aux_menus = [[:file, "&Arquivo"],
+             [:edit, "&Editar"],
+             [:commands, "&Comandos"],
+             [:about, "Aj&uda"]]
+
+    @menus = aux_menus.map {|group, name|
+      menu = Qt::Menu.new(@menubar)
+      menu.objectName = "menu" + group.to_s
+      menu.title = name
+      @menubar.addAction(menu.menuAction())
+      @actions[group].each {|act|
+        menu.addAction(act)
+      }
+      menu
+    }
+
+    @actions[:commands].each {|act|
+      toolbar.addAction(act)
     }
     setMenuBar(@menubar)
     toolbar.tool_button_style = Qt::ToolButtonTextBesideIcon ##XXXasrail: preferencia...
