@@ -139,12 +139,14 @@ class MainWindow < Qt::MainWindow
 
   def m_play(timeout)
     timeout,rev = timeout.polar
-#    @tid = Gtk::timeout_add(timeout) {
-#      stop if ((rev.zero? && @mview.halted) || 
-#               (!rev.zero? && @mview.on_start?))
-#      rev.zero? ? m_step : m_prev
-#      update_labels
-#    }
+    @tid = Qt::Timer.new(self)
+    connect(@tid, SIGNAL(:timeout), self) {
+      stop if ((rev.zero? && @mview.halted) || 
+               (!rev.zero? && @mview.on_start?))
+      rev.zero? ? m_step : m_prev
+      update_labels
+    }
+    @tid.start(timeout)
   end
 
   def turn_but_act(act,st)
@@ -193,8 +195,7 @@ class MainWindow < Qt::MainWindow
   end
 
   def m_stop
-#    Gtk::timeout_remove(@tid) if @tid
-    @tid = nil
+    @tid.stop()
   end
 
   def stop
