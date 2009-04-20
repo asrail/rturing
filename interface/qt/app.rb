@@ -13,5 +13,5 @@ def main(machine, tape)
 end
 
 if __FILE__ == $0
-  main(nil, nil)
+  main(ARGV[0], ARGV[1])
 end
