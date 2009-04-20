@@ -38,12 +38,12 @@ class MainWindow < Qt::MainWindow
     toolbar = Qt::ToolBar.new(self)
 
     aux_actions[:commands] = [
-       [:first, "images/32/go-first.png", "&Reiniciar", "", "Retorna ao estado inicial"], 
-       [:prev, "images/32/go-previous.png", "&Voltar", "", "Retrocede um passo"],
-       [:stop, "images/32/process-stop.png", "&Parar", "", "Interrompe a execução"], 
+       [:first, "images/32/go-first.png", "&Reiniciar", "Ctrl+i", "Retorna ao estado inicial"], 
+       [:prev, "images/32/go-previous.png", "&Voltar", "Ctrl+b", "Retrocede um passo"],
+       [:stop, "images/32/process-stop.png", "&Parar", "Ctrl+p", "Interrompe a execução"], 
        [:play, "images/32/media-playback-start.png", "E&xecutar", "Ctrl+r", "Inicia a execução"], 
-       [:step, "images/32/go-next.png", "Ava&nçar", "", "Avança um passo"],
-       [:last, "images/32/go-last.png", "Últi&mo", "", "Avança até o último passo ou primeiro loop infinito"]
+       [:step, "images/32/go-next.png", "Ava&nçar", "Ctrl+n", "Avança um passo"],
+       [:last, "images/32/go-last.png", "Últi&mo", "Ctrl+l", "Avança até o último passo ou primeiro loop infinito"]
     ]
 
     aux_actions[:file] = [
