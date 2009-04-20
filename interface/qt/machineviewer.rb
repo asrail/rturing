@@ -41,8 +41,7 @@ class MachineViewer < Qt::VBoxLayout
 #      @tips.set_tip(@event, "A máquina está parada " + 
 #                    "(ie, a função de transição não está definida).", "")
     else
-    @halted.pixmap = @icon.pixmap(22, 22)
-#      @halted = "No" #.set(Gtk::Stock::NO, Gtk::IconSize::MENU)
+      @halted.pixmap = @icon.pixmap(22, 22)
 #      @tips.set_tip(@event, "A máquina ainda não chegou ao fim.", "")
     end
     @estado.setText(tr("Estado atual: %s." % @machine.state, "Number of actual state"))
@@ -53,8 +52,10 @@ class MachineViewer < Qt::VBoxLayout
       end
     }
 
-    if i > 0
+    if i > 1
       @chars.setText(tr("%s caracteres não nulos." % i, "Number of characters on tape"))
+    elsif i == 1
+      @chars.setText(tr("1 caracter não nulo.")) ##XXXasrail: this will blow away when i18n'ed
     else
       @chars.setText(tr("Nenhum caracter não-nulo."))
     end
