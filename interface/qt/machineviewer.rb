@@ -11,6 +11,7 @@ class MachineViewer < Qt::VBoxLayout
     @cabecote = Qt::Label.new
     @halted = Qt::Label.new
     @icon = Qt::Icon.new("images/32/media-record.png")
+#    @tips.set_tip(@event, "A máquina não foi carregada.", "")
     @estado = Qt::Label.new
     @chars = Qt::Label.new
     @this_m = Qt::VBoxLayout.new
