@@ -43,7 +43,7 @@ class MachineViewer < Qt::VBoxLayout
       @halted = "No" #.set(Gtk::Stock::NO, Gtk::IconSize::MENU)
 #      @tips.set_tip(@event, "A máquina ainda não chegou ao fim.", "")
     end
-    @estado.setText(tr("Estado atual: #{@machine.state}. "))
+    @estado.setText(tr("Estado atual: %s." % @machine.state, "Number of actual state"))
     i = 0
     @machine.tape.tape.each { |char|
       if not ((char == " ") or (char == "#") or (char == "_"))
@@ -52,7 +52,7 @@ class MachineViewer < Qt::VBoxLayout
     }
 
     if i > 0
-      @chars.setText(tr("%n caracteres não nulos.", "Number of non-null characters on tape", i))
+      @chars.setText(tr("%s caracteres não nulos." % i, "Number of characters on tape"))
     else
       @chars.setText(tr("Nenhum caracter não-nulo."))
     end
