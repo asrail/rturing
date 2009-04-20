@@ -34,8 +34,8 @@ class MachineViewer < Qt::VBoxLayout
   end
 
   def update_labels
-    @fita.setText(tr("<span face=\"Courier\">#{@machine.tape.to_s}</span>"))
-    @cabecote.setText(tr("<span face=\"Courier\">#{"_"*@machine.current.pos}^</span>"))
+    @fita.setText("<span face=\"Courier\">#{@machine.tape.to_s}</span>")
+    @cabecote.setText("<span face=\"Courier\">#{"_"*@machine.current.pos}^</span>")
     if @machine.halted 
       @halted.pixmap = @icon.pixmap(22, 22, Qt::Icon::Disabled)
 #      @tips.set_tip(@event, "A máquina está parada " + 
