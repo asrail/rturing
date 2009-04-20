@@ -8,17 +8,9 @@ class MachineViewer < Qt::VBoxLayout
     @parent = parent
     @machine = machine
     @fita = Qt::Label.new
-#    @fita.ellipsize = Pango::Layout::ELLIPSIZE_NONE
     @cabecote = Qt::Label.new
     @halted = Qt::Label.new
     @icon = Qt::Icon.new("images/32/media-record.png")
-#    @event = Qt::StatusBar.new(parent)
-#    @event.setObjectName('statusbar')
-##    parent.setStatusBar(@event)
-#    @event.addWidget(@halted)
-#    @tips = Gtk::Tooltips.new
-#    @tips.set_tip(@event, "A máquina não foi carregada.", "")
-#    @tips.enable
     @estado = Qt::Label.new
     @chars = Qt::Label.new
     @this_m = Qt::VBoxLayout.new
