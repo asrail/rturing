@@ -10,7 +10,8 @@ class MachineViewer < Qt::VBoxLayout
     @fita = Qt::Label.new
 #    @fita.ellipsize = Pango::Layout::ELLIPSIZE_NONE
     @cabecote = Qt::Label.new
-    @halted = "halted" #Gtk::Image.new(Gtk::Stock::YES, Gtk::IconSize::MENU)
+    @halted = Qt::Label.new
+    @icon = Qt::Icon.new("images/32/media-record.png")
 #    @event = Qt::StatusBar.new(parent)
 #    @event.setObjectName('statusbar')
 ##    parent.setStatusBar(@event)
@@ -24,7 +25,7 @@ class MachineViewer < Qt::VBoxLayout
     @this_m.addWidget(@fita)
     @this_m.addWidget(@cabecote)
     hb = Qt::HBoxLayout.new
-#    hb.addWidget(@event)
+    hb.addWidget(@halted)
     hb.addWidget(@estado)
     hb.addWidget(@chars)
     @this_m.addLayout(hb)
@@ -36,11 +37,12 @@ class MachineViewer < Qt::VBoxLayout
     @fita.setText(tr("<span face=\"Courier\">#{@machine.tape.to_s}</span>"))
     @cabecote.setText(tr("<span face=\"Courier\">#{"_"*@machine.current.pos}^</span>"))
     if @machine.halted 
-      @halted = "Yes" #.set(Gtk::Stock::YES, Gtk::IconSize::MENU)
+      @halted.pixmap = @icon.pixmap(22, 22, Qt::Icon::Disabled)
 #      @tips.set_tip(@event, "A máquina está parada " + 
 #                    "(ie, a função de transição não está definida).", "")
     else
-      @halted = "No" #.set(Gtk::Stock::NO, Gtk::IconSize::MENU)
+    @halted.pixmap = @icon.pixmap(22, 22)
+#      @halted = "No" #.set(Gtk::Stock::NO, Gtk::IconSize::MENU)
 #      @tips.set_tip(@event, "A máquina ainda não chegou ao fim.", "")
     end
     @estado.setText(tr("Estado atual: %s." % @machine.state, "Number of actual state"))
