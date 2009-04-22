@@ -14,7 +14,7 @@ class ExistemErros
                  "<estado_atual> <simbolo_lido> <simbolo_escrito> " +
                  "<direcao> <novo_estado>\n" +
                  "Onde direção é d, e, l, ou r.")
-    Qt::MessageBox::error(parent,
+    Qt::MessageBox::error(@parent,
                           Qt::Object::tr("Erro"),
                           message)
     yield
