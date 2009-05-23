@@ -426,8 +426,8 @@ module Turing #:nodoc
     
     def process(update = nil)
       while !halted
-        step
         send(update) if update
+        step
       end
     end
   end
