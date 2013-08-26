@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require 'Qt4'
 
 class ExistemErros

@@ -1,9 +1,9 @@
+# -*- coding: utf-8 -*-
 require 'Qt4'
 require 'turing/machine'
 require 'mathn'
 require 'salvaantes'
 require 'existemerros'
-$KCODE='utf8'
 
 class Qt::Action
   ##XXXasrail

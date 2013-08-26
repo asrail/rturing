@@ -1,5 +1,8 @@
 #!/usr/bin/ruby
 
-require 'interface/rturing'
+$: << File.dirname(__FILE__)
+$: << File.join(File.dirname(__FILE__),'interface/qt')
+
+require 'interface/qt/app'
 
 main(ARGV[0], ARGV[1])
